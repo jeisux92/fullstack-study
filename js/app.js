@@ -12,7 +12,7 @@
     catch (e) { return fallback; }
   }
   let progress = load(P_KEY, { cards: {}, quiz: {}, read: {} });
-  let settings = load(S_KEY, { dark: true });
+  let settings = load(S_KEY, { dark: false });
   function saveProgress() { localStorage.setItem(P_KEY, JSON.stringify(progress)); }
   function saveSettings() { localStorage.setItem(S_KEY, JSON.stringify(settings)); }
 
@@ -65,6 +65,7 @@
     const h = location.hash.replace(/^#\/?/, "");
     const parts = h.split("/").filter(Boolean);
     if (parts[0] === "track" && parts[1]) return { view: "track", track: parts[1] };
+    if (parts[0] === "guide" && parts[1]) return { view: "guide", track: parts[1] };
     if (parts[0] === "study" && parts[1] && parts[2]) return { view: "study", track: parts[1], topic: parts[2], mode: parts[3] || "read" };
     return { view: "home" };
   }
@@ -159,8 +160,74 @@
           <div><h1>${t.name}</h1><p>${esc(t.tagline)}</p></div>
           ${ring(s.pct, 64)}
         </div>
+        <div class="track-cta-row">
+          <a class="btn" href="#/guide/${trackId}">📖 Read the full guide (one page)</a>
+        </div>
       </div>
       <div class="topic-list">${rows}</div>`;
+  }
+
+  /* ---------------- full guide (one page per track) ---------------- */
+  function renderGuide(trackId) {
+    const t = DATA.tracks[trackId];
+    if (!t) return renderHome();
+    const toc = t.topics.map(id =>
+      `<button class="toc-link" data-target="sec-${id}">${DATA.topics[id].icon} ${esc(DATA.topics[id].title)}</button>`
+    ).join("");
+    const sections = t.topics.map(id => {
+      const topic = DATA.topics[id];
+      return `<section class="guide-section" id="sec-${id}">
+        <div class="guide-head">
+          <span class="topic-icon">${topic.icon}</span>
+          <h2>${esc(topic.title)}</h2>
+          <div class="guide-actions">
+            <a class="btn ghost sm" href="#/study/${trackId}/${id}/cards">🃏 Cards</a>
+            <a class="btn ghost sm" href="#/study/${trackId}/${id}/quiz">✅ Quiz</a>
+          </div>
+        </div>
+        <div class="read guide-body">${topic.read}</div>
+      </section>`;
+    }).join("");
+    app.innerHTML = `
+      <div class="page-head">
+        <a class="back" href="#/track/${trackId}">← ${t.name} topics</a>
+        <div class="page-title"><span class="track-icon-lg">${t.icon}</span>
+          <div><h1>${t.name} — Full Guide</h1><p>All ${t.topics.length} topics on a single page.</p></div>
+        </div>
+      </div>
+      <div class="guide-layout">
+        <nav class="guide-toc" id="guide-toc">
+          <h4>Contents</h4>
+          ${toc}
+          <button class="toc-top" id="toc-top">↑ Back to top</button>
+        </nav>
+        <div class="guide-content">${sections}</div>
+      </div>`;
+
+    const tocEl = document.getElementById("guide-toc");
+    tocEl.addEventListener("click", e => {
+      const btn = e.target.closest("[data-target]");
+      if (btn) {
+        const el = document.getElementById(btn.dataset.target);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (e.target.closest("#toc-top")) window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    // scroll-spy: highlight the section currently in view
+    const links = Array.from(tocEl.querySelectorAll(".toc-link"));
+    const byId = {};
+    links.forEach(l => byId[l.dataset.target] = l);
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          links.forEach(l => l.classList.remove("active"));
+          const l = byId[en.target.id];
+          if (l) l.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px" });
+    t.topics.forEach(id => { const el = document.getElementById("sec-" + id); if (el) obs.observe(el); });
   }
 
   /* ---------------- study shell ---------------- */
@@ -423,6 +490,7 @@
     const route = parseHash();
     renderHeader(route);
     if (route.view === "track") renderTrack(route.track);
+    else if (route.view === "guide") renderGuide(route.track);
     else if (route.view === "study") renderStudy(route.track, route.topic, route.mode);
     else renderHome();
     window.scrollTo(0, 0);
