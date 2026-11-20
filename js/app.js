@@ -11,7 +11,7 @@
     try { return JSON.parse(localStorage.getItem(key)) || fallback; }
     catch (e) { return fallback; }
   }
-  let progress = load(P_KEY, { cards: {}, quiz: {}, read: {} });
+  let progress = load(P_KEY, { cards: {}, quiz: {}, read: {}, srs: {} });
   let settings = load(S_KEY, { dark: false });
   function saveProgress() { localStorage.setItem(P_KEY, JSON.stringify(progress)); }
   function saveSettings() { localStorage.setItem(S_KEY, JSON.stringify(settings)); }
@@ -66,6 +66,7 @@
     const parts = h.split("/").filter(Boolean);
     if (parts[0] === "track" && parts[1]) return { view: "track", track: parts[1] };
     if (parts[0] === "guide" && parts[1]) return { view: "guide", track: parts[1] };
+    if (parts[0] === "review") return { view: "review", scope: parts[1] || "all", track: DATA.tracks[parts[1]] ? parts[1] : undefined };
     if (parts[0] === "study" && parts[1] && parts[2]) return { view: "study", track: parts[1], topic: parts[2], mode: parts[3] || "read" };
     return { view: "home" };
   }
@@ -105,6 +106,7 @@
     }).join("");
     const totalCards = Object.values(DATA.topics).reduce((n, t) => n + t.cards.length, 0);
     const totalQuiz = Object.values(DATA.topics).reduce((n, t) => n + t.quiz.length, 0);
+    const dueAll = dueRefs("all").length;
     app.innerHTML = `
       <section class="hero">
         <h1>Study smarter, not harder.</h1>
@@ -117,6 +119,7 @@
           <div><b>${totalQuiz}</b><span>quiz questions</span></div>
         </div>
       </section>
+      ${dueAll ? `<a class="review-banner" href="#/review/all">🔁 <b>${dueAll}</b> card${dueAll === 1 ? "" : "s"} due for review — start a session →</a>` : ""}
       <section class="track-grid">${cards}</section>
       <section class="how">
         <h3>How it works</h3>
@@ -162,6 +165,7 @@
         </div>
         <div class="track-cta-row">
           <a class="btn" href="#/guide/${trackId}">📖 Read the full guide (one page)</a>
+          <a class="btn ghost" href="#/review/${trackId}">🔁 Review due (${dueRefs(trackId).length})</a>
         </div>
       </div>
       <div class="topic-list">${rows}</div>`;
@@ -250,7 +254,7 @@
       </div>
       <div id="study-body"></div>`;
     const body = document.getElementById("study-body");
-    if (mode === "cards") { session = newCards(topicId); renderCards(body, trackId, topicId); }
+    if (mode === "cards") { renderCards(body, trackId, topicId); }
     else if (mode === "quiz") { session = newQuiz(topicId); renderQuiz(body, trackId, topicId); }
     else { session = null; renderRead(body, trackId, topicId); }
   }
@@ -274,12 +278,46 @@
     });
   }
 
-  /* ---------------- flashcards ---------------- */
-  function newCards(topicId) {
-    const topic = DATA.topics[topicId];
-    const order = topic.cards.map((_, i) => i);
-    return { topicId, order, pos: 0, flipped: false, shuffle: false };
+  /* ---------------- spaced repetition ---------------- */
+  // SM-2-style ladder: again=10m, then 1d, 3d, 7d, 21d, 60d on successive "Got it".
+  const SRS_LADDER = [10 * 60e3, 24 * 3600e3, 3 * 24 * 3600e3, 7 * 24 * 3600e3, 21 * 24 * 3600e3, 60 * 24 * 3600e3];
+  function srsSchedule(id, grade) {
+    progress.srs = progress.srs || {};
+    const prev = progress.srs[id];
+    const step = grade === "review" ? 0 : Math.min((prev ? prev.step : 0) + 1, SRS_LADDER.length - 1);
+    progress.srs[id] = { step, due: Date.now() + SRS_LADDER[step] };
   }
+  function scopeTopicIds(scope) {
+    return scope === "all" ? Object.keys(DATA.topics) : (DATA.tracks[scope] ? DATA.tracks[scope].topics : []);
+  }
+  function dueRefs(scope) {
+    const now = Date.now(), out = [];
+    scopeTopicIds(scope).forEach(tid => DATA.topics[tid].cards.forEach((c, i) => {
+      const id = cardId(tid, i);
+      const s = progress.srs && progress.srs[id];
+      const legacyReview = progress.cards[id] === "review" && !s;
+      if ((s && s.due <= now) || legacyReview) out.push({ topicId: tid, idx: i, due: s ? s.due : 0 });
+    }));
+    out.sort((a, b) => a.due - b.due);
+    return out;
+  }
+  function nextDueIn(scope) {
+    const now = Date.now(); let min = Infinity;
+    scopeTopicIds(scope).forEach(tid => DATA.topics[tid].cards.forEach((c, i) => {
+      const s = progress.srs && progress.srs[cardId(tid, i)];
+      if (s && s.due > now && s.due < min) min = s.due;
+    }));
+    return min === Infinity ? null : min - now;
+  }
+  function fmtRel(ms) {
+    const m = Math.round(ms / 60e3);
+    if (m < 60) return m + "m";
+    const h = Math.round(m / 60);
+    if (h < 24) return h + "h";
+    return Math.round(h / 24) + "d";
+  }
+
+  /* ---------------- card player (topic decks + review decks) ---------------- */
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -287,23 +325,76 @@
     }
     return arr;
   }
+  function newTopicSession(topicId) {
+    return { kind: "topic", topicId, deck: DATA.topics[topicId].cards.map((_, i) => ({ topicId, idx: i })), pos: 0, flipped: false, shuffle: false };
+  }
   function renderCards(body, trackId, topicId) {
-    const topic = DATA.topics[topicId];
+    if (!session || session.kind !== "topic" || session.topicId !== topicId) session = newTopicSession(topicId);
+    renderPlayer(body, { kind: "topic", trackId, topicId });
+  }
+  function renderReview(scope) {
+    session = { kind: "review", scope, deck: dueRefs(scope), pos: 0, flipped: false, shuffle: false };
+    const label = scope === "all" ? "All tracks" : DATA.tracks[scope].name;
+    const back = scope === "all" ? "#/" : "#/track/" + scope;
+    app.innerHTML = `
+      <div class="page-head">
+        <a class="back" href="${back}">← ${label}</a>
+        <div class="page-title"><span class="track-icon-lg">🔁</span>
+          <div><h1>Review — ${label}</h1><p>Spaced repetition: cards you flagged or that are due today.</p></div>
+        </div>
+      </div>
+      <div id="study-body"></div>`;
+    renderPlayer(document.getElementById("study-body"), { kind: "review", scope });
+  }
+  function renderPlayerEmpty(body, ctx) {
+    const nxt = nextDueIn(ctx.kind === "review" ? ctx.scope : ctx.topicId);
+    const back = ctx.kind === "review" ? (ctx.scope === "all" ? "#/" : "#/track/" + ctx.scope) : "#/track/" + ctx.trackId;
+    body.innerHTML = `
+      <div class="quiz-done">
+        <div class="empty-emoji">🎉</div>
+        <h2>Nothing due right now</h2>
+        <p class="quiz-msg">${nxt ? "Next card comes back in <b>" + fmtRel(nxt) + "</b>." : "Mark cards in a topic to build your review queue."}</p>
+        <div class="cards-actions center">
+          <a class="btn" href="${back}">← Back</a>
+          ${ctx.kind === "topic" ? `<a class="btn ghost" href="#/study/${ctx.trackId}/${ctx.topicId}/cards">Open the full deck</a>` : ""}
+        </div>
+      </div>`;
+  }
+  function renderPlayer(body, ctx) {
     const s = session;
-    const idx = s.order[s.pos];
-    const card = topic.cards[idx];
-    const mark = progress.cards[cardId(topicId, idx)];
-    const st = topicStats(topicId);
+    if (!s.deck.length) return renderPlayerEmpty(body, ctx);
+    const ref = s.deck[s.pos];
+    const topic = DATA.topics[ref.topicId];
+    const card = topic.cards[ref.idx];
+    const id = cardId(ref.topicId, ref.idx);
+    const mark = progress.cards[id];
+    const srs = progress.srs && progress.srs[id];
     const markBadge = mark === "known" ? '<span class="badge known">Got it</span>'
       : mark === "review" ? '<span class="badge review">Still learning</span>' : "";
+    const dueBadge = (srs && srs.due <= Date.now()) ? '<span class="badge review">due</span>' : "";
+    const topicTag = ctx.kind === "review" ? `<span class="badge topic">${topic.icon} ${esc(topic.title)}</span>` : "";
+
+    let progressLine, topRight, foot;
+    if (ctx.kind === "topic") {
+      const st = topicStats(ctx.topicId);
+      progressLine = `${st.known} mastered · ${st.review} reviewing · ${st.total - st.known - st.review} new`;
+      topRight = `<label class="shuffle"><input type="checkbox" id="shuffle" ${s.shuffle ? "checked" : ""}> Shuffle</label>`;
+      foot = `<button class="btn ghost sm" id="restart">↺ Restart deck</button>
+              <a class="btn sm" href="#/study/${ctx.trackId}/${ctx.topicId}/quiz">Take the quiz →</a>`;
+    } else {
+      progressLine = `${s.deck.length} card${s.deck.length === 1 ? "" : "s"} left in this review`;
+      topRight = `<span class="cards-progress">marking schedules the next repetition</span>`;
+      foot = `<a class="btn ghost sm" href="${ctx.scope === "all" ? "#/" : "#/track/" + ctx.scope}">← Back</a>`;
+    }
+
     body.innerHTML = `
       <div class="cards-wrap">
         <div class="cards-top">
-          <div class="cards-count">Card ${s.pos + 1} / ${s.order.length} ${markBadge}</div>
-          <div class="cards-progress">${st.known} mastered · ${st.review} reviewing · ${st.total - st.known - st.review} new</div>
-          <label class="shuffle"><input type="checkbox" id="shuffle" ${s.shuffle ? "checked" : ""}> Shuffle</label>
+          <div class="cards-count">Card ${s.pos + 1} / ${s.deck.length} ${markBadge}${dueBadge}${topicTag}</div>
+          <div class="cards-progress">${progressLine}</div>
+          ${topRight}
         </div>
-        ${bar(Math.round((s.pos + 1) / s.order.length * 100))}
+        ${bar(Math.round((s.pos + 1) / s.deck.length * 100))}
         <div class="flashcard ${s.flipped ? "flipped" : ""}" id="flashcard" tabindex="0" role="button" aria-label="Flip card">
           <div class="fc-inner">
             <div class="fc-face fc-front"><span class="fc-label">Question</span><p>${esc(card.q)}</p><span class="fc-hint">click or press space to flip</span></div>
@@ -314,47 +405,53 @@
           <button class="btn ghost" id="prev" ${s.pos === 0 ? "disabled" : ""}>← Prev</button>
           <button class="btn review" id="mark-review">1 · Still learning</button>
           <button class="btn known" id="mark-known">2 · Got it</button>
-          <button class="btn ghost" id="next" ${s.pos === s.order.length - 1 ? "disabled" : ""}>Next →</button>
+          <button class="btn ghost" id="next" ${s.pos === s.deck.length - 1 ? "disabled" : ""}>Next →</button>
         </div>
-        <div class="cards-foot">
-          <button class="btn ghost sm" id="restart">↺ Restart deck</button>
-          <a class="btn sm" href="#/study/${trackId}/${topicId}/quiz">Take the quiz →</a>
-        </div>
+        <div class="cards-foot">${foot}</div>
       </div>`;
 
     const fc = document.getElementById("flashcard");
     const flip = () => { s.flipped = !s.flipped; fc.classList.toggle("flipped", s.flipped); };
     fc.addEventListener("click", flip);
-    document.getElementById("shuffle").addEventListener("change", e => {
+    const sh = document.getElementById("shuffle");
+    if (sh) sh.addEventListener("change", e => {
       s.shuffle = e.target.checked;
-      s.order = topic.cards.map((_, i) => i);
-      if (s.shuffle) shuffle(s.order);
+      s.deck = DATA.topics[ctx.topicId].cards.map((_, i) => ({ topicId: ctx.topicId, idx: i }));
+      if (s.shuffle) shuffle(s.deck);
       s.pos = 0; s.flipped = false;
-      renderCards(body, trackId, topicId);
+      renderPlayer(body, ctx);
     });
     document.getElementById("prev").addEventListener("click", () => nav(-1));
     document.getElementById("next").addEventListener("click", () => nav(1));
     document.getElementById("mark-review").addEventListener("click", () => markCard("review"));
     document.getElementById("mark-known").addEventListener("click", () => markCard("known"));
-    document.getElementById("restart").addEventListener("click", () => {
-      session = newCards(topicId);
-      if (s.shuffle) { session.shuffle = true; shuffle(session.order); }
-      renderCards(body, trackId, topicId);
+    const rs = document.getElementById("restart");
+    if (rs) rs.addEventListener("click", () => {
+      const keep = s.shuffle;
+      session = newTopicSession(ctx.topicId);
+      session.shuffle = keep;
+      if (keep) shuffle(session.deck);
+      renderPlayer(body, ctx);
     });
 
     function nav(d) {
       const np = s.pos + d;
-      if (np < 0 || np >= s.order.length) return;
+      if (np < 0 || np >= s.deck.length) return;
       s.pos = np; s.flipped = false;
-      renderCards(body, trackId, topicId);
+      renderPlayer(body, ctx);
     }
     function markCard(m) {
-      progress.cards[cardId(topicId, idx)] = m;
+      progress.cards[id] = m;
+      srsSchedule(id, m);
       saveProgress();
-      if (s.pos < s.order.length - 1) { s.pos++; s.flipped = false; }
-      renderCards(body, trackId, topicId);
+      if (s.kind === "review") {
+        // scheduled into the future -> drop from this session
+        s.deck.splice(s.pos, 1);
+        if (s.pos >= s.deck.length) s.pos = Math.max(0, s.deck.length - 1);
+        s.flipped = false;
+      } else if (s.pos < s.deck.length - 1) { s.pos++; s.flipped = false; }
+      renderPlayer(body, ctx);
     }
-    // expose for keyboard handler
     session._flip = flip; session._nav = nav; session._mark = markCard;
   }
 
@@ -481,7 +578,7 @@
   });
   document.getElementById("reset-btn").addEventListener("click", () => {
     if (confirm("Reset all study progress? This cannot be undone.")) {
-      progress = { cards: {}, quiz: {}, read: {} }; saveProgress(); render();
+      progress = { cards: {}, quiz: {}, read: {}, srs: {} }; saveProgress(); render();
     }
   });
 
@@ -491,6 +588,7 @@
     renderHeader(route);
     if (route.view === "track") renderTrack(route.track);
     else if (route.view === "guide") renderGuide(route.track);
+    else if (route.view === "review") renderReview(route.scope);
     else if (route.view === "study") renderStudy(route.track, route.topic, route.mode);
     else renderHome();
     window.scrollTo(0, 0);
