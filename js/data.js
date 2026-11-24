@@ -5,41 +5,56 @@ window.STUDY_DATA = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Architecture, APIs, system design scenarios, databases & concurrency, caching, security, Node.js & .NET, DevOps, principles, patterns & OOP.",
-      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns"],
+      tagline: "Architecture, APIs, system design scenarios, databases & concurrency, caching, security, Node.js & .NET, DevOps, cloud, principles, patterns & OOP.",
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "os-basics", "git", "devops", "cloud", "principles", "patterns", "oop", "testing", "antipatterns", "behavioral"],
       groups: [
         { name: "System Design", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Security", topics: ["security"] },
-        { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Delivery & Ops", topics: ["devops"] },
-        { name: "Code Design", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] }
+        { name: "Platform & Runtime", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Delivery & Ops", topics: ["git", "devops", "cloud"] },
+        { name: "Code Design", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
+        { name: "Interview Skills", topics: ["behavioral"] }
       ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "JavaScript, TypeScript, CSS & HTTP fundamentals, React in depth, and real-time WebSockets.",
-      topics: ["js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      tagline: "CSS & HTTP, web performance and front-end security, React in depth, real-time WebSockets — and the behavioral round.",
+      topics: ["css-web", "http", "web-perf", "fe-security", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt", "behavioral"],
       groups: [
-        { name: "Web Fundamentals", topics: ["js-core", "typescript", "css-web", "http"] },
+        { name: "Web Platform", topics: ["css-web", "http", "web-perf", "fe-security"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
-        { name: "Real-Time Web", topics: ["web-rt"] }
+        { name: "Real-Time Web", topics: ["web-rt"] },
+        { name: "Interview Skills", topics: ["behavioral"] }
+      ]
+    },
+    languages: {
+      name: "Runtimes & Languages",
+      icon: "🔤",
+      tagline: "The languages and runtimes behind the stacks: JavaScript, TypeScript, Node.js and .NET — plus Git.",
+      topics: ["js-core", "typescript", "nodejs", "dotnet", "os-basics", "git"],
+      groups: [
+        { name: "Languages", topics: ["js-core", "typescript"] },
+        { name: "Runtimes", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Tooling", topics: ["git"] }
       ]
     },
     fullstack: {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Everything: the complete back-end and front-end curriculum in one track.",
-      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns", "js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "os-basics", "git", "devops", "cloud", "principles", "patterns", "oop", "testing", "antipatterns", "behavioral", "js-core", "typescript", "css-web", "http", "web-perf", "fe-security", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
         { name: "System Design", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Security", topics: ["security"] },
-        { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Delivery & Ops", topics: ["devops"] },
+        { name: "Platform & Runtime", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Delivery & Ops", topics: ["git", "devops", "cloud"] },
         { name: "Code Design", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
-        { name: "Web Fundamentals", topics: ["js-core", "typescript", "css-web", "http"] },
+        { name: "Interview Skills", topics: ["behavioral"] },
+        { name: "Languages", topics: ["js-core", "typescript"] },
+        { name: "Web Platform", topics: ["css-web", "http", "web-perf", "fe-security"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Real-Time Web", topics: ["web-rt"] }
       ]
@@ -1358,6 +1373,282 @@ read:   client ─► API ─► cache (hit ~95%) ─► DB on miss ─► 302 r
         { q: "A celebrity with 100M followers posts. Plain fan-out-on-write breaks because…", options: ["Reads become too slow", "One post means 100M timeline writes", "The cache evicts", "WebSockets disconnect"], answer: 1, explain: "Write amplification explodes — hence the hybrid: pull on read for the celebrity's posts, push for everyone else." },
         { q: "Rate limiter: which storage pattern fits?", options: ["Counters in Redis with TTL and atomic increments", "A file per user", "A Postgres row locked per request", "Browser localStorage"], answer: 0, explain: "Redis gives shared, atomic, expiring counters across instances — the standard distributed limiter." },
         { q: "For analytics on every click, the shortener should return…", options: ["301 permanent", "302 temporary", "304 not modified", "204 no content"], answer: 1, explain: "302 forces each click through your service so you can log it; 301 would be cached and skip you." }
+      ]
+    },
+
+    "behavioral": {
+      title: "Behavioral Interviews (STAR)",
+      track: "backend",
+      icon: "🎤",
+      blurb: "Behavioral interviews predict future performance from past behavior: instead of 'what is X', they ask 'tell me about a time when…'. STAR — Situation, Task, Action, Result — is the structure that keeps those stories clear.",
+      read: `
+        <p><strong>Why they exist:</strong> skills get you screened in; behavior decides the offer. Interviewers assume past behavior predicts future behavior, so they probe real situations: conflict, failure, leadership, ambiguity. You cannot improvise these well — you prepare a small set of true stories and reuse them.</p>
+        <p><strong>STAR:</strong> <em>Situation</em> (10 seconds of context), <em>Task</em> (what you were responsible for), <em>Action</em> (the bulk — what <strong>you</strong> did and why), <em>Result</em> (the measurable outcome, plus what you learned). The common failure is spending all the time on S and T and rushing the A.</p>
+        <pre><code>S  "Our checkout error rate tripled after a Friday release."
+T  "I owned the payments service and had to find the cause before Monday."
+A  "I added correlation IDs to every log line, reproduced the failure
+     in staging, and found a retry loop without an idempotency key.
+     I shipped the key, then wrote the runbook we were missing."
+R  "Error rate back to baseline in 6 hours; retries became idempotent,
+     and the runbook was used twice more that quarter."</code></pre>
+        <p><strong>Prepare five or six stories</strong> and map them to question families: a conflict with a colleague, a failure you owned, leading without authority, an ambiguous problem, a decision you'd make differently, your biggest impact. One strong story usually answers three or four questions — listen for the competency behind the question, then pick the story that shows it.</p>
+        <table><thead><tr><th>Question family</th><th>What they are testing</th></tr></thead><tbody>
+        <tr><td>"Tell me about a conflict"</td><td>Empathy, directness, focus on the problem not the person</td></tr>
+        <tr><td>"Tell me about a failure"</td><td>Ownership — do you blame others or own your part?</td></tr>
+        <tr><td>"Tell me about something ambiguous"</td><td>How you scope, ask questions and make decisions with incomplete data</td></tr>
+        <tr><td>"Tell me about leading a project"</td><td>Influence, communication, delivering through others</td></tr>
+        </tbody></table>
+        <p><strong>Pitfalls:</strong> being vague ("we improved performance" — by how much?), hiding in "we" (say "I" for your actions), skipping the result, telling a story where you were the hero and everyone else was wrong, or inventing one — follow-up questions expose invented stories fast.</p>
+        <p><strong>"Why are you leaving?"</strong> should be about moving toward something (scope, growth, a domain), never about escaping a bad manager. Keep it short and positive. And always prepare two or three genuine questions to ask: about team problems, how success is measured, or what the interviewer would change.</p>`,
+      cards: [
+        { q: "What is a behavioral interview testing?", a: "Past behavior as a predictor of future behavior: how you act in conflict, failure, ambiguity and leadership situations. Technical skill gets you screened in; behavior usually decides the offer." },
+        { q: "What does STAR stand for?", a: "Situation (brief context), Task (your responsibility), Action (what you specifically did and why — the bulk), Result (measurable outcome and what you learned)." },
+        { q: "Where should most of your talking time go in a STAR answer?", a: "The Action. A common failure is spending most of the time on situation and task and rushing what you actually did. Keep the context to a couple of sentences." },
+        { q: "How many stories should you prepare?", a: "Five or six true stories covering conflict, failure, leadership, ambiguity, a decision you'd change, and your biggest impact. One good story maps to several questions." },
+        { q: "How do you answer 'tell me about a conflict'?", a: "Pick a real disagreement, describe what the other person wanted, explain how you found common ground, and end with the resolution and relationship afterward. Never frame it as the other person being wrong." },
+        { q: "How do you answer 'tell me about a failure'?", a: "Choose a real failure you own, state your part plainly, describe the fix and what you changed afterward. The test is ownership — blaming others is the failure." },
+        { q: "Why say 'I' instead of 'we'?", a: "The interviewer needs to know what you contributed. Use 'we' for the team outcome and 'I' for your decisions and actions; hiding in 'we' makes your role invisible." },
+        { q: "What makes a result convincing?", a: "Something measurable: error rate, latency, time saved, revenue, adoption. 'Improved performance' is weak; 'cut p95 latency from 900ms to 180ms' is a result." },
+        { q: "How should you answer 'why are you leaving?'", a: "Frame it as moving toward something — scope, growth, a domain you want — not escaping a bad manager or company. Keep it short and positive." },
+        { q: "Should you invent a story if you can't think of one?", a: "No. Follow-up questions ('what did they say next?', 'why that approach?') expose invented stories quickly. Use a smaller real example instead." }
+      ],
+      quiz: [
+        { q: "An interviewer asks about a time you handled a conflict. The best answer…", options: ["Shows the other person was wrong", "Shows empathy, what you did, and how it was resolved", "Avoids any real disagreement", "Focuses mostly on the backstory"], answer: 1, explain: "They are testing how you work with people: your actions, the resolution and the relationship afterward." },
+        { q: "Which result is the strongest close to a STAR answer?", options: ["Things got much better afterwards", "We fixed the problem as a team", "Error rate dropped from 3% to 0.1% in a week", "My manager was very happy"], answer: 2, explain: "Specific and measurable beats vague praise. Numbers make the result credible." },
+        { q: "You have 2 minutes for an answer. Most of it should be…", options: ["Situation", "Task", "Action", "Result"], answer: 2, explain: "Context should be brief; what you did and why is what the interviewer is evaluating." },
+        { q: "Asked about a failure, you should…", options: ["Pick one where teammates caused the problem", "Say you can't think of one", "Own your part and explain what you changed", "Choose an unrelated success"], answer: 2, explain: "The question tests ownership. Naming your own part and the fix is the strong answer." },
+        { q: "'Why are you leaving?' is best answered by…", options: ["Listing what's wrong with your current employer", "Describing what you want to move toward", "Saying it's about money", "Avoiding the question"], answer: 1, explain: "Moving toward growth or scope reads as ambition; escaping reads as negativity." }
+      ]
+    },
+
+    "fe-security": {
+      title: "Front-End Security",
+      track: "frontend",
+      icon: "🛡️",
+      blurb: "Front-end security is defending the browser side of an app: preventing script injection, forged requests and UI redress, validating cross-window messages, and keeping the dependency supply chain clean.",
+      read: `
+        <p><strong>XSS (cross-site scripting)</strong> is injecting script that runs in your origin. <em>Stored</em> XSS comes from the database (a comment containing a script tag), <em>reflected</em> XSS comes from the URL, and <em>DOM</em> XSS comes from your own code writing untrusted data into a sink. The browser treats injected script exactly like yours: it can read cookies visible to JavaScript, the DOM and localStorage.</p>
+        <pre><code>// DOM XSS: location.hash is attacker-controlled
+el.innerHTML = location.hash.slice(1);          // ✗ script runs
+
+// Safe: text is never parsed as HTML
+el.textContent = location.hash.slice(1);        // ✓
+
+// If you must render HTML, sanitize it first
+el.innerHTML = DOMPurify.sanitize(userHtml);    // ✓</code></pre>
+        <p><strong>Defenses in layers:</strong> output encoding by default (frameworks like React escape text — the danger is <code>dangerouslySetInnerHTML</code>, <code>innerHTML</code> and <code>eval</code>); sanitize any HTML you must render; and a <strong>Content Security Policy</strong> that blocks inline script and limits where scripts can load from — so that one missed escaping does not become an exploit.</p>
+        <pre><code>Content-Security-Policy: default-src 'self'; script-src 'self';
+  object-src 'none'; base-uri 'none'; frame-ancestors 'none'</code></pre>
+        <p><strong>CSRF (cross-site request forgery)</strong> makes the user's browser send a request they did not intend — the browser attaches their cookies automatically. Defenses: anti-CSRF tokens tied to the session, the <code>SameSite</code> cookie attribute (see the HTTP topic), checking <code>Origin</code>/<code>Referer</code>, and not using cookies for state-changing requests when a header token will do.</p>
+        <p><strong>Clickjacking</strong> overlays your page invisibly under an attacker's page so a click lands on your buttons. Prevent it with <code>frame-ancestors 'none'</code> in the CSP (the modern replacement for <code>X-Frame-Options</code>).</p>
+        <p><strong><code>postMessage</code>:</strong> always pass an explicit <code>targetOrigin</code>, never <code>*</code>, and verify <code>event.origin</code> and <code>event.source</code> on the receiving side before trusting the data. <strong>Open redirects</strong> (a <code>?next=</code> parameter that accepts any URL) enable convincing phishing — validate against an allow-list of relative paths.</p>
+        <p><strong>Supply chain:</strong> every dependency runs with your app's privileges. Commit the lockfile, run <code>npm audit</code> in CI, pin versions, and keep the dependency count down. Store tokens per the HTTP topic: access token in memory, refresh token in an HttpOnly cookie.</p>`,
+      cards: [
+        { q: "What are the three types of XSS?", a: "Stored: the malicious payload is saved (e.g. a database comment) and served to victims. Reflected: the payload is in the request and echoed back in the response. DOM: your own client-side code writes untrusted data into a dangerous sink like innerHTML." },
+        { q: "How do you prevent XSS?", a: "In layers: keep untrusted data as text (textContent) instead of HTML, sanitize HTML you must render (DOMPurify), avoid eval and dangerouslySetInnerHTML, and add a Content Security Policy so one miss does not become an exploit." },
+        { q: "What does a Content Security Policy do?", a: "It declares which sources the browser may load scripts, styles and other resources from. Blocking inline script and limiting script-src means an injected script will not execute." },
+        { q: "What is CSRF and how do you stop it?", a: "A forged request sent from another site using the user's automatically attached cookies. Defenses: anti-CSRF tokens, SameSite cookie attributes, validating Origin/Referer, and custom header tokens for APIs." },
+        { q: "What is clickjacking?", a: "Embedding your page invisibly in an iframe so the user's clicks land on your buttons or links. Prevent it with frame-ancestors 'none' in the CSP." },
+        { q: "What are the rules for postMessage?", a: "Pass an explicit targetOrigin instead of '*', and on the receiving side check event.origin (and event.source) before trusting or acting on the data." },
+        { q: "Why are open redirects a security problem?", a: "A trusted domain redirecting to an arbitrary URL makes phishing links look legitimate (app.example.com/login?next=evil.com). Validate redirect targets against an allow-list of local paths." },
+        { q: "How do you protect the dependency supply chain?", a: "Commit the lockfile, run npm audit in CI, pin versions, remove unused dependencies, and review what you add — every package runs with your app's privileges." },
+        { q: "Is React safe from XSS by default?", a: "Mostly: JSX escapes string content. The escape hatches are dangerouslySetInnerHTML, raw innerHTML/eval, and URLs built from user input (javascript: hrefs)." },
+        { q: "Why does XSS matter if tokens are not in cookies?", a: "Injected script runs with your app's privileges: it can read localStorage, the DOM and any data on the page, and make authenticated requests as the user." }
+      ],
+      quiz: [
+        { q: "A page renders a search query with el.innerHTML = query. This is…", options: ["Stored XSS", "Reflected or DOM XSS", "CSRF", "Clickjacking"], answer: 1, explain: "Untrusted data written into innerHTML is parsed as HTML — use textContent or sanitize." },
+        { q: "Which header stops your page from being framed by another site?", options: ["Content-Security-Policy: frame-ancestors 'none'", "Access-Control-Allow-Origin", "Strict-Transport-Security", "X-Content-Type-Options"], answer: 0, explain: "frame-ancestors controls who may embed the page — the defense against clickjacking." },
+        { q: "CSRF works because…", options: ["JavaScript can read cross-origin responses", "The browser attaches the user's cookies automatically", "Tokens are stored in localStorage", "Passwords are weak"], answer: 1, explain: "A request from another site still carries the session cookie, so it looks legitimate — hence tokens and SameSite." },
+        { q: "A dependency you use publishes a malicious version. Best preventive practice?", options: ["Always install the latest version", "Commit the lockfile, pin versions, and audit in CI", "Install only weekly", "Disable npm"], answer: 1, explain: "Reproducible, audited installs mean a bad release does not reach your build unnoticed." },
+        { q: "postMessage(data, "*") is risky because…", options: ["It is slow", "The data can be delivered to any origin", "It only works cross-origin", "It encodes the data"], answer: 1, explain: "Always name the target origin, and verify event.origin when receiving." }
+      ]
+    },
+
+    "git": {
+      title: "Git & Collaboration",
+      track: "backend",
+      icon: "🌿",
+      blurb: "Git is a distributed version control system built on an immutable graph of commits. Understanding that graph — and how merge, rebase and reset reshape it — is what makes team collaboration and conflict resolution predictable.",
+      read: `
+        <p><strong>The model:</strong> a repository is a directed acyclic graph of commits; each commit points to its parent(s) and a branch is just a movable pointer to a commit. Day to day you work across three areas.</p>
+        <pre><code>working tree ──(git add)──► staging area ──(git commit)──► repository
+   edit files                 "what goes in              local history,
+                               the next commit"          safe to share</code></pre>
+        <pre><code>main:     A ── B ──────────── F   (merge commit, two parents)
+                \             /
+feature:         C ── D ── E
+
+rebased:  A ── B ── C' ── D' ── E'      (same changes, new commits)</code></pre>
+        <p><strong>Merge vs rebase:</strong> <code>merge</code> joins two histories with a merge commit and preserves exactly what happened. <code>rebase</code> replays your commits on top of another branch, producing a linear history — but it <em>rewrites commits</em> (new hashes). Rule: rebase your own local, unpushed work; never rebase commits that others may have pulled.</p>
+        <p><strong>Squash and interactive rebase:</strong> <code>git rebase -i HEAD~3</code> lets you combine, reorder, reword or drop commits so a feature branch reads as a clean series of logical changes before review. Squash-merging a pull request collapses the whole branch into one commit on main.</p>
+        <p><strong>Conflicts</strong> happen when two branches change the same lines. Resolve deliberately: read both sides, edit the file to the content you actually want, <code>git add</code> it, and continue the merge or rebase. Do not blindly pick "ours" or "theirs" — the right answer is usually a combination.</p>
+        <p><strong>Undoing, by intent:</strong></p>
+        <table><thead><tr><th>Command</th><th>Effect</th><th>When</th></tr></thead><tbody>
+        <tr><td>git restore</td><td>Discard uncommitted changes</td><td>"Throw away what I just typed"</td></tr>
+        <tr><td>git reset</td><td>Move the branch pointer back (rewrites history)</td><td>Local commits that were never pushed</td></tr>
+        <tr><td>git revert</td><td>Add a new commit that undoes an old one</td><td>Shared history — safe on main</td></tr>
+        <tr><td>git bisect</td><td>Binary-search the commit that introduced a bug</td><td>"It worked last week"</td></tr>
+        </tbody></table>
+        <p><strong>Collaboration:</strong> keep branches short-lived, open small pull requests, and write commits that explain <em>why</em> — subject line in the imperative, body with context. In review, be kind and specific, distinguish blocking comments from suggestions, and review the change, not the person.</p>`,
+      cards: [
+        { q: "What are Git's three areas?", a: "The working tree (your edited files), the staging area or index (what will go in the next commit), and the repository (committed history). git add moves changes to staging; git commit records them." },
+        { q: "What is a branch, really?", a: "A movable pointer to a commit. Commits form a graph of parent pointers; creating and switching branches is cheap because it only moves a pointer." },
+        { q: "Merge vs rebase?", a: "Merge joins histories with a merge commit and preserves what happened. Rebase replays your commits onto another branch for linear history, rewriting them with new hashes." },
+        { q: "When should you not rebase?", a: "On commits that others may have pulled — shared branches like main. Rewriting shared history forces everyone to reconcile divergent commits." },
+        { q: "What is interactive rebase for?", a: "Cleaning up your own branch before review: squash, reorder, reword or drop commits so the history reads as logical steps (git rebase -i HEAD~3)." },
+        { q: "How do you resolve a merge conflict?", a: "Read both sides, edit the file to the content you actually want (often a combination), git add it, then continue the merge or rebase. Avoid blindly choosing ours or theirs." },
+        { q: "git reset vs git revert?", a: "reset moves the branch pointer back and rewrites history — only for local, unpushed commits. revert creates a new commit that undoes an earlier one — the safe choice on shared history." },
+        { q: "How does git bisect help?", a: "It binary-searches history: you mark commits good or bad and it checks out midpoints, finding the commit that introduced a bug in log(n) steps." },
+        { q: "What makes a good commit?", a: "One logical change, a concise imperative subject, and a body explaining why — the context a reviewer could not get from the diff." },
+        { q: "What is good PR hygiene?", a: "Small, short-lived branches and small PRs; a description with context and how it was tested; and reviews that are specific and kind, separating blocking issues from suggestions." }
+      ],
+      quiz: [
+        { q: "You want a linear history for your local feature branch before opening a PR. Use…", options: ["git merge", "git rebase", "git reset --hard", "git stash"], answer: 1, explain: "Rebase replays your local commits on top of main, giving a linear history." },
+        { q: "A bad commit was pushed to main yesterday. Safest way to undo it?", options: ["git reset --hard HEAD~1 and force-push", "git revert <commit>", "Delete the repository", "git restore"], answer: 1, explain: "revert adds a commit that undoes the change without rewriting shared history." },
+        { q: "A bug appeared sometime in the last 100 commits. Fastest way to find it?", options: ["Read every diff", "git bisect", "git blame", "git log --stat"], answer: 1, explain: "bisect binary-searches with good/bad answers, in about 7 steps for 100 commits." },
+        { q: "Why not rebase main onto your feature branch and force-push?", options: ["It is too slow", "It rewrites history others have already pulled", "Rebase only works on one commit", "It deletes branches"], answer: 1, explain: "Rewriting shared commits breaks every clone that already has them." },
+        { q: "During a conflict, 'theirs' refers to…", options: ["Your current branch", "The branch being merged in or rebased onto", "The remote always", "The older version"], answer: 1, explain: "Ours is the branch you are on; theirs is the incoming side. In a rebase the roles can feel swapped, so read the content." }
+      ]
+    },
+
+    "web-perf": {
+      title: "Web Performance & PWA",
+      track: "frontend",
+      icon: "📊",
+      blurb: "Web performance is how fast a page becomes usable: measured by Core Web Vitals (LCP, INP, CLS), improved by rendering strategy, caching, and loading less — and extended offline and installable with Progressive Web Apps.",
+      read: `
+        <p><strong>Core Web Vitals</strong> are the user-centric metrics Google measures for every page. <em>LCP</em> (Largest Contentful Paint) is when the main content appears; <em>INP</em> (Interaction to Next Paint) is responsiveness to input; <em>CLS</em> (Cumulative Layout Shift) is visual stability. "Good" is LCP under 2.5s, INP under 200ms, CLS under 0.1 — measured at the 75th percentile of real users.</p>
+        <table><thead><tr><th>Metric</th><th>Improve it by</th></tr></thead><tbody>
+        <tr><td>LCP</td><td>Server response time (CDN, cache), prioritizing the hero image, preloading key resources, no render-blocking CSS/JS</td></tr>
+        <tr><td>INP</td><td>Less JavaScript, breaking long tasks, avoiding heavy work on input events, deferring non-urgent updates</td></tr>
+        <tr><td>CLS</td><td>Size and aspect-ratio on images and ads, reserving space for late content, avoiding injecting content above existing content</td></tr>
+        </tbody></table>
+        <p><strong>The critical rendering path</strong> is what must happen before first paint: HTML → DOM, CSS → CSSOM, then layout and paint. CSS is render-blocking and parser-blocking scripts halt the parser, so inline critical CSS, defer non-essential scripts, and avoid synchronous third-party scripts in the head.</p>
+        <pre><code>&lt;link rel="preload" as="font" href="/fonts/inter.woff2" crossorigin&gt;
+&lt;link rel="preconnect" href="https://api.example.com"&gt;
+&lt;script src="/app.js" defer&gt;&lt;/script&gt;
+&lt;img src="hero.avif" width="1200" height="600" fetchpriority="high"&gt;
+&lt;img src="below-fold.webp" loading="lazy" width="600" height="400"&gt;</code></pre>
+        <p><strong>Load less, later:</strong> modern image formats (AVIF/WebP) with responsive <code>srcset</code>, lazy loading below the fold, code splitting by route, and analyzing the bundle to remove what nobody uses (see the React performance topic). Most slow pages are slow because of too much JavaScript.</p>
+        <p><strong>Service Workers and PWA:</strong> a service worker is a script the browser runs between page and network; it can intercept requests and answer from a cache (Cache API), enabling offline use and a fast, app-shell model. Combined with a web manifest it makes the site installable — a Progressive Web App. Updates are versioned: install the new worker, skip waiting when safe, and cache assets with hashed filenames.</p>
+        <pre><code>self.addEventListener("fetch", (event) =&gt; {
+  event.respondWith(
+    caches.match(event.request).then((cached) =&gt;
+      cached || fetch(event.request))     // cache-first for static assets
+  );
+});</code></pre>
+        <p><strong>Web Workers</strong> run scripts on a background thread, so CPU-heavy work (parsing, compression, image processing) does not block the main thread and hurt INP. HTTP caching (Cache-Control, ETag) is covered in the HTTP topic.</p>`,
+      cards: [
+        { q: "What are the Core Web Vitals?", a: "LCP — when the main content paints (good under 2.5s). INP — responsiveness to interactions (under 200ms). CLS — how much the layout shifts (under 0.1). Measured at the 75th percentile of real users." },
+        { q: "How do you improve LCP?", a: "Faster server response (CDN, caching), prioritizing the largest element (preload, fetchpriority, no lazy-loading on it), removing render-blocking CSS and JS, and optimizing the hero image format and size." },
+        { q: "How do you improve INP?", a: "Ship less JavaScript, split long tasks, keep input handlers light, and defer non-urgent work. INP measures the delay between the user's action and the next painted frame." },
+        { q: "What causes layout shift (CLS)?", a: "Content moving after paint: images without dimensions, ads or embeds that load late, web font swaps, or inserting content above what the user is reading." },
+        { q: "What is the critical rendering path?", a: "The sequence before first paint: build the DOM and CSSOM, combine them, then layout and paint. CSS blocks rendering and classic script tags block parsing, so minimize and prioritize what sits in that path." },
+        { q: "What do preload, preconnect and defer do?", a: "preload fetches a resource you will need soon; preconnect opens a connection to another origin early; defer downloads a script without blocking parsing and runs it after the document is parsed." },
+        { q: "What is a service worker?", a: "A background script that acts as a programmable proxy between the page and the network. It can intercept fetches and serve from cache, which enables offline support and instant repeat visits." },
+        { q: "What makes a site a PWA?", a: "A service worker for offline/caching, a web app manifest (name, icons, display mode) so it can be installed, and HTTPS. It is a set of capabilities, not a framework." },
+        { q: "When would you use a Web Worker?", a: "For CPU-heavy work that would block the main thread — parsing large data, compression, cryptography, image processing — keeping the UI responsive." },
+        { q: "What is the first thing to check on a slow page?", a: "Measure with real data and the DevTools performance panel: a long main thread and a large JS bundle are the usual cause. Optimize what the measurement shows, not guesses." }
+      ],
+      quiz: [
+        { q: "A page's buttons feel laggy only after lots of JavaScript loads. The metric affected is…", options: ["LCP", "INP", "CLS", "TTFB"], answer: 1, explain: "INP measures interaction latency; heavy main-thread JavaScript delays the response to input." },
+        { q: "Images loading push the text down the page. This hurts…", options: ["CLS", "LCP", "INP", "TTI"], answer: 0, explain: "Content moving after paint is layout shift. Set width/height or aspect-ratio so space is reserved." },
+        { q: "Which loads a script without blocking HTML parsing?", options: ["<script src=a.js>", "<script src=a.js defer>", "<script> in the head", "@import"], answer: 1, explain: "defer downloads in parallel and executes after parsing; a classic script tag blocks the parser." },
+        { q: "Offline support in a web app is provided by…", options: ["localStorage", "A service worker", "Web Workers", "HTTP/2"], answer: 1, explain: "The service worker intercepts requests and can answer from its cache when the network is unavailable." },
+        { q: "You need to parse a 20MB file in the browser without freezing the UI. Use…", options: ["setTimeout", "A Web Worker", "A larger bundle", "CSS animations"], answer: 1, explain: "Workers run on a separate thread, so the main thread stays free to respond to input." }
+      ]
+    },
+
+    "cloud": {
+      title: "Cloud Fundamentals",
+      track: "backend",
+      icon: "☁️",
+      blurb: "Cloud computing is renting compute, storage and networking on demand, and the managed services built on them. Knowing the service categories and their trade-offs — control versus operations — is what interviewers probe.",
+      read: `
+        <p><strong>The shared responsibility model:</strong> the provider secures the data centers, hardware and the managed services themselves; <em>you</em> secure what you put in them — data, configuration, access and code. "It's in the cloud" never removes your part.</p>
+        <p><strong>The compute spectrum</strong> trades control for less operations:</p>
+        <table><thead><tr><th>Model</th><th>You manage</th><th>Trade-off</th></tr></thead><tbody>
+        <tr><td>VM (IaaS)</td><td>OS, runtime, app</td><td>Full control; you patch and scale everything</td></tr>
+        <tr><td>Containers / Kubernetes</td><td>App and cluster</td><td>Portability and density; cluster complexity</td></tr>
+        <tr><td>PaaS (App Service, Beanstalk)</td><td>Only the app</td><td>Fast to ship; less control of the environment</td></tr>
+        <tr><td>FaaS / serverless (Lambda)</td><td>Just a function</td><td>No servers to run; cold starts, limits, per-invocation cost</td></tr>
+        </tbody></table>
+        <p><strong>Storage and data:</strong> object storage (S3-style blobs) for files and static assets; block storage for disks; managed databases (RDS, DynamoDB, Cosmos) that handle backups, patching and failover. Choosing managed over self-hosted is usually right unless you have a specific reason.</p>
+        <p><strong>Networking:</strong> a <em>VPC</em> is your private network in the cloud with subnets across availability zones; a <em>load balancer</em> spreads traffic across healthy instances; a <em>CDN</em> caches content near users (and terminates TLS). Security groups and subnets define what can reach what.</p>
+        <pre><code>Internet ──► CDN ──► Load balancer
+                          │
+            ┌─────────────┴─────────────┐
+         Private subnet              Private subnet      (one per zone)
+         [ app instances ]           [ app instances ]
+                          │
+                   Managed database (multi-AZ)</code></pre>
+        <p><strong>Identity and access (IAM):</strong> every request is made by some principal (user, service role). Apply least privilege: separate roles per service, short-lived credentials, and never access keys in code or environment files.</p>
+        <p><strong>Serverless trade-offs:</strong> you pay per invocation and scale to zero, but cold starts add latency on the first request, execution time and payload are limited, and vendor coupling is high. <strong>Multi-region</strong> improves latency and availability but forces you into the consistency trade-offs of the CAP theorem.</p>`,
+      cards: [
+        { q: "What is the shared responsibility model?", a: "The provider secures the infrastructure and managed services; you secure everything you put on top — data, configuration, access policies and application code." },
+        { q: "IaaS vs PaaS vs serverless?", a: "IaaS: you manage the OS and up. PaaS: you manage only the application. Serverless: you manage only a function. Each step up removes operations and removes control." },
+        { q: "When is serverless a poor fit?", a: "Steady high traffic (per-invocation cost exceeds reserved compute), latency-sensitive paths hit by cold starts, long-running jobs beyond execution limits, or heavy state." },
+        { q: "What are the main storage categories?", a: "Object storage for files and assets (S3), block storage for VM disks, file storage for shared filesystems, and managed databases for structured data." },
+        { q: "What is a VPC?", a: "A private network you define in the cloud: its IP range, subnets spread across availability zones, routing, and firewall rules (security groups) controlling what can talk to what." },
+        { q: "What do a load balancer and a CDN each do?", a: "A load balancer distributes traffic across healthy instances in one or more zones. A CDN caches static (and sometimes dynamic) content at edge locations close to users." },
+        { q: "What is least privilege in IAM?", a: "Each user and service gets only the permissions it needs — separate roles per service, short-lived credentials, no wildcard policies, and no keys in code." },
+        { q: "Why deploy across multiple availability zones?", a: "So that a failure in one zone (power, network) does not take the service down. Instances are spread across zones behind a load balancer, and managed databases replicate across zones." },
+        { q: "What is a cold start?", a: "The latency of provisioning a fresh function instance in serverless when none is warm. Mitigate with provisioned concurrency, smaller deployments, or reserving serverless for async work." },
+        { q: "What does multi-region cost you?", a: "Complexity and consistency: data must replicate across regions, so you choose per use case between strong consistency and availability (CAP), and you handle failover." }
+      ],
+      quiz: [
+        { q: "A team wants to run code on events without managing any servers. The model is…", options: ["IaaS", "PaaS", "FaaS / serverless", "On-premise"], answer: 2, explain: "Functions as a Service runs your code on demand; the provider manages everything beneath it." },
+        { q: "Who is responsible for securing data stored in a managed cloud database?", options: ["The cloud provider", "The customer", "The CDN", "Nobody"], answer: 1, explain: "The provider secures the service; data, access policy and configuration are the customer's responsibility." },
+        { q: "An image-heavy site is slow for users far from its servers. Best fix?", options: ["More database replicas", "A CDN", "A larger VM", "Serverless"], answer: 1, explain: "A CDN caches assets at edge locations near users, cutting latency and origin load." },
+        { q: "A service runs constantly at high load. Serverless is likely…", options: ["Cheaper than reserved compute", "More expensive than reserved compute, and a poor fit", "Required", "Cold-start free"], answer: 1, explain: "Per-invocation pricing favors bursty workloads; steady high traffic is cheaper on reserved instances or containers." },
+        { q: "Deploying across three availability zones protects against…", options: ["Slow queries", "A single zone's outage", "High CDN costs", "Cold starts"], answer: 1, explain: "Spreading instances across zones means one zone's failure does not take the service down." }
+      ]
+    },
+
+    "os-basics": {
+      title: "OS & Concurrency Basics",
+      track: "backend",
+      icon: "📟",
+      blurb: "Operating-system fundamentals explain what your code actually runs on: processes and threads, how the CPU is shared, how memory is managed, and how waiting for I/O is modeled — the base under event loops, thread pools and locks.",
+      read: `
+        <p><strong>Process vs thread:</strong> a process has its own memory space, file descriptors and resources; threads inside a process share that memory and each have their own stack and program counter. Processes are isolated (a crash does not take down the others); threads are cheap to communicate with (shared memory) but need synchronization.</p>
+        <pre><code>Process A                      Process B
+┌───────────────┐             ┌───────────────┐
+│ heap (shared  │             │ heap (own     │
+│ by threads)   │             │ address space)│
+│ ┌────┐ ┌────┐ │   no direct │ ┌────┐        │
+│ │T1  │ │T2  │ │   sharing ◄─┼─┤T3  │        │
+│ │stck│ │stck│ │   except IPC│ │stck│        │
+│ └────┘ └────┘ │             │ └────┘        │
+└───────────────┘             └───────────────┘</code></pre>
+        <p><strong>Scheduling and context switching:</strong> with more runnable threads than cores, the OS switches between them (preemption). A context switch saves and restores registers and can flush CPU caches, so threads that are many but mostly waiting (I/O-bound) are efficient, while many CPU-bound threads mostly add switching overhead.</p>
+        <p><strong>Synchronization:</strong> a <em>mutex</em> lets one thread into a critical section; a <em>semaphore</em> allows up to N; a <em>race condition</em> appears when correctness depends on timing — the fix is to protect shared state, not to "be careful". A <em>deadlock</em> is threads each holding a lock and waiting for another's; avoid it with consistent lock ordering and short critical sections (the database topic covers the same idea for transactions).</p>
+        <pre><code>// Race: two threads read n, both add, one increment is lost
+n = n + 1        // read → add → write, not atomic
+
+// Fix: only one thread in the critical section
+lock.acquire(); n = n + 1; lock.release();</code></pre>
+        <p><strong>Memory:</strong> each process sees a <em>virtual</em> address space that the OS maps to physical memory in pages; this gives isolation and lets a machine run more memory than it has (swapping). The <em>stack</em> holds call frames and local values and is fast and automatically reclaimed; the <em>heap</em> holds dynamically allocated objects and is where garbage collection and leaks live.</p>
+        <p><strong>I/O models:</strong> with blocking I/O a thread waits until data is ready. With non-blocking I/O and readiness notifications (epoll, kqueue, IOCP) one thread asks "which sockets are ready?" and handles only those — the mechanism behind the Node.js event loop and nginx. Many concurrent connections then cost little more than a data structure.</p>
+        <p><strong>Syscalls and caches:</strong> user code reaches the kernel only through system calls (read, write, open, socket), which are relatively expensive — one reason buffering and batching matter. And CPU caches make sequential access to contiguous memory far faster than pointer-chasing across the heap.</p>`,
+      cards: [
+        { q: "Process vs thread?", a: "A process has its own memory and resources; threads within it share memory and have separate stacks. Processes give isolation, threads give cheap shared state that needs synchronization." },
+        { q: "What is a context switch and why does it cost?", a: "The OS saves one thread's state and restores another's when it preempts. It costs time and can evict CPU cache contents, so too many CPU-bound threads mostly add overhead." },
+        { q: "Mutex vs semaphore?", a: "A mutex allows one thread into a critical section at a time. A semaphore allows up to N holders — useful for rate-limiting access to a pool of resources." },
+        { q: "What is a race condition?", a: "When the result depends on the timing of concurrent accesses — for example two threads doing read-modify-write on the same variable and losing an update. Fix by protecting the shared state with a lock or an atomic operation." },
+        { q: "What is a deadlock and how do you avoid it?", a: "Threads each hold a lock and wait for a lock another holds, so none can proceed. Avoid it with a consistent lock ordering everywhere and short critical sections." },
+        { q: "What is virtual memory?", a: "Each process gets its own virtual address space, which the OS maps to physical memory in pages. It provides isolation between processes and allows more memory to be used than physically exists." },
+        { q: "Stack vs heap?", a: "The stack holds call frames and local values, is fast, and is reclaimed automatically. The heap holds dynamically allocated objects with manual or garbage-collected lifetimes — the home of memory leaks." },
+        { q: "Blocking vs non-blocking I/O?", a: "Blocking: a thread waits until an operation completes. Non-blocking: the thread asks which descriptors are ready (epoll, kqueue, IOCP) and handles only those — one thread can serve many connections." },
+        { q: "What is a system call?", a: "The controlled entry point from user code into the kernel (read, write, open, socket). It has a fixed cost, which is why buffering and batching reduce overhead." },
+        { q: "Why does memory locality matter?", a: "CPU caches make sequential access to nearby memory much faster than following pointers across the heap. Data layout affects performance as much as algorithm choice for hot paths." }
+      ],
+      quiz: [
+        { q: "Two threads run counter = counter + 1 one million times each; the result is below two million. Why?", options: ["Integer overflow", "A race condition: the update is not atomic", "Virtual memory", "A context switch is impossible"], answer: 1, explain: "Read-modify-write interleaves between threads. Protect it with a lock or an atomic increment." },
+        { q: "One web server thread handles tens of thousands of mostly idle connections. It is using…", options: ["Blocking I/O with one thread per connection", "Non-blocking I/O with readiness notifications", "More cores than connections", "A semaphore"], answer: 1, explain: "epoll-style readiness lets one thread serve many waiting connections cheaply — the event-loop model." },
+        { q: "Which avoids deadlock most reliably?", options: ["Longer critical sections", "Acquiring locks in the same order in every thread", "More threads", "Larger stacks"], answer: 1, explain: "A consistent global lock order makes a cycle of waiting impossible." },
+        { q: "A crash in one process does not affect others because…", options: ["They share the heap", "Each has a separate virtual address space", "Threads are expensive", "Syscalls are fast"], answer: 1, explain: "Virtual memory isolates processes; a fault in one address space cannot reach another." },
+        { q: "Where do dynamically allocated objects live?", options: ["The stack", "The heap", "The cache", "Registers"], answer: 1, explain: "The heap holds objects with flexible lifetimes; the stack holds call frames and locals." }
       ]
     }
   }

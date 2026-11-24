@@ -95,7 +95,7 @@ p { margin: 0 0 .8em; }
 .hero-stats span { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .6px; }
 
 /* ---------- track cards ---------- */
-.track-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 26px 0; }
+.track-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; margin: 26px 0; }
 .track-card {
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 22px; box-shadow: var(--shadow); transition: .18s; display: flex; flex-direction: column;

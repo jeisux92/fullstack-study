@@ -5,41 +5,56 @@ window.STUDY_DATA_ES = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Arquitectura, APIs, escenarios de system design, bases de datos y concurrencia, caché, seguridad, Node.js y .NET, DevOps, principios, patrones y POO.",
-      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns"],
+      tagline: "Arquitectura, APIs, escenarios de system design, bases de datos y concurrencia, caché, seguridad, Node.js y .NET, DevOps, cloud, principios, patrones y POO.",
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "os-basics", "git", "devops", "cloud", "principles", "patterns", "oop", "testing", "antipatterns", "behavioral"],
       groups: [
         { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Seguridad", topics: ["security"] },
-        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Entrega y Operaciones", topics: ["devops"] },
-        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] }
+        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Entrega y Operaciones", topics: ["git", "devops", "cloud"] },
+        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
+        { name: "Habilidades de Entrevista", topics: ["behavioral"] }
       ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "Fundamentos de JavaScript, TypeScript, CSS y HTTP, React a fondo y WebSockets en tiempo real.",
-      topics: ["js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      tagline: "CSS y HTTP, rendimiento web y seguridad front-end, React a fondo, WebSockets en tiempo real — y la ronda conductual.",
+      topics: ["css-web", "http", "web-perf", "fe-security", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt", "behavioral"],
       groups: [
-        { name: "Fundamentos Web", topics: ["js-core", "typescript", "css-web", "http"] },
+        { name: "Plataforma Web", topics: ["css-web", "http", "web-perf", "fe-security"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
-        { name: "Web en Tiempo Real", topics: ["web-rt"] }
+        { name: "Web en Tiempo Real", topics: ["web-rt"] },
+        { name: "Habilidades de Entrevista", topics: ["behavioral"] }
+      ]
+    },
+    languages: {
+      name: "Runtimes y Lenguajes",
+      icon: "🔤",
+      tagline: "Los lenguajes y runtimes detrás de los stacks: JavaScript, TypeScript, Node.js y .NET — más Git.",
+      topics: ["js-core", "typescript", "nodejs", "dotnet", "os-basics", "git"],
+      groups: [
+        { name: "Lenguajes", topics: ["js-core", "typescript"] },
+        { name: "Runtimes", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Herramientas", topics: ["git"] }
       ]
     },
     fullstack: {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Todo: el currículo completo de back-end y front-end en una sola ruta.",
-      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns", "js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "os-basics", "git", "devops", "cloud", "principles", "patterns", "oop", "testing", "antipatterns", "behavioral", "js-core", "typescript", "css-web", "http", "web-perf", "fe-security", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
         { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Seguridad", topics: ["security"] },
-        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Entrega y Operaciones", topics: ["devops"] },
+        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet", "os-basics"] },
+        { name: "Entrega y Operaciones", topics: ["git", "devops", "cloud"] },
         { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
-        { name: "Fundamentos Web", topics: ["js-core", "typescript", "css-web", "http"] },
+        { name: "Habilidades de Entrevista", topics: ["behavioral"] },
+        { name: "Lenguajes", topics: ["js-core", "typescript"] },
+        { name: "Plataforma Web", topics: ["css-web", "http", "web-perf", "fe-security"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Web en Tiempo Real", topics: ["web-rt"] }
       ]
@@ -1358,6 +1373,282 @@ lectura:   cliente ─► API ─► caché (hit ~95%) ─► BD en miss ─► 
         { q: "Una celebridad con 100M de seguidores publica. El fan-out-al-escribir simple se rompe porque…", options: ["Las lecturas se vuelven lentas", "Un post significa 100M de escrituras de timeline", "La caché se vacía", "Los WebSockets se desconectan"], answer: 1, explain: "La amplificación de escritura explota — de ahí el híbrido: pull al leer para la celebridad, push para el resto." },
         { q: "Rate limiter: ¿qué patrón de storage encaja?", options: ["Contadores en Redis con TTL e incrementos atómicos", "Un archivo por usuario", "Una fila Postgres bloqueada por request", "localStorage del navegador"], answer: 0, explain: "Redis da contadores compartidos, atómicos y con expiración entre instancias — el limiter distribuido estándar." },
         { q: "Para analítica en cada clic, el acortador debe devolver…", options: ["301 permanente", "302 temporal", "304 not modified", "204 no content"], answer: 1, explain: "El 302 obliga a cada clic a pasar por tu servicio para poder registrarlo; el 301 se cachearía y te saltaría." }
+      ]
+    },
+
+    "behavioral": {
+      title: "Entrevistas Conductuales (STAR)",
+      track: "backend",
+      icon: "🎤",
+      blurb: "Las entrevistas conductuales predicen el desempeño futuro a partir del comportamiento pasado: en vez de 'qué es X', preguntan 'cuéntame de una vez en que…'. STAR — Situación, Tarea, Acción, Resultado — es la estructura que mantiene esas historias claras.",
+      read: `
+        <p><strong>Por qué existen:</strong> las habilidades te hacen pasar el filtro; el comportamiento decide la oferta. El entrevistador asume que el comportamiento pasado predice el futuro, así que sondea situaciones reales: conflictos, fracasos, liderazgo, ambigüedad. No se improvisan bien — se prepara un pequeño set de historias verdaderas y se reutilizan.</p>
+        <p><strong>STAR:</strong> <em>Situación</em> (10 segundos de contexto), <em>Tarea</em> (de qué eras responsable), <em>Acción</em> (la mayor parte — qué hiciste <strong>tú</strong> y por qué), <em>Resultado</em> (el resultado medible y qué aprendiste). El fallo común es gastar todo el tiempo en S y T y correr la A.</p>
+        <pre><code>S  "La tasa de error de nuestro checkout se triplicó tras un release del viernes."
+T  "Yo era dueño del servicio de pagos y tenía que encontrar la causa antes del lunes."
+A  "Agregué correlation IDs a cada línea de log, reproduje el fallo en staging
+     y encontré un bucle de reintentos sin idempotency key. Publiqué la key
+     y luego escribí el runbook que nos faltaba."
+R  "La tasa de error volvió a la línea base en 6 horas; los reintentos quedaron
+     idempotentes y el runbook se usó dos veces más ese trimestre."</code></pre>
+        <p><strong>Prepara cinco o seis historias</strong> y mápealas a familias de preguntas: un conflicto con un colega, un fracaso que asumiste, liderar sin autoridad, un problema ambiguo, una decisión que cambiarías, tu mayor impacto. Una buena historia suele responder tres o cuatro preguntas — escucha la competencia detrás de la pregunta y elige la historia que la muestra.</p>
+        <table><thead><tr><th>Familia de pregunta</th><th>Qué están evaluando</th></tr></thead><tbody>
+        <tr><td>"Cuéntame de un conflicto"</td><td>Empatía, franqueza, foco en el problema y no en la persona</td></tr>
+        <tr><td>"Cuéntame de un fracaso"</td><td>Ownership — ¿culpas a otros o asumes tu parte?</td></tr>
+        <tr><td>"Cuéntame algo ambiguo"</td><td>Cómo delimitas, preguntas y decides con datos incompletos</td></tr>
+        <tr><td>"Cuéntame cuando lideraste un proyecto"</td><td>Influencia, comunicación, entregar a través de otros</td></tr>
+        </tbody></table>
+        <p><strong>Errores típicos:</strong> ser vago ("mejoramos el rendimiento" — ¿cuánto?), esconderse en el "nosotros" (di "yo" para tus acciones), saltarse el resultado, contar una historia donde eres el héroe y todos los demás estaban equivocados, o inventarla — las preguntas de seguimiento exponen rápido las historias inventadas.</p>
+        <p><strong>"¿Por qué te vas?"</strong> debe ser sobre avanzar hacia algo (alcance, crecimiento, un dominio), nunca sobre escapar de un mal jefe. Corto y positivo. Y siempre prepara dos o tres preguntas genuinas para el entrevistador: sobre los problemas del equipo, cómo se mide el éxito o qué cambiaría él.</p>`,
+      cards: [
+        { q: "¿Qué evalúa una entrevista conductual?", a: "El comportamiento pasado como predictor del futuro: cómo actúas ante conflicto, fracaso, ambigüedad y liderazgo. La habilidad técnica te hace pasar el filtro; el comportamiento suele decidir la oferta." },
+        { q: "¿Qué significa STAR?", a: "Situación (contexto breve), Tarea (tu responsabilidad), Acción (qué hiciste tú específicamente y por qué — la mayor parte), Resultado (resultado medible y qué aprendiste)." },
+        { q: "¿A qué parte debería ir la mayor parte del tiempo en una respuesta STAR?", a: "A la Acción. Un fallo común es gastar la mayor parte del tiempo en situación y tarea y correr lo que realmente hiciste. Mantén el contexto en un par de frases." },
+        { q: "¿Cuántas historias deberías preparar?", a: "Cinco o seis historias verdaderas que cubran conflicto, fracaso, liderazgo, ambigüedad, una decisión que cambiarías y tu mayor impacto. Una buena historia responde a varias preguntas." },
+        { q: "¿Cómo respondes 'cuéntame de un conflicto'?", a: "Elige un desacuerdo real, describe qué quería la otra persona, explica cómo encontraste el punto en común y cierra con la resolución y la relación después. Nunca lo plantees como que el otro estaba equivocado." },
+        { q: "¿Cómo respondes 'cuéntame de un fracaso'?", a: "Elige un fracaso real que sea tuyo, di tu parte con claridad, describe el arreglo y qué cambiaste después. Lo que se evalúa es el ownership — culpar a otros es el fracaso." },
+        { q: "¿Por qué decir 'yo' en vez de 'nosotros'?", a: "El entrevistador necesita saber qué aportaste. Usa 'nosotros' para el resultado del equipo y 'yo' para tus decisiones y acciones; esconderse en el 'nosotros' hace invisible tu rol." },
+        { q: "¿Qué hace convincente a un resultado?", a: "Algo medible: tasa de error, latencia, tiempo ahorrado, ingresos, adopción. 'Mejoramos el rendimiento' es débil; 'bajamos la latencia p95 de 900ms a 180ms' es un resultado." },
+        { q: "¿Cómo responder '¿por qué te vas?'", a: "Plantéalo como avanzar hacia algo — alcance, crecimiento, un dominio que quieres — no como escapar de un mal jefe o empresa. Corto y positivo." },
+        { q: "¿Deberías inventar una historia si no se te ocurre ninguna?", a: "No. Las preguntas de seguimiento ('¿qué te dijo después?', '¿por qué ese enfoque?') exponen rápido las historias inventadas. Usa un ejemplo real más chico." }
+      ],
+      quiz: [
+        { q: "Te preguntan por una vez en que manejaste un conflicto. La mejor respuesta…", options: ["Muestra que la otra persona estaba equivocada", "Muestra empatía, lo que hiciste y cómo se resolvió", "Evita cualquier desacuerdo real", "Se concentra sobre todo en la historia previa"], answer: 1, explain: "Evalúan cómo trabajas con personas: tus acciones, la resolución y la relación después." },
+        { q: "¿Cuál es el mejor cierre para una respuesta STAR?", options: ["Las cosas mejoraron mucho después", "Arreglamos el problema en equipo", "La tasa de error bajó de 3% a 0.1% en una semana", "Mi jefe quedó muy contento"], answer: 2, explain: "Lo específico y medible gana al elogio vago. Los números hacen creíble el resultado." },
+        { q: "Tienes 2 minutos para responder. La mayor parte debería ser…", options: ["Situación", "Tarea", "Acción", "Resultado"], answer: 2, explain: "El contexto debe ser breve; lo que hiciste y por qué es lo que el entrevistador evalúa." },
+        { q: "Si te preguntan por un fracaso, deberías…", options: ["Elegir uno donde los compañeros causaron el problema", "Decir que no se te ocurre ninguno", "Asumir tu parte y explicar qué cambiaste", "Contar un éxito no relacionado"], answer: 2, explain: "La pregunta evalúa ownership. Nombrar tu propia parte y el arreglo es la respuesta fuerte." },
+        { q: "'¿Por qué te vas?' se responde mejor…", options: ["Listando lo que está mal en tu empleador actual", "Describiendo hacia qué quieres avanzar", "Diciendo que es por dinero", "Evitando la pregunta"], answer: 1, explain: "Avanzar hacia crecimiento o alcance se lee como ambición; escapar se lee como negatividad." }
+      ]
+    },
+
+    "fe-security": {
+      title: "Seguridad Front-End",
+      track: "frontend",
+      icon: "🛡️",
+      blurb: "La seguridad front-end defiende el lado del navegador de una app: evita inyección de scripts, requests forjados y suplantación de interfaz, valida mensajes entre ventanas y mantiene limpia la cadena de suministro de dependencias.",
+      read: `
+        <p><strong>XSS (cross-site scripting)</strong> es inyectar script que corre en tu origen. El <em>almacenado</em> viene de la base de datos (un comentario con un script), el <em>reflejado</em> viene de la URL y el de <em>DOM</em> viene de tu propio código escribiendo datos no confiables en un sink. El navegador trata el script inyectado exactamente como el tuyo: puede leer cookies visibles a JavaScript, el DOM y localStorage.</p>
+        <pre><code>// XSS de DOM: location.hash lo controla el atacante
+el.innerHTML = location.hash.slice(1);          // ✗ se ejecuta script
+
+// Seguro: el texto nunca se parsea como HTML
+el.textContent = location.hash.slice(1);        // ✓
+
+// Si debes renderizar HTML, sanitízalo antes
+el.innerHTML = DOMPurify.sanitize(userHtml);    // ✓</code></pre>
+        <p><strong>Defensas en capas:</strong> escape de salida por defecto (frameworks como React escapan el texto — el peligro es <code>dangerouslySetInnerHTML</code>, <code>innerHTML</code> y <code>eval</code>); sanitizar cualquier HTML que debas renderizar; y una <strong>Content Security Policy</strong> que bloquee script inline y limite desde dónde se cargan scripts — para que un escape olvidado no se convierta en exploit.</p>
+        <pre><code>Content-Security-Policy: default-src 'self'; script-src 'self';
+  object-src 'none'; base-uri 'none'; frame-ancestors 'none'</code></pre>
+        <p><strong>CSRF (cross-site request forgery)</strong> hace que el navegador del usuario envíe un request que no quiso — el navegador adjunta sus cookies automáticamente. Defensas: tokens anti-CSRF ligados a la sesión, el atributo <code>SameSite</code> (ver el tema de HTTP), validar <code>Origin</code>/<code>Referer</code>, y no usar cookies para requests que cambian estado cuando basta un token en cabecera.</p>
+        <p><strong>Clickjacking</strong> superpone tu página de forma invisible bajo la del atacante para que un clic caiga en tus botones. Se evita con <code>frame-ancestors 'none'</code> en la CSP (el reemplazo moderno de <code>X-Frame-Options</code>).</p>
+        <p><strong><code>postMessage</code>:</strong> pasa siempre un <code>targetOrigin</code> explícito, nunca <code>*</code>, y verifica <code>event.origin</code> y <code>event.source</code> al recibir antes de confiar en los datos. Los <strong>open redirects</strong> (un parámetro <code>?next=</code> que acepta cualquier URL) habilitan phishing convincente — valídalos contra una allow-list de rutas relativas.</p>
+        <p><strong>Cadena de suministro:</strong> cada dependencia corre con los privilegios de tu app. Comitea el lockfile, corre <code>npm audit</code> en CI, fija versiones y mantén bajo el número de dependencias. Guarda los tokens según el tema de HTTP: access token en memoria, refresh token en cookie HttpOnly.</p>`,
+      cards: [
+        { q: "¿Cuáles son los tres tipos de XSS?", a: "Almacenado: el payload se guarda (p. ej. un comentario en la BD) y se sirve a las víctimas. Reflejado: el payload va en el request y se devuelve en la respuesta. De DOM: tu propio código cliente escribe datos no confiables en un sink peligroso como innerHTML." },
+        { q: "¿Cómo se previene el XSS?", a: "En capas: mantén los datos no confiables como texto (textContent) y no como HTML, sanitiza el HTML que debas renderizar (DOMPurify), evita eval y dangerouslySetInnerHTML, y agrega una Content Security Policy para que un fallo no sea un exploit." },
+        { q: "¿Qué hace una Content Security Policy?", a: "Declara desde qué fuentes el navegador puede cargar scripts, estilos y otros recursos. Bloquear script inline y limitar script-src significa que un script inyectado no se ejecutará." },
+        { q: "¿Qué es CSRF y cómo se evita?", a: "Un request forjado enviado desde otro sitio usando las cookies que el navegador adjunta automáticamente. Defensas: tokens anti-CSRF, atributos SameSite, validar Origin/Referer y tokens en cabeceras custom para APIs." },
+        { q: "¿Qué es el clickjacking?", a: "Embeber tu página de forma invisible en un iframe para que los clics del usuario caigan en tus botones o enlaces. Se evita con frame-ancestors 'none' en la CSP." },
+        { q: "¿Cuáles son las reglas de postMessage?", a: "Pasar un targetOrigin explícito en vez de '*', y al recibir comprobar event.origin (y event.source) antes de confiar o actuar sobre los datos." },
+        { q: "¿Por qué los open redirects son un problema de seguridad?", a: "Un dominio de confianza que redirige a cualquier URL hace que los links de phishing parezcan legítimos (app.ejemplo.com/login?next=malo.com). Valida los destinos contra una allow-list de rutas locales." },
+        { q: "¿Cómo proteges la cadena de suministro de dependencias?", a: "Comitea el lockfile, corre npm audit en CI, fija versiones, elimina dependencias sin uso y revisa lo que agregas — cada paquete corre con los privilegios de tu app." },
+        { q: "¿React es seguro ante XSS por defecto?", a: "Casi siempre: JSX escapa el contenido de texto. Las salidas de emergencia son dangerouslySetInnerHTML, innerHTML/eval crudos y URLs armadas con input del usuario (hrefs javascript:)." },
+        { q: "¿Por qué importa el XSS si los tokens no están en cookies?", a: "El script inyectado corre con los privilegios de tu app: puede leer localStorage, el DOM y cualquier dato de la página, y hacer requests autenticados como el usuario." }
+      ],
+      quiz: [
+        { q: "Una página renderiza una búsqueda con el.innerHTML = query. Esto es…", options: ["XSS almacenado", "XSS reflejado o de DOM", "CSRF", "Clickjacking"], answer: 1, explain: "Datos no confiables escritos en innerHTML se parsean como HTML — usa textContent o sanitiza." },
+        { q: "¿Qué cabecera impide que otra site embeba tu página?", options: ["Content-Security-Policy: frame-ancestors 'none'", "Access-Control-Allow-Origin", "Strict-Transport-Security", "X-Content-Type-Options"], answer: 0, explain: "frame-ancestors controla quién puede embeber la página — la defensa contra clickjacking." },
+        { q: "El CSRF funciona porque…", options: ["JavaScript puede leer respuestas de otro origen", "El navegador adjunta las cookies del usuario automáticamente", "Los tokens están en localStorage", "Las contraseñas son débiles"], answer: 1, explain: "Un request de otro sitio sigue llevando la cookie de sesión, así que parece legítimo — de ahí los tokens y SameSite." },
+        { q: "Una dependencia que usas publica una versión maliciosa. ¿Mejor práctica preventiva?", options: ["Instalar siempre la última versión", "Comitear el lockfile, fijar versiones y auditar en CI", "Instalar solo semanalmente", "Desinstalar npm"], answer: 1, explain: "Instalaciones reproducibles y auditadas hacen que un release malo no llegue a tu build sin que lo notes." },
+        { q: "postMessage(data, "*") es riesgoso porque…", options: ["Es lento", "Los datos pueden entregarse a cualquier origen", "Solo funciona cross-origin", "Codifica los datos"], answer: 1, explain: "Nombra siempre el origen destino y verifica event.origin al recibir." }
+      ]
+    },
+
+    "git": {
+      title: "Git y Colaboración",
+      track: "backend",
+      icon: "🌿",
+      blurb: "Git es un sistema de control de versiones distribuido construido sobre un grafo inmutable de commits. Entender ese grafo — y cómo merge, rebase y reset lo remodelan — es lo que vuelve predecible la colaboración y la resolución de conflictos.",
+      read: `
+        <p><strong>El modelo:</strong> un repositorio es un grafo acíclico dirigido de commits; cada commit apunta a su(s) padre(s) y una rama es solo un puntero móvil a un commit. En el día a día trabajas en tres áreas.</p>
+        <pre><code>working tree ──(git add)──► staging area ──(git commit)──► repositorio
+   editas archivos             "qué va en el             historial local,
+                                próximo commit"          seguro de compartir</code></pre>
+        <pre><code>main:     A ── B ──────────── F   (commit de merge, dos padres)
+                \             /
+feature:         C ── D ── E
+
+rebasada: A ── B ── C' ── D' ── E'      (mismos cambios, commits nuevos)</code></pre>
+        <p><strong>Merge vs rebase:</strong> <code>merge</code> une dos historias con un commit de merge y preserva exactamente lo que pasó. <code>rebase</code> reproduce tus commits encima de otra rama y produce historial lineal — pero <em>reescribe commits</em> (hashes nuevos). Regla: haz rebase de tu trabajo local sin pushear; nunca de commits que otros puedan haber descargado.</p>
+        <p><strong>Squash y rebase interactivo:</strong> <code>git rebase -i HEAD~3</code> te permite combinar, reordenar, reformular o descartar commits para que una rama de feature se lea como una serie limpia de cambios lógicos antes del review. El squash-merge de un pull request colapsa toda la rama en un commit en main.</p>
+        <p><strong>Los conflictos</strong> ocurren cuando dos ramas cambian las mismas líneas. Resuélvelos deliberadamente: lee ambos lados, edita el archivo al contenido que realmente quieres, <code>git add</code> y continúa el merge o rebase. No elijas a ciegas "ours" o "theirs" — la respuesta correcta suele ser una combinación.</p>
+        <p><strong>Deshacer, según la intención:</strong></p>
+        <table><thead><tr><th>Comando</th><th>Efecto</th><th>Cuándo</th></tr></thead><tbody>
+        <tr><td>git restore</td><td>Descarta cambios sin commitear</td><td>"Tirar lo que acabo de escribir"</td></tr>
+        <tr><td>git reset</td><td>Mueve el puntero de la rama atrás (reescribe historial)</td><td>Commits locales nunca pusheados</td></tr>
+        <tr><td>git revert</td><td>Agrega un commit nuevo que deshace uno viejo</td><td>Historial compartido — seguro en main</td></tr>
+        <tr><td>git bisect</td><td>Busca por bisección el commit que introdujo un bug</td><td>"La semana pasada funcionaba"</td></tr>
+        </tbody></table>
+        <p><strong>Colaboración:</strong> ramas de vida corta, pull requests chicos y commits que expliquen el <em>porqué</em> — asunto en imperativo, cuerpo con contexto. En el review, sé amable y específico, distingue comentarios bloqueantes de sugerencias y revisa el cambio, no la persona.</p>`,
+      cards: [
+        { q: "¿Cuáles son las tres áreas de Git?", a: "El working tree (tus archivos editados), el staging area o índice (lo que irá en el próximo commit) y el repositorio (historial commiteado). git add lleva cambios al staging; git commit los registra." },
+        { q: "¿Qué es una rama, en el fondo?", a: "Un puntero móvil a un commit. Los commits forman un grafo de punteros a padres; crear y cambiar ramas es barato porque solo mueve un puntero." },
+        { q: "¿Merge vs rebase?", a: "Merge une historias con un commit de merge y preserva lo que pasó. Rebase reproduce tus commits sobre otra rama para tener historial lineal, reescribiéndolos con hashes nuevos." },
+        { q: "¿Cuándo no deberías hacer rebase?", a: "Sobre commits que otros puedan haber descargado — ramas compartidas como main. Re escribir historial compartido obliga a todos a conciliar commits divergentes." },
+        { q: "¿Para qué sirve el rebase interactivo?", a: "Limpiar tu propia rama antes del review: squash, reordenar, reformular o descartar commits para que el historial se lea como pasos lógicos (git rebase -i HEAD~3)." },
+        { q: "¿Cómo resuelves un conflicto de merge?", a: "Lee ambos lados, edita el archivo al contenido que realmente quieres (a menudo una combinación), git add y continúa el merge o rebase. Evita elegir a ciegas ours o theirs." },
+        { q: "¿git reset vs git revert?", a: "reset mueve el puntero de la rama atrás y reescribe historial — solo para commits locales sin pushear. revert crea un commit nuevo que deshace uno anterior — la opción segura en historial compartido." },
+        { q: "¿Cómo ayuda git bisect?", a: "Hace bisección del historial: marcas commits como buenos o malos y te ubica en puntos medios, encontrando el commit que introdujo un bug en log(n) pasos." },
+        { q: "¿Qué hace bueno a un commit?", a: "Un cambio lógico, un asunto conciso en imperativo y un cuerpo que explique por qué — el contexto que un revisor no saca del diff." },
+        { q: "¿Qué es una buena higiene de PRs?", a: "Ramas cortas y PRs chicos; una descripción con contexto y cómo se probó; y reviews específicos y amables, separando lo bloqueante de las sugerencias." }
+      ],
+      quiz: [
+        { q: "Quieres historial lineal en tu rama local antes de abrir un PR. Usa…", options: ["git merge", "git rebase", "git reset --hard", "git stash"], answer: 1, explain: "Rebase re produce tus commits locales encima de main y da historial lineal." },
+        { q: "Un commit malo llegó a main ayer. ¿La forma más segura de deshacerlo?", options: ["git reset --hard HEAD~1 y force-push", "git revert <commit>", "Borrar el repositorio", "git restore"], answer: 1, explain: "revert agrega un commit que deshace el cambio sin reescribir historial compartido." },
+        { q: "Apareció un bug en alguno de los últimos 100 commits. ¿La forma más rápida de encontrarlo?", options: ["Leer cada diff", "git bisect", "git blame", "git log --stat"], answer: 1, explain: "bisect hace bisección con respuestas bueno/malo, en unos 7 pasos para 100 commits." },
+        { q: "¿Por qué no rebasar main sobre tu rama y hacer force-push?", options: ["Es demasiado lento", "Re escribe historial que otros ya descargaron", "Rebase solo funciona sobre un commit", "Borra ramas"], answer: 1, explain: "Re escribir commits compartidos rompe cada clon que ya los tenga." },
+        { q: "En un conflicto, 'theirs' se refiere a…", options: ["Tu rama actual", "La rama que se está mergeando o sobre la que se rebasa", "Siempre el remoto", "La versión más vieja"], answer: 1, explain: "Ours es la rama en la que estás; theirs es el lado entrante. En un rebase los roles se sienten invertidos, así que lee el contenido." }
+      ]
+    },
+
+    "web-perf": {
+      title: "Rendimiento Web y PWA",
+      track: "frontend",
+      icon: "📊",
+      blurb: "El rendimiento web es qué tan rápido una página se vuelve usable: se mide con Core Web Vitals (LCP, INP, CLS), se mejora con estrategia de render, caché y cargando menos — y se extiende a offline e instalable con Progressive Web Apps.",
+      read: `
+        <p><strong>Core Web Vitals</strong> son las métricas centradas en el usuario que Google mide en cada página. <em>LCP</em> (Largest Contentful Paint) es cuándo aparece el contenido principal; <em>INP</em> (Interaction to Next Paint) es la respuesta a la entrada del usuario; <em>CLS</em> (Cumulative Layout Shift) es la estabilidad visual. "Bueno" es LCP bajo 2.5s, INP bajo 200ms, CLS bajo 0.1 — medido en el percentil 75 de usuarios reales.</p>
+        <table><thead><tr><th>Métrica</th><th>Se mejora con</th></tr></thead><tbody>
+        <tr><td>LCP</td><td>Tiempo de respuesta del servidor (CDN, caché), priorizar la imagen principal, precargar recursos clave, sin CSS/JS que bloquee el render</td></tr>
+        <tr><td>INP</td><td>Menos JavaScript, partir tareas largas, evitar trabajo pesado en eventos de input, diferir updates no urgentes</td></tr>
+        <tr><td>CLS</td><td>Size y aspect-ratio en imágenes y anuncios, reservar espacio para contenido tardío, no insertar contenido por encima del existente</td></tr>
+        </tbody></table>
+        <p><strong>El critical rendering path</strong> es lo que debe pasar antes del primer paint: HTML → DOM, CSS → CSSOM, luego layout y paint. El CSS bloquea el render y los scripts clásicos detienen el parser, así que inlinea el CSS crítico, difiere los scripts no esenciales y evita scripts de terceros síncronos en el head.</p>
+        <pre><code>&lt;link rel="preload" as="font" href="/fonts/inter.woff2" crossorigin&gt;
+&lt;link rel="preconnect" href="https://api.example.com"&gt;
+&lt;script src="/app.js" defer&gt;&lt;/script&gt;
+&lt;img src="hero.avif" width="1200" height="600" fetchpriority="high"&gt;
+&lt;img src="below-fold.webp" loading="lazy" width="600" height="400"&gt;</code></pre>
+        <p><strong>Carga menos, más tarde:</strong> formatos de imagen modernos (AVIF/WebP) con <code>srcset</code> responsivo, lazy loading bajo el pliegue, code splitting por ruta y análisis del bundle para eliminar lo que nadie usa (ver el tema de rendimiento en React). La mayoría de las páginas lentas lo son por demasiado JavaScript.</p>
+        <p><strong>Service Workers y PWA:</strong> un service worker es un script que el navegador corre entre la página y la red; puede interceptar requests y responder desde una caché (Cache API), lo que habilita el uso offline y un modelo de app shell rápido. Junto con un web manifest vuelve el sitio instalable — una Progressive Web App. Los updates son versionados: instala el worker nuevo, skip waiting cuando sea seguro y cachea assets con nombres hasheados.</p>
+        <pre><code>self.addEventListener("fetch", (event) =&gt; {
+  event.respondWith(
+    caches.match(event.request).then((cached) =&gt;
+      cached || fetch(event.request))     // cache-first para assets estáticos
+  );
+});</code></pre>
+        <p><strong>Web Workers</strong> corren scripts en un hilo en segundo plano, así el trabajo pesado de CPU (parseo, compresión, procesamiento de imágenes) no bloquea el main thread ni daña el INP. El caché HTTP (Cache-Control, ETag) está en el tema de HTTP.</p>`,
+      cards: [
+        { q: "¿Cuáles son los Core Web Vitals?", a: "LCP — cuándo se pinta el contenido principal (bueno bajo 2.5s). INP — respuesta a las interacciones (bajo 200ms). CLS — cuánto se mueve el layout (bajo 0.1). Medidos en el percentil 75 de usuarios reales." },
+        { q: "¿Cómo mejoras el LCP?", a: "Respuesta de servidor más rápida (CDN, caché), priorizar el elemento más grande (preload, fetchpriority, sin lazy-loading en él), quitar CSS y JS que bloqueen el render y optimizar formato y tamaño de la imagen principal." },
+        { q: "¿Cómo mejoras el INP?", a: "Menos JavaScript, partir tareas largas, mantener livianos los handlers de input y diferir el trabajo no urgente. INP mide el retraso entre la acción del usuario y el siguiente frame pintado." },
+        { q: "¿Qué causa layout shift (CLS)?", a: "Contenido que se mueve después del paint: imágenes sin dimensiones, anuncios o embeds que cargan tarde, cambios de fuente web o insertar contenido por encima de lo que el usuario lee." },
+        { q: "¿Qué es el critical rendering path?", a: "La secuencia antes del primer paint: construir DOM y CSSOM, combinarlos, luego layout y paint. El CSS bloquea el render y los script clásicos bloquean el parseo, así que minimiza y prioriza lo que está en ese camino." },
+        { q: "¿Qué hacen preload, preconnect y defer?", a: "preload descarga un recurso que necesitarás pronto; preconnect abre antes una conexión a otro origen; defer descarga un script sin bloquear el parseo y lo ejecuta tras parsear el documento." },
+        { q: "¿Qué es un service worker?", a: "Un script en segundo plano que actúa como proxy programable entre la página y la red. Puede interceptar fetches y servir desde caché, lo que habilita offline y visitas repetidas instantáneas." },
+        { q: "¿Qué convierte un sitio en PWA?", a: "Un service worker para offline/caché, un web app manifest (nombre, íconos, modo de display) para que sea instalable y HTTPS. Es un conjunto de capacidades, no un framework." },
+        { q: "¿Cuándo usar un Web Worker?", a: "Para trabajo pesado de CPU que bloquearía el main thread — parsear datos grandes, compresión, criptografía, procesamiento de imágenes — manteniendo la UI responsiva." },
+        { q: "¿Qué revisar primero en una página lenta?", a: "Medir con datos reales y el panel de performance de DevTools: un main thread ocupado y un bundle de JS grande son la causa habitual. Optimiza lo que muestra la medición, no suposiciones." }
+      ],
+      quiz: [
+        { q: "Los botones de una página se sienten lentos solo después de cargar mucho JavaScript. La métrica afectada es…", options: ["LCP", "INP", "CLS", "TTFB"], answer: 1, explain: "INP mide la latencia de interacción; JavaScript pesado en el main thread retrasa la respuesta al input." },
+        { q: "Las imágenes empujan el texto hacia abajo al cargar. Esto daña…", options: ["CLS", "LCP", "INP", "TTI"], answer: 0, explain: "Contenido que se mueve tras el paint es layout shift. Define width/height o aspect-ratio para reservar el espacio." },
+        { q: "¿Cuál carga un script sin bloquear el parseo del HTML?", options: ["<script src=a.js>", "<script src=a.js defer>", "<script> en el head", "@import"], answer: 1, explain: "defer descarga en paralelo y ejecuta tras el parseo; un script clásico bloquea el parser." },
+        { q: "El soporte offline en una web app lo da…", options: ["localStorage", "Un service worker", "Web Workers", "HTTP/2"], answer: 1, explain: "El service worker intercepta requests y puede responder desde su caché cuando no hay red." },
+        { q: "Necesitas parsear un archivo de 20MB en el navegador sin congelar la UI. Usa…", options: ["setTimeout", "Un Web Worker", "Un bundle más grande", "Animaciones CSS"], answer: 1, explain: "Los workers corren en un hilo aparte, así el main thread queda libre para responder al input." }
+      ]
+    },
+
+    "cloud": {
+      title: "Fundamentos de Cloud",
+      track: "backend",
+      icon: "☁️",
+      blurb: "La computación en la nube es alquilar cómputo, almacenamiento y red bajo demanda, y los servicios gestionados construidos sobre ellos. Conocer las categorías de servicio y sus trade-offs — control versus operación — es lo que sondea el entrevistador.",
+      read: `
+        <p><strong>El modelo de responsabilidad compartida:</strong> el proveedor asegura los data centers, el hardware y los servicios gestionados; <em>tú</em> aseguras lo que pones en ellos — datos, configuración, accesos y código. "Está en la nube" nunca elimina tu parte.</p>
+        <p><strong>El espectro de cómputo</strong> cambia control por menos operación:</p>
+        <table><thead><tr><th>Modelo</th><th>Tú administras</th><th>Trade-off</th></tr></thead><tbody>
+        <tr><td>VM (IaaS)</td><td>SO, runtime, app</td><td>Control total; parcheas y escalas todo</td></tr>
+        <tr><td>Contenedores / Kubernetes</td><td>App y clúster</td><td>Portabilidad y densidad; complejidad del clúster</td></tr>
+        <tr><td>PaaS (App Service, Beanstalk)</td><td>Solo la app</td><td>Rápido de publicar; menos control del entorno</td></tr>
+        <tr><td>FaaS / serverless (Lambda)</td><td>Solo una función</td><td>Sin servidores que operar; cold starts, límites, costo por invocación</td></tr>
+        </tbody></table>
+        <p><strong>Almacenamiento y datos:</strong> object storage (blobs estilo S3) para archivos y assets estáticos; block storage para discos; bases de datos gestionadas (RDS, DynamoDB, Cosmos) que se ocupan de backups, parches y failover. Elegir gestionado antes que auto-hospedado suele ser correcto salvo razón específica.</p>
+        <p><strong>Red:</strong> una <em>VPC</em> es tu red privada en la nube con subnets en varias zonas de disponibilidad; un <em>load balancer</em> reparte tráfico entre instancias sanas; una <em>CDN</em> cachea contenido cerca de los usuarios (y termina TLS). Los security groups y las subnets definen qué puede alcanzar qué.</p>
+        <pre><code>Internet ──► CDN ──► Load balancer
+                          │
+            ┌─────────────┴─────────────┐
+         Subnet privada            Subnet privada       (una por zona)
+         [ instancias app ]        [ instancias app ]
+                          │
+                   Base de datos gestionada (multi-AZ)</code></pre>
+        <p><strong>Identidad y acceso (IAM):</strong> cada request lo hace algún principal (usuario, rol de servicio). Aplica mínimo privilegio: roles separados por servicio, credenciales de vida corta y nunca claves de acceso en código ni en archivos de entorno.</p>
+        <p><strong>Trade-offs de serverless:</strong> pagas por invocación y escalas a cero, pero los cold starts suman latencia en el primer request, el tiempo de ejecución y el payload tienen límites y el acoplamiento al proveedor es alto. <strong>Multi-región</strong> mejora latencia y disponibilidad, pero te lleva a los trade-offs de consistencia del teorema CAP.</p>`,
+      cards: [
+        { q: "¿Qué es el modelo de responsabilidad compartida?", a: "El proveedor asegura la infraestructura y los servicios gestionados; tú aseguras todo lo que pones encima — datos, configuración, políticas de acceso y código de aplicación." },
+        { q: "¿IaaS vs PaaS vs serverless?", a: "IaaS: administras desde el SO hacia arriba. PaaS: administras solo la aplicación. Serverless: administras solo una función. Cada paso quita operación y quita control." },
+        { q: "¿Cuándo serverless es mala opción?", a: "Tráfico alto y constante (el costo por invocación supera al cómputo reservado), rutas sensibles a latencia golpeadas por cold starts, trabajos largos que superan los límites de ejecución o mucho estado." },
+        { q: "¿Cuáles son las categorías principales de almacenamiento?", a: "Object storage para archivos y assets (S3), block storage para discos de VMs, file storage para sistemas de archivos compartidos y bases de datos gestionadas para datos estructurados." },
+        { q: "¿Qué es una VPC?", a: "Una red privada que defines en la nube: su rango de IPs, subnets repartidas en zonas de disponibilidad, routing y reglas de firewall (security groups) que controlan qué puede hablar con qué." },
+        { q: "¿Qué hacen un load balancer y una CDN?", a: "Un load balancer distribuye tráfico entre instancias sanas en una o más zonas. Una CDN cachea contenido estático (y a veces dinámico) en ubicaciones de borde cerca de los usuarios." },
+        { q: "¿Qué es el mínimo privilegio en IAM?", a: "Cada usuario y servicio recibe solo los permisos que necesita — roles separados por servicio, credenciales de vida corta, sin políticas comodín y sin claves en el código." },
+        { q: "¿Por qué desplegar en varias zonas de disponibilidad?", a: "Para que una falla en una zona (energía, red) no tire el servicio. Las instancias se reparten entre zonas detrás de un load balancer y las bases gestionadas replican entre zonas." },
+        { q: "¿Qué es un cold start?", a: "La latencia de aprovisionar una instancia nueva de función en serverless cuando ninguna está caliente. Se mitiga con concurrencia aprovisionada, despliegues más chicos o reservando serverless para trabajo asíncrono." },
+        { q: "¿Qué te cuesta la multi-región?", a: "Complejidad y consistencia: los datos deben replicarse entre regiones, así que eliges por caso de uso entre consistencia fuerte y disponibilidad (CAP), y gestionas el failover." }
+      ],
+      quiz: [
+        { q: "Un equipo quiere ejecutar código ante eventos sin administrar servidores. El modelo es…", options: ["IaaS", "PaaS", "FaaS / serverless", "On-premise"], answer: 2, explain: "Functions as a Service corre tu código bajo demanda; el proveedor administra todo por debajo." },
+        { q: "¿Quién es responsable de asegurar los datos en una base de datos gestionada?", options: ["El proveedor de nube", "El cliente", "La CDN", "Nadie"], answer: 1, explain: "El proveedor asegura el servicio; los datos, la política de acceso y la configuración son responsabilidad del cliente." },
+        { q: "Un sitio con muchas imágenes es lento para usuarios lejos de sus servidores. ¿Mejor arreglo?", options: ["Más réplicas de base de datos", "Una CDN", "Una VM más grande", "Serverless"], answer: 1, explain: "Una CDN cachea assets en ubicaciones de borde cerca de los usuarios, bajando latencia y carga del origen." },
+        { q: "Un servicio corre constantemente con alta carga. Serverless probablemente…", options: ["Es más barato que cómputo reservado", "Es más caro que cómputo reservado y un mal encaje", "Es obligatorio", "No tiene cold starts"], answer: 1, explain: "El precio por invocación favorece cargas con ráfagas; el tráfico alto y constante es más barato en instancias reservadas o contenedores." },
+        { q: "Desplegar en tres zonas de disponibilidad protege contra…", options: ["Queries lentas", "La caída de una sola zona", "Altos costos de CDN", "Cold starts"], answer: 1, explain: "Repartir instancias entre zonas hace que la falla de una no tire el servicio." }
+      ]
+    },
+
+    "os-basics": {
+      title: "Fundamentos de SO y Concurrencia",
+      track: "backend",
+      icon: "📟",
+      blurb: "Los fundamentos de sistema operativo explican sobre qué corre realmente tu código: procesos y threads, cómo se comparte la CPU, cómo se administra la memoria y cómo se modela la espera de I/O — la base bajo event loops, thread pools y locks.",
+      read: `
+        <p><strong>Proceso vs thread:</strong> un proceso tiene su propio espacio de memoria, descriptores de archivo y recursos; los threads dentro de un proceso comparten esa memoria y cada uno tiene su propia pila y contador de programa. Los procesos están aislados (un crash no tumba a los demás); los threads se comunican barato (memoria compartida) pero necesitan sincronización.</p>
+        <pre><code>Proceso A                     Proceso B
+┌───────────────┐             ┌───────────────┐
+│ heap (compar- │             │ heap (espacio │
+│ tido por hilos)│             │ propio)       │
+│ ┌────┐ ┌────┐ │  sin acceso │ ┌────┐        │
+│ │T1  │ │T2  │ │  directo, ◄─┼─┤T3  │        │
+│ │pila│ │pila│ │  salvo IPC   │ │pila│        │
+│ └────┘ └────┘ │             │ └────┘        │
+└───────────────┘             └───────────────┘</code></pre>
+        <p><strong>Scheduling y context switch:</strong> con más threads ejecutables que núcleos, el SO alterna entre ellos (preempción). Un context switch guarda y restaura registros y puede vaciar cachés de CPU, así que muchos threads que mayormente esperan (I/O-bound) son eficientes, mientras que muchos threads de CPU solo suman sobrecosto de cambio.</p>
+        <p><strong>Sincronización:</strong> un <em>mutex</em> deja entrar a un thread a una sección crítica; un <em>semáforo</em> permite hasta N; una <em>condición de carrera</em> aparece cuando la corrección depende del timing — el arreglo es proteger el estado compartido, no "tener cuidado". Un <em>deadlock</em> es threads que cada uno sostiene un lock y espera el de otro; se evita con orden de locks consistente y secciones críticas cortas (el tema de bases de datos cubre la misma idea para transacciones).</p>
+        <pre><code>// Carrera: dos threads leen n, ambos suman, se pierde un incremento
+n = n + 1        // leer → sumar → escribir, no es atómico
+
+// Arreglo: solo un thread en la sección crítica
+lock.acquire(); n = n + 1; lock.release();</code></pre>
+        <p><strong>Memoria:</strong> cada proceso ve un espacio de direcciones <em>virtual</em> que el SO mapea a memoria física en páginas; esto da aislamiento y permite usar más memoria de la que hay (swapping). La <em>pila</em> guarda frames de llamadas y valores locales, es rápida y se recupera sola; el <em>heap</em> guarda objetos asignados dinámicamente y es donde viven el garbage collection y las fugas de memoria.</p>
+        <p><strong>Modelos de I/O:</strong> con I/O bloqueante un thread espera hasta que haya datos. Con I/O no bloqueante y notificaciones de disponibilidad (epoll, kqueue, IOCP) un thread pregunta "¿qué sockets están listos?" y atiende solo esos — el mecanismo detrás del event loop de Node.js y de nginx. Muchas conexiones concurrentes cuestan entonces poco más que una estructura de datos.</p>
+        <p><strong>Syscalls y cachés:</strong> el código de usuario llega al kernel solo mediante llamadas al sistema (read, write, open, socket), que son relativamente caras — una razón para buferizar y hacer batching. Y las cachés de CPU hacen que el acceso secuencial a memoria contigua sea mucho más rápido que saltar entre punteros por el heap.</p>`,
+      cards: [
+        { q: "¿Proceso vs thread?", a: "Un proceso tiene su propia memoria y recursos; los threads dentro de él comparten memoria y tienen pilas separadas. Los procesos dan aislamiento, los threads dan estado compartido barato que necesita sincronización." },
+        { q: "¿Qué es un context switch y por qué cuesta?", a: "El SO guarda el estado de un thread y restaura el de otro cuando hace preempción. Cuesta tiempo y puede desalojar contenido de las cachés de CPU, así que demasiados threads de CPU solo suman sobrecosto." },
+        { q: "¿Mutex vs semáforo?", a: "Un mutex permite que un solo thread entre a una sección crítica a la vez. Un semáforo permite hasta N titulares — útil para limitar el acceso a un pool de recursos." },
+        { q: "¿Qué es una condición de carrera?", a: "Cuando el resultado depende del timing de accesos concurrentes — por ejemplo dos threads haciendo leer-modificar-escribir sobre la misma variable y perdiendo un update. Se arregla protegiendo el estado compartido con un lock o una operación atómica." },
+        { q: "¿Qué es un deadlock y cómo se evita?", a: "Threads que cada uno sostiene un lock y espera un lock que otro sostiene, así que ninguno avanza. Se evita con un orden de locks consistente en todas partes y secciones críticas cortas." },
+        { q: "¿Qué es la memoria virtual?", a: "Cada proceso recibe su propio espacio de direcciones virtual, que el SO mapea a memoria física en páginas. Da aislamiento entre procesos y permite usar más memoria de la que existe físicamente." },
+        { q: "¿Pila vs heap?", a: "La pila guarda frames de llamadas y valores locales, es rápida y se recupera sola. El heap guarda objetos asignados dinámicamente con vidas gestionadas a mano o por garbage collector — el hogar de las fugas de memoria." },
+        { q: "¿I/O bloqueante vs no bloqueante?", a: "Bloqueante: un thread espera hasta que la operación termine. No bloqueante: el thread pregunta qué descriptores están listos (epoll, kqueue, IOCP) y atiende solo esos — un thread puede servir muchas conexiones." },
+        { q: "¿Qué es una llamada al sistema?", a: "El punto de entrada controlado desde el código de usuario al kernel (read, write, open, socket). Tiene un costo fijo, razón por la que el buffering y el batching reducen la sobrecarga." },
+        { q: "¿Por qué importa la localidad de memoria?", a: "Las cachés de CPU hacen que el acceso secuencial a memoria cercana sea mucho más rápido que seguir punteros por el heap. El layout de los datos afecta el rendimiento tanto como el algoritmo en las rutas calientes." }
+      ],
+      quiz: [
+        { q: "Dos threads ejecutan counter = counter + 1 un millón de veces cada uno; el resultado es menor que dos millones. ¿Por qué?", options: ["Desbordamiento de entero", "Una condición de carrera: el update no es atómico", "Memoria virtual", "Un context switch es imposible"], answer: 1, explain: "Leer-modificar-escribir se intercala entre threads. Protégelo con un lock o un incremento atómico." },
+        { q: "Un thread de un servidor web atiende decenas de miles de conexiones casi inactivas. Está usando…", options: ["I/O bloqueante con un thread por conexión", "I/O no bloqueante con notificaciones de disponibilidad", "Más núcleos que conexiones", "Un semáforo"], answer: 1, explain: "La disponibilidad estilo epoll deja que un thread atienda muchas conexiones en espera barato — el modelo de event loop." },
+        { q: "¿Qué evita el deadlock de forma más fiable?", options: ["Secciones críticas más largas", "Adquirir los locks en el mismo orden en todos los threads", "Más threads", "Pilas más grandes"], answer: 1, explain: "Un orden de locks global y consistente hace imposible un ciclo de espera." },
+        { q: "Un crash en un proceso no afecta a los demás porque…", options: ["Comparten el heap", "Cada uno tiene un espacio de direcciones virtual separado", "Los threads son caros", "Las syscalls son rápidas"], answer: 1, explain: "La memoria virtual aísla los procesos; un fallo en un espacio de direcciones no puede alcanzar otro." },
+        { q: "¿Dónde viven los objetos asignados dinámicamente?", options: ["En la pila", "En el heap", "En la caché", "En los registros"], answer: 1, explain: "El heap guarda objetos con vidas flexibles; la pila guarda frames de llamadas y locales." }
       ]
     }
   }
