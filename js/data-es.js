@@ -5,20 +5,42 @@ window.STUDY_DATA_ES = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Arquitectura, APIs, bases de datos, concurrencia, caché, seguridad, principios y POO.",
-      topics: ["architecture", "distributed", "apis", "databases", "cache-messaging", "security", "principles", "patterns", "oop", "antipatterns"]
+      tagline: "Arquitectura, APIs, bases de datos y concurrencia, caché, seguridad, Node.js y .NET, principios, patrones y POO.",
+      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns"],
+      groups: [
+        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis"] },
+        { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
+        { name: "Seguridad", topics: ["security"] },
+        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
+        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "antipatterns"] }
+      ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "React.js: fundamentos, hooks, renderizado, rendimiento, estado, SSR y testing.",
-      topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"]
+      tagline: "Fundamentos de JavaScript y CSS, React a fondo y WebSockets en tiempo real.",
+      topics: ["js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      groups: [
+        { name: "Fundamentos Web", topics: ["js-core", "css-web"] },
+        { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
+        { name: "Web en Tiempo Real", topics: ["web-rt"] }
+      ]
     },
     fullstack: {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Todo: el currículo completo de back-end y front-end en una sola ruta.",
-      topics: ["architecture", "distributed", "apis", "databases", "cache-messaging", "security", "principles", "patterns", "oop", "antipatterns", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"]
+      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns", "js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      groups: [
+        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis"] },
+        { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
+        { name: "Seguridad", topics: ["security"] },
+        { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
+        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "antipatterns"] },
+        { name: "Fundamentos Web", topics: ["js-core", "css-web"] },
+        { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
+        { name: "Web en Tiempo Real", topics: ["web-rt"] }
+      ]
     }
   },
 
@@ -259,38 +281,54 @@ window.STUDY_DATA_ES = {
       icon: "🧱",
       blurb: "Un patrón de diseño es una solución con nombre y reutilizable a un problema que se repite en el diseño de software. El catálogo clásico de la Gang of Four cubre creación y estructura de objetos; el desarrollo back-end agrega patrones de arquitectura como Repository, Saga y Outbox.",
       read: `
-        <table><thead><tr><th>Patrón</th><th>Uso típico en back-end</th></tr></thead><tbody>
-        <tr><td>Repository</td><td>Abstrae el acceso a datos; el dominio no sabe si es SQL/Mongo/API; sin fugas del ORM</td></tr>
-        <tr><td>Unit of Work</td><td>Agrupa operaciones en una transacción</td></tr>
-        <tr><td>DTO / Mapper</td><td>Objetos de transporte; conversión entre dominio/DTO/persistencia</td></tr>
-        <tr><td>DI</td><td>Recibir dependencias por el constructor — testeabilidad</td></tr>
-        <tr><td>Factory / Builder</td><td>Encapsular creación / objetos complejos paso a paso</td></tr>
-        <tr><td>Strategy</td><td>Intercambiar algoritmos en runtime (gateways, descuentos)</td></tr>
-        <tr><td>Adapter / Facade</td><td>Adecuar interfaz externa / simplificar un subsistema</td></tr>
-        <tr><td>Decorator / Proxy</td><td>Agregar logging/caché/retry alrededor / lazy load, control de acceso</td></tr>
-        <tr><td>Observer</td><td>Notificar sin acoplar — raíz de la mensajería</td></tr>
-        <tr><td>Chain of Responsibility / Template Method</td><td>Pipelines de middleware / esqueleto fijo, pasos variables</td></tr>
-        <tr><td>Singleton</td><td>Prefiere el scope singleton del contenedor DI sobre getInstance() manual</td></tr>
-        </tbody></table>
-        <p><strong>Strategy vs State:</strong> Strategy = algoritmo elegido desde afuera; State = el objeto cambia su propio comportamiento por estado interno (Order en NEW/PAID/SHIPPED).</p>
-        <p><strong>Cuándo NO aplicar:</strong> una sola implementación sin segundo uso (YAGNI), capas que no agregan nada, patrones como decoración. La sobre-ingeniería es en sí un antipatrón.</p>`,
+        <p>Un patrón de diseño es una solución con nombre y reutilizable a un problema que se repite. Se agrupan en <strong>creacionales</strong> (cómo se construyen los objetos), <strong>estructurales</strong> (cómo se componen), <strong>de comportamiento</strong> (cómo colaboran) — más los <strong>de datos y arquitectura</strong> que agrega el back-end.</p>
+        <h4>Creacionales — cómo se construyen los objetos</h4>
+        <p><strong>Factory Method.</strong> Un método decide qué clase concreta instanciar, así los llamadores dependen de una abstracción y no de constructores. Ejemplo: <code>SenderFactory.forProvider(config)</code> devolviendo un sender de SendGrid o SES. Omitelo cuando la construcción es un simple <code>new</code> sin variación.</p>
+        <p><strong>Builder.</strong> Ensambla un objeto complejo paso a paso con una API fluida en vez de constructores telescópicos. Ejemplo: <code>Query.select(...).where(...).limit(...)</code>. Omitelo para objetos con dos campos.</p>
+        <p><strong>Singleton.</strong> Garantiza una única instancia compartida con acceso global. En back-end, prefiere el scope singleton del contenedor DI sobre un <code>getInstance()</code> manual — un singleton estático esconde dependencias, bloquea el testing y trae sorpresas de concurrencia.</p>
+        <h4>Estructurales — cómo se componen</h4>
+        <p><strong>Adapter.</strong> Convierte una interfaz externa en la que tu sistema espera. Ejemplo: envolver el SDK de un proveedor de SMS detrás de tu propio puerto <code>SmsSender</code> para poder cambiar de proveedor. Trade-off: es indirección deliberada — no adaptes interfaces que son tuyas.</p>
+        <p><strong>Facade.</strong> Un punto de entrada simplificado sobre un subsistema complicado. Ejemplo: <code>PaymentFacade.charge()</code> ocultando fraude + gateway + ledger. A diferencia del Adapter (convierte una interfaz), la Facade esconde complejidad tras una nueva más simple.</p>
+        <p><strong>Decorator.</strong> Envuelve un componente para agregar comportamiento — logging, caché, retry — sin modificarlo: misma interfaz, responsabilidades apilables. Omítelo cuando un único interés transversal se resuelve con middleware simple.</p>
+        <p><strong>Proxy.</strong> Un suplente que controla el acceso al sujeto real: lazy loading, control de acceso, caché, llamadas remotas. El Decorator agrega comportamiento; el Proxy controla acceso.</p>
+        <p><strong>DTO & Mapper.</strong> Los DTO son objetos de transporte inertes en los bordes de la API; los mappers convierten entre entidades de dominio, DTO y modelos de persistencia. Mantienen la estructura interna fuera de tus contratos, al costo de boilerplate de mapeo.</p>
+        <h4>De comportamiento — cómo colaboran</h4>
+        <p><strong>Strategy.</strong> Define una familia de algoritmos intercambiables tras una interfaz; el llamador elige uno en runtime. Ejemplo: gateways de pago (<code>CardStrategy</code>, <code>PayPalStrategy</code>). Botón de apagado: cuando solo existirá una implementación (YAGNI).</p>
+        <p><strong>State.</strong> Estructuralmente idéntico a Strategy, pero el objeto cambia su propio comportamiento según su estado interno (Order en NEW/PAID/SHIPPED) — la "estrategia" no se elige desde afuera.</p>
+        <p><strong>Observer.</strong> Un sujeto emite eventos; los observadores se suscriben sin que el sujeto los conozca. Raíz conceptual de los eventos de dominio y los message brokers. Riesgo: flujos ocultos difíciles de trazar — mantén pocos eventos y con sentido.</p>
+        <p><strong>Chain of Responsibility.</strong> Una petición atraviesa un pipeline de manejadores, cada uno decidiendo actuar, mutar o pasarla. Ejemplo: middleware HTTP (auth → validación → handler).</p>
+        <p><strong>Template Method.</strong> Una clase base fija el esqueleto del algoritmo y deja que las subclases sobreescriban pasos individuales. Prefiere composición (Strategy) cuando los pasos varían de forma independiente.</p>
+        <h4>Datos y arquitectura — básicos del back-end</h4>
+        <p><strong>Repository.</strong> Media entre el dominio y la persistencia tras una interfaz tipo colección (<code>findByEmail()</code>), así el dominio nunca ve SQL, Mongo ni tipos del ORM. Mal uso típico: filtrar entidades y query types del ORM a través de él.</p>
+        <p><strong>Unit of Work.</strong> Rastrea todo lo cargado y cambiado en una transacción de negocio y hace commit o rollback como unidad — lo que el <code>DbContext</code> de EF Core hace por ti, o un transaction script a mano.</p>
+        <p><strong>Dependency Injection.</strong> Las dependencias llegan desde afuera (constructor) en vez de instanciarse adentro, habilitando mocks y reemplazos. Es un patrón, no un framework — el contenedor solo automatiza el cableado.</p>
+        <p><strong>Cuándo NO usar ningún patrón:</strong> una sola implementación sin segundo uso a la vista (YAGNI, regla de tres), una capa que no agrega nada, patrones como decoración. La sobre-ingeniería es en sí un antipatrón.</p>`,
       cards: [
-        { q: "¿Qué hace el patrón Repository?", a: "Abstrae el acceso a datos: el dominio llama a UserRepository.findByEmail() sin saber si detrás hay SQL, Mongo o una API. No debe filtrar detalles del ORM." },
-        { q: "¿Patrón Strategy vs State?", a: "Estructuralmente parecidos. Strategy: el algoritmo se elige desde afuera (caller/config). State: el objeto cambia su propio comportamiento según su estado interno (Order en NEW/PAID/SHIPPED)." },
-        { q: "¿Adapter vs Facade?", a: "Adapter adecúa una interfaz externa a la que tu sistema espera (proveedor de email). Facade simplifica un subsistema complejo tras una interfaz limpia (PaymentFacade sobre varios proveedores)." },
-        { q: "¿Qué agrega un Decorator?", a: "Comportamiento alrededor de un servicio sin modificarlo — logging, caché, retry — envolviéndolo." },
-        { q: "¿Cómo implementar Singleton correctamente?", a: "Prefiere el scope singleton del contenedor DI sobre un getInstance() manual. El estado global oculto daña la testeabilidad y la concurrencia." },
-        { q: "¿Qué es Unit of Work?", a: "Agrupa varias operaciones en una transacción y hace commit/rollback al final." },
-        { q: "¿Para qué sirven los DTOs?", a: "Objetos de transporte entre capas/APIs para nunca exponer entidades de la BD directamente; un Mapper convierte entre dominio, DTO y modelos de persistencia." },
-        { q: "¿Cuándo NO crear una abstracción?", a: "Una sola implementación sin segundo uso a la vista (YAGNI/regla de tres), una capa que no agrega nada, o una interfaz que nadie mockea ni implementa dos veces." },
-        { q: "¿La importancia del patrón Observer?", a: "Notificar cambios sin acoplar emisor a receptores — la raíz conceptual de la mensajería/pub-sub." }
+        { q: "Explica el patrón Factory Method.", a: "Un método que decide qué clase concreta instanciar, así los llamadores dependen de una abstracción y no de constructores — p. ej. SenderFactory.forProvider(config) devolviendo SendGrid o SES. Omitelo cuando la construcción es un simple new sin variación." },
+        { q: "Explica el patrón Builder.", a: "Ensambla un objeto complejo paso a paso con una API fluida en vez de constructores telescópicos — Query.select().where().limit(). Omitelo para objetos con dos campos." },
+        { q: "¿Cómo implementar Singleton en código back-end?", a: "Prefiere el scope singleton del contenedor DI sobre un getInstance() manual. Un singleton estático esconde dependencias, bloquea el testing y trae sorpresas de concurrencia." },
+        { q: "Explica el patrón Adapter.", a: "Convierte una interfaz externa en la que tu sistema espera — envolver el SDK de un proveedor de SMS detrás de tu propio SmsSender para poder cambiarlo. Es indirección deliberada: no adaptes interfaces que son tuyas." },
+        { q: "Explica Facade y su diferencia con Adapter.", a: "Un punto de entrada simplificado sobre un subsistema complicado (PaymentFacade.charge() ocultando fraude + gateway + ledger). Adapter convierte una interfaz existente; Facade esconde complejidad tras una nueva más simple." },
+        { q: "Explica el patrón Decorator.", a: "Envuelve un componente para agregar comportamiento — logging, caché, retry — sin modificarlo: misma interfaz, responsabilidades apilables. Para un único interés transversal, middleware simple puede bastar." },
+        { q: "¿Decorator vs Proxy?", a: "Decorator agrega comportamiento alrededor de un componente (misma interfaz, responsabilidades apilables). Proxy controla el acceso al sujeto real: lazy loading, control de acceso, caché, llamadas remotas." },
+        { q: "¿Para qué sirven DTO y Mapper?", a: "Los DTO son objetos de transporte inertes en los bordes de la API; los mappers convierten entre entidades de dominio, DTO y modelos de persistencia. Mantienen la estructura interna fuera de tus contratos, al costo de boilerplate de mapeo." },
+        { q: "Explica el patrón Strategy.", a: "Define una familia de algoritmos intercambiables tras una interfaz; el llamador elige uno en runtime — gateways de pago (CardStrategy, PayPalStrategy). Botón de apagado: cuando solo existirá una implementación (YAGNI)." },
+        { q: "¿Strategy vs State?", a: "Estructuralmente idénticos. Strategy: el algoritmo se elige desde afuera (caller/config). State: el objeto cambia su propio comportamiento según su estado interno (Order en NEW/PAID/SHIPPED)." },
+        { q: "Explica Observer y su riesgo.", a: "Un sujeto emite eventos; los observadores se suscriben sin que el sujeto los conozca — la raíz conceptual de los eventos de dominio y los brokers. Riesgo: flujos ocultos difíciles de trazar — mantén pocos eventos y con sentido." },
+        { q: "Explica Chain of Responsibility.", a: "Una petición atraviesa un pipeline de manejadores, cada uno decidiendo actuar, mutar o pasarla — el middleware HTTP (auth → validación → handler) es el caso clásico." },
+        { q: "Explica Template Method y su preferencia moderna.", a: "Una clase base fija el esqueleto del algoritmo y las subclases sobreescriben pasos individuales. Prefiere composición (Strategy) cuando los pasos varían de forma independiente." },
+        { q: "Explica Repository y su mal uso típico.", a: "Media entre dominio y persistencia tras una interfaz tipo colección (findByEmail()), así el dominio nunca ve SQL, Mongo ni tipos del ORM. Mal uso: filtrar entidades y query types del ORM a través de él." },
+        { q: "Explica Unit of Work.", a: "Rastrea todo lo cargado y cambiado en una transacción de negocio y hace commit o rollback como unidad — lo que el DbContext de EF Core hace por ti, o un transaction script a mano." },
+        { q: "¿Qué es Dependency Injection, en el fondo?", a: "Dependencias entregadas desde afuera (constructor) en vez de instanciarse adentro, habilitando mocks y reemplazos. Es un patrón, no un framework — el contenedor solo automatiza el cableado." }
       ],
       quiz: [
         { q: "Un Order se comporta distinto en NEW, PAID, SHIPPED según su propio estado. ¿Qué patrón?", options: ["Strategy", "State", "Adapter", "Facade"], answer: 1, explain: "State: el objeto cambia su comportamiento por estado interno. Strategy se elige desde afuera." },
         { q: "Envolver un servicio para agregar retry sin editarlo es…", options: ["Proxy", "Decorator", "Facade", "Builder"], answer: 1, explain: "Decorator agrega comportamiento alrededor de un componente sin modificarlo." },
         { q: "La forma recomendada de tener un Singleton es…", options: ["Un getInstance() estático", "El scope singleton del contenedor DI", "Una variable global", "Una instancia nueva por llamada"], answer: 1, explain: "El scope del contenedor evita estado global oculto y mantiene la testeabilidad." },
         { q: "Adaptar el SDK de un proveedor de email detrás de tu propia interfaz es…", options: ["Facade", "Adapter", "Strategy", "Observer"], answer: 1, explain: "Adapter convierte una interfaz externa a la que tu sistema espera." },
-        { q: "Crear una interfaz para una sola implementación sin segundo uso es…", options: ["Buena práctica de DIP", "Sobre-ingeniería (YAGNI)", "Exigido por SOLID", "La regla de tres"], answer: 1, explain: "No abstruyas prematuramente; espera un segundo uso real." }
+        { q: "El código debe crear clientes de SendGrid o SES según config, sin que los llamadores conozcan las clases concretas. ¿Qué patrón?", options: ["Factory Method", "Observer", "Template Method", "Proxy"], answer: 0, explain: "Factory Method encapsula qué clase concreta se instancia tras una abstracción." },
+        { q: "Una petición fluye por auth → validación → handler, y cada eslabón puede cortar la cadena. Esto es…", options: ["Observer", "Chain of Responsibility", "Mediator", "Command"], answer: 1, explain: "Chain of Responsibility pasa la petición por manejadores que actúan, mutan o la pasan — el middleware HTTP en esencia." },
+        { q: "Crear una interfaz para una sola implementación sin segundo uso es…", options: ["Buena práctica de DIP", "Sobre-ingeniería (YAGNI)", "Exigido por SOLID", "La regla de tres"], answer: 1, explain: "No abstrigas prematuramente; espera un segundo uso real." }
       ]
     },
 
@@ -581,6 +619,232 @@ window.STUDY_DATA_ES = {
         { q: "Los error boundaries atrapan…", options: ["Errores de event handlers", "Errores asíncronos", "Errores del árbol de renderizado debajo de ellos", "Todos los errores"], answer: 2, explain: "Atrapan errores de render debajo; los de handlers y asíncronos necesitan try/catch." },
         { q: "Un efecto que corre dos veces en desarrollo lo causa…", options: ["Un bug en tu código", "La doble invocación de StrictMode", "React.memo", "Hidratación"], answer: 1, explain: "StrictMode invoca dos veces a propósito para revelar cleanups faltantes; no pasa en producción." },
         { q: "Para tests de interacción realistas, prefiere…", options: ["fireEvent", "userEvent", "Mutación directa de estado", "Solo snapshots"], answer: 1, explain: "userEvent simula secuencias completas de eventos reales del usuario." }
+      ]
+    },
+
+    "nodejs": {
+      title: "Runtime de Node.js",
+      track: "backend",
+      icon: "🟩",
+      blurb: "Node.js es un runtime de JavaScript construido sobre el motor V8 de Chrome y libuv que ejecuta código en un solo hilo con I/O no bloqueante y orientado a eventos — ideal para servicios intensivos en I/O, y escalable horizontalmente con cluster o worker threads.",
+      read: `
+        <p><strong>Event loop (libuv):</strong> tu JS corre en un hilo; el loop vacía la pila de llamadas y luego procesa las <strong>microtasks</strong> (Promises) antes de cada <strong>macrotask</strong> (timers, callbacks de I/O). Las llamadas bloqueantes (fs síncrono, JSON.parse gigantes, bucles largos) matan de hambre a todo — Node es rápido coordinando I/O, no haciendo CPU.</p>
+        <p><strong>Thread pool:</strong> libuv delega el trabajo de fs, crypto, dns y zlib a 4 hilos por defecto (UV_THREADPOOL_SIZE). Por eso el Node "single-threaded" igual hace disco/crypto en paralelo.</p>
+        <p><strong>Trabajo de CPU:</strong> <code>worker_threads</code> (JS en paralelo en un proceso) vs <code>cluster</code> (N procesos, uno por núcleo, tras un puerto compartido — también tu unidad de reinicio sin downtime). Para escalar, prefiere más procesos/contenedores antes que máquinas más grandes.</p>
+        <p><strong>Streams y backpressure:</strong> procesa los datos por chunks (pipeline(), transform streams) en vez de bufferizar payloads enteros; el backpressure (highWaterMark + await drain) evita que un productor rápido desborde a un consumidor lento.</p>
+        <p><strong>Buffers y EventEmitter:</strong> los Buffers manejan bytes crudos fuera del heap de V8; EventEmitter es el pub/sub en proceso sobre el que se construyen streams, servers y casi toda la API (los eventos de error no tienen handler por defecto — lanzan).</p>
+        <p><strong>npm y semver:</strong> <code>^</code> permite minor+patch, <code>~</code> solo patch; los lockfiles hacen las instalaciones reproducibles — comitealos. Audita dependencias (cadena de suministro).</p>
+        <p><strong>Higiene de producción:</strong> config por variables de entorno (12-factor), graceful shutdown (dejar de aceptar conexiones, drenar, cerrar pools de BD), logs como streams, y manejar <code>uncaughtException</code>/<code>unhandledRejection</code> logueando y saliendo — deja que el orquestador te reinicie.</p>`,
+      cards: [
+        { q: "¿Cómo funciona el event loop de Node.js?", a: "Tu JS corre en un hilo; el loop de libuv vacía la pila de llamadas y luego procesa las microtasks (Promises) antes de cada macrotask (timers, callbacks de I/O). Node es coordinación de I/O dirigida por eventos — no cómputo paralelo." },
+        { q: "¿Qué bloquea el event loop y por qué es fatal en Node?", a: "Llamadas fs síncronas, JSON.parse/stringify gigantes, bucles largos de CPU, regex complejas. Todo lo demás comparte ese hilo — un request bloqueado detiene todos. Delega a worker threads o colas." },
+        { q: "Si Node es single-threaded, ¿cómo corren fs/crypto en paralelo?", a: "El thread pool de libuv — 4 hilos por defecto (UV_THREADPOOL_SIZE) — se lleva el trabajo de fs, crypto, dns y zlib fuera del hilo principal." },
+        { q: "¿Cluster vs worker_threads?", a: "Cluster forkea N procesos (uno por núcleo) compartiendo un puerto — escalado a nivel de proceso y la unidad de reinicio sin downtime. worker_threads corre hilos de JS en paralelo dentro de un proceso — para trabajo de CPU que comparte memoria." },
+        { q: "¿Qué es el backpressure en streams?", a: "Un productor rápido desbordando a un consumidor lento. Los streams señalan capacidad (highWaterMark); write() devuelve false / pipeline() espera drain para que el productor pause en vez de bufferizar memoria sin límite." },
+        { q: "¿Por qué streams en vez de bufferizar payloads enteros?", a: "Memoria constante: procesa un archivo de 2GB por chunks con pipeline() y transform streams en vez de cargarlo (o su JSON) a la RAM." },
+        { q: "¿Qué es un Buffer?", a: "Un bloque de bytes crudos de longitud fija asignado fuera del heap de V8 — la forma en que Node lee/escribe archivos, sockets y protocolos binarios sin el costo de strings de JS." },
+        { q: "¿Qué es EventEmitter — y su filo más peligroso?", a: "El pub/sub en proceso de Node (on/emit), la base de streams y servers. Filo: un evento 'error' sin listener lanza y puede tumbar el proceso — maneja siempre los errores." },
+        { q: "¿Qué significan ^ y ~ en package.json, y por qué comitear el lockfile?", a: "^ permite upgrades de minor+patch, ~ solo patch. El lockfile fija el árbol exacto resuelto para que cada instalación (y CI) sea reproducible — comitealo." },
+        { q: "¿Qué significa graceful shutdown en Node?", a: "Ante SIGTERM: dejar de aceptar conexiones nuevas, terminar los requests en vuelo, cerrar pools/manejadores de BD y salir — orquestado para que el load balancer y el orquestador te reinicien sin requests caídos." },
+        { q: "¿Cómo manejar un uncaughtException?", a: "Loguearlo, liberar lo que se pueda y salir — el proceso puede quedar en estado indefinido. Deja que PM2/Kubernetes lo reinicie; no intentes seguir corriendo tras un crash." }
+      ],
+      quiz: [
+        { q: "Un endpoint lee un archivo de 2GB a memoria con fs.readFileSync y lo parsea. Bajo carga el servicio muere. Causa raíz?", options: ["Muy pocos workers de cluster", "Bloquear el único hilo del event loop + memoria sin límite", "Un bug del GC de V8", "Falta el thread pool"], answer: 1, explain: "El I/O síncrono bloquea el loop para todos los requests mientras bufferiza gigabytes — usa streams con pipeline()." },
+        { q: "Tu API hace reescalado pesado de imágenes y el event loop se traba. Mejor arreglo?", options: ["Subir UV_THREADPOOL_SIZE a 128", "Mover el reescalado a worker_threads o a una cola", "Agregar RAM", "Usar promises en todo"], answer: 1, explain: "El trabajo de CPU va fuera del loop — worker threads en proceso, o una cola/servicio de workers fuera de proceso." },
+        { q: "El módulo cluster te da principalmente…", options: ["Hilos de JS en paralelo compartiendo memoria", "N procesos en N núcleos tras un puerto", "I/O de archivos asíncrono", "Un thread pool para crypto"], answer: 1, explain: "Cluster forkea procesos que comparten el puerto — escalado a nivel de proceso y la unidad de reinicio rolling." },
+        { q: "write() en un stream sigue devolviendo false. ¿Qué te está diciendo el stream?", options: ["El stream se cerró", "Backpressure: el consumidor no abastece — pausa la producción hasta drain", "Debes reintentar la escritura", "El buffer está corrupto"], answer: 1, explain: "Eso es backpressure — respétalo pausando/reanudando o dejando que pipeline() regule la producción." },
+        { q: "Un evento 'error' se dispara en un stream sin listener de error. Node…", options: ["Lo ignora", "Lanza — potencialmente tumbando el proceso", "Emite un warning", "Reintenta la operación"], answer: 1, explain: "Los eventos 'error' sin handler lanzan; adjunta handlers o usa pipeline(), que propaga errores." },
+        { q: "Se dispara un uncaughtException. La respuesta correcta es…", options: ["Seguir sirviendo — es solo un warning", "Loguear, limpiar y salir; deja que el supervisor reinicie", "Reiniciar el event loop", "Tragarlo con un handler vacío"], answer: 1, explain: "Tras una excepción no capturada el estado del proceso es indefinido — sal limpio y deja que PM2/K8s reinicie." }
+      ]
+    },
+
+    "dotnet": {
+      title: ".NET / C# para Back-End",
+      track: "backend",
+      icon: "⚙️",
+      blurb: ".NET (con ASP.NET Core) es el runtime administrado y el framework web de Microsoft: C# compila a IL, corre en el CLR con el servidor Kestrel, y trae contenedor DI, el ORM EF Core y un pipeline de middleware.",
+      read: `
+        <p><strong>Runtime:</strong> C# compila a IL, JIT-compilado por el CLR (GC, seguridad de tipos). Las apps ASP.NET Core se auto-hospedan en <strong>Kestrel</strong> (servidor web multiplataforma); IIS/Nginx suelen ir delante como reverse proxies.</p>
+        <p><strong>Pipeline de middleware:</strong> el request fluye por componentes registrados en orden (app.Use(...)) — cada uno puede actuar y cortocircuitar o llamar al siguiente: auth → routing → transversales → endpoints. El orden importa.</p>
+        <p><strong>DI incorporado:</strong> inyección por constructor vía IServiceProvider con tres lifetimes: <strong>Transient</strong> (nuevo en cada resolve), <strong>Scoped</strong> (uno por request HTTP), <strong>Singleton</strong> (uno para siempre). Trampa clásica: la <em>captive dependency</em> — un singleton sosteniendo un scoped (como un DbContext) lo mantiene vivo más allá de su request, causando estado viejo y bugs de concurrencia.</p>
+        <p><strong>EF Core:</strong> el DbContext es Unit of Work + change tracker; las queries LINQ son IQueryable traducidas a SQL. Pitfall N+1: IQueryable devuelto y enumerado tarde, o lazy loading — se arregla con eager loading (.Include). Las migraciones son scripts de esquema versionados y reversibles (el patrón expand-contract para despliegues sin downtime).</p>
+        <p><strong>async/await:</strong> escala liberando hilos durante el I/O. Evita <code>.Result/.Wait()</code> (deadlocks sync-over-async bajo sync context, starvation del thread pool); prefiere Task.WhenAll para llamadas independientes.</p>
+        <p><strong>Minimal APIs vs MVC:</strong> minimal APIs (lambdas en endpoint-routing) para microservicios y servicios chicos; controllers + filters para apps grandes con convenciones. Ambos comparten pipeline y DI.</p>
+        <p><strong>Configuración y options:</strong> appsettings + variables de entorno + secrets se funden en IConfiguration y se bindean a clases Options&lt;T&gt; tipadas validadas al arranque.</p>`,
+      cards: [
+        { q: "¿Qué son el CLR, el IL y Kestrel en una frase?", a: "C# compila a IL, que el CLR JIT-compila y ejecuta (GC, seguridad de tipos). Las apps ASP.NET Core se auto-hospedan en Kestrel, un servidor web multiplataforma, normalmente detrás de un reverse proxy como Nginx o IIS." },
+        { q: "¿Cómo funciona el pipeline de middleware de ASP.NET Core?", a: "Componentes registrados en orden (app.Use); cada uno ve el HttpContext, puede actuar/cortocircuitar o llamar al siguiente — auth → routing → transversales → endpoint. El orden de registro importa." },
+        { q: "Explica los tres lifetimes de servicios del DI.", a: "Transient: instancia nueva por resolve. Scoped: uno por request HTTP. Singleton: uno de por vida de la app. Elige por estado y thread-safety, y nunca dejes que un servicio longevo capture uno más corto." },
+        { q: "¿Qué es una captive dependency?", a: "Un singleton que inyecta un scoped (p. ej. DbContext) — lo captura más allá del request, causando datos viejos y bugs de concurrencia. Arreglo: inyecta IServiceScopeFactory y crea un scope por unidad de trabajo." },
+        { q: "¿Qué es el DbContext en términos de EF Core?", a: "Unit of Work + change tracker: rastrea las entidades cargadas, traduce LINQ (IQueryable) a SQL y guarda los cambios como una transacción con SaveChanges()." },
+        { q: "¿Cómo ocurre el clásico N+1 de EF Core y cómo se arregla?", a: "Enumerando datos relacionados lazy, o devolviendo un IQueryable que se consulta por fila. Arreglo: eager loading (.Include/.ThenInclude), proyección (.Select de lo justo) o batching." },
+        { q: "¿Por qué las migraciones de EF Core son más que scripts de esquema?", a: "Son snapshots C# del modelo, versionados, ordenados y reversibles — aplícalas con expand-contract (agregar columna → desplegar código → backfill → eliminar lo viejo) para despliegues sin downtime." },
+        { q: "¿Por qué es peligroso .Result/.Wait()?", a: "Sync-over-async: bloquea un hilo del pool esperando la completitud async — starvation de hilos y deadlocks cuando existe SynchronizationContext (el ASP.NET clásico). Usa await." },
+        { q: "¿Cuándo Task.WhenAll vs awaits secuenciales?", a: "WhenAll corre I/O independiente en concurrently y falla rápido con la primera excepción; los awaits secuenciales serializan la latencia. Solo usa WhenAll con llamadas verdaderamente independientes." },
+        { q: "¿Minimal APIs vs controllers MVC — cuándo cada uno?", a: "Minimal APIs: lambdas en endpoint-routing, menos ceremonia — microservicios y servicios chicos. MVC: controllers, filters y convenciones de model-binding — apps grandes que quieren estructura. Mismo pipeline y DI debajo." },
+        { q: "¿Qué es el patrón Options?", a: "Configuración tipada: las fuentes de IConfiguration (appsettings, env vars, secrets) se bindean a clases Options<T> validadas al arranque — sin magic strings regadas por el código." }
+      ],
+      quiz: [
+        { q: "Un singleton inyecta un DbContext scoped. Con el tiempo sirve filas viejas y lanza errores de concurrencia. Esto es…", options: ["Una fuga del thread pool", "Una captive dependency", "Una query N+1", "Un bug de orden de middleware"], answer: 1, explain: "El singleton captura la instancia scoped más allá de su request. Inyecta IServiceScopeFactory y scopea por unidad de trabajo." },
+        { q: "Un endpoint hace tres llamadas de API independientes con awaits secuenciales. ¿La mejora más simple?", options: ["Envolver en Task.Run", "Task.WhenAll de las tres llamadas", "Hacer el servicio singleton", "Agregar cabeceras de caché"], answer: 1, explain: "WhenAll corre el I/O independiente en concurrently en vez de pagar tres latencias en serie." },
+        { q: "En ASP.NET Core, el middleware registrado después de uno que cortocircuita…", options: ["Corre igual en paralelo", "No corre para ese request", "Corre dos veces", "Lanza error"], answer: 1, explain: "El pipeline cortocircuitado se detiene ahí — por eso el middleware de auth va antes que el trabajo." },
+        { q: "Lazy-loading de propiedades de navegación dentro de un bucle produce…", options: ["Un deadlock", "Queries N+1", "Una captive dependency", "View bloat"], answer: 1, explain: "Una query por acceso — se arregla con .Include eager loading o proyección." },
+        { q: "Scoped lifetime significa…", options: ["Una instancia por resolve", "Una instancia por request HTTP", "Una instancia de por vida de la app", "Una instancia por hilo"], answer: 1, explain: "Scoped ata la instancia al request actual — correcto para estado por-request tipo DbContext." },
+        { q: "Llamar .Result sobre un método async en un request puede hacer deadlock porque…", options: ["El GC se pausa", "Bloquea el hilo que la continuación necesita (sync-over-async)", "Kestrel prohíbe I/O síncrono", "Los Options no están bindeados"], answer: 1, explain: "Bloquear un hilo esperando una continuación que necesita ese contexto = deadlock/starvation. Await hasta el fondo." }
+      ]
+    },
+
+    "db-advanced": {
+      title: "Bases de Datos — Avanzado",
+      track: "backend",
+      icon: "🧮",
+      blurb: "Más allá de lo básico: trade-offs de diseño de esquema (normalización vs desnormalización), llaves, vistas y vistas materializadas, connection pooling, patrones de auditoría y migraciones sin downtime en producción.",
+      read: `
+        <p><strong>Normalización (1NF–3NF):</strong> 1NF valores atómicos, 2NF sin dependencia parcial de la llave, 3NF sin dependencia transitiva. Normalizado = un hecho en un lugar (sin anomalías de actualización), al costo de joins. <strong>Desnormaliza deliberadamente</strong> en rutas de lectura intensiva: columnas duplicadas, contadores precalculados, tablas resumen — con estrategia de sincronización (triggers, eventos) o staleness aceptado.</p>
+        <p><strong>Llaves:</strong> los int autoincrementales son chicos y amigos del índice; los GUID no colisionan y se generan en el cliente, pero los aleatorios fragmentan los B-trees — prefiere UUIDs secuenciales (UUIDv7) a escala.</p>
+        <p><strong>Vistas vs vistas materializadas:</strong> una vista es una query guardada (siempre fresca, paga la query cada vez); una vista materializada guarda el resultado (lecturas rápidas, necesita refresh — staleness por velocidad).</p>
+        <p><strong>Stored procedures:</strong> lógica en la base — menos round trips, difícil de versionar/testear/depurar, parte el codebase. Default moderno: lógica en la app, SQL para datos; stored procs para operaciones genuinas de bulk/set.</p>
+        <p><strong>Connection pooling:</strong> las conexiones son caras (TCP + auth + estado de sesión); un pool las reutiliza. Regla de tamaño: pool ≈ núcleos para OLTP, no "todos los posibles". Síntomas de starvation: timeouts adquiriendo conexiones — busca fugas (conexiones sin cerrar) antes de subir el límite.</p>
+        <p><strong>Soft deletes y auditoría:</strong> flags deleted_at mantienen filas recuperables pero contaminan cada query (¡recuerda el filtro!) y los unique constraints; las pistas de auditoría (tablas de cambios append-only o CDC) responden "quién cambió qué y cuándo" sin violar la fuente única de verdad.</p>
+        <p><strong>Migraciones sin downtime (expand-contract):</strong> agrega la columna/tabla nueva (despliegue 1) → doble escritura/backfill (despliegue 2) → cambia las lecturas → elimina lo viejo (contract). Nunca un ALTER destructivo en el hot path durante un release.</p>`,
+      cards: [
+        { q: "¿Qué eliminan 1NF, 2NF y 3NF respectivamente?", a: "1NF: valores no atómicos/repetidos. 2NF: dependencias parciales de parte de una llave compuesta. 3NF: dependencias transitivas (no-llave → no-llave). Cada paso pone un hecho en un lugar." },
+        { q: "¿Cuándo es correcta la desnormalización?", a: "En rutas calientes de lectura intensiva donde los joins cuestan demasiado: columnas duplicadas, contadores precalculados, tablas resumen — aceptadas a cambio de una estrategia de sincronización (eventos, triggers) o staleness aceptado." },
+        { q: "¿Llave primaria int autoincremental vs GUID?", a: "Ints: chicos, secuenciales, amigos del índice. GUIDs: sin colisiones, generables en el cliente — pero los aleatorios fragmentan los B-trees; prefiere UUIDs ordenados (UUIDv7) a escala." },
+        { q: "¿Vista vs vista materializada?", a: "Una vista es una query guardada — siempre fresca, paga la query por lectura. Una vista materializada persiste el resultado — lecturas rápidas, hay que refrescarla (staleness por velocidad)." },
+        { q: "¿La postura moderna sobre los stored procedures?", a: "Default: lógica en la app (testeable, versionable), SQL para datos. Guarda los stored procs para operaciones genuinas de bulk/set donde los round trips dominan — no para lógica de negocio." },
+        { q: "¿Por qué las conexiones necesitan pooling y cómo se dimensiona?", a: "Las conexiones son caras (TCP + auth + sesión). Un pool las reutiliza; para OLTP, tamaño ≈ cantidad de núcleos por nodo — más solo agrega contención. Los timeouts adquiriendo conexión suelen ser fuga, no pool chico." },
+        { q: "¿Síntomas y causa del agotamiento del pool?", a: "Los requests se cuelgan y luego expiran esperando conexión. Causa: conexiones fugadas (sin cerrar/dispose) o transacciones largas sosteniéndolas — arregla la fuga antes de subir el límite." },
+        { q: "¿Trade-offs del soft delete?", a: "deleted_at mantiene filas recuperables, pero cada query debe recordar el filtro, los unique constraints exigen cuidado y las tablas crecen para siempre. Considera tablas de auditoría + deletes reales para datos de alta rotación." },
+        { q: "¿Cómo auditar cambios sin corromper el modelo?", a: "Tablas append-only de cambios (quién/qué/cuándo/diff) o CDC desde el WAL — historial del lado lectura, mientras la tabla viva sigue siendo la fuente única de verdad." },
+        { q: "Explica las migraciones expand-contract.", a: "Cambio de esquema sin downtime: expandir (agregar columna/tabla nueva) → desplegar código con doble escritura → backfill → cambiar lecturas → contraer (eliminar lo viejo). Nunca ALTER destructivo en el hot path durante el release." },
+        { q: "¿Qué sacrifica un ORM frente al SQL crudo?", a: "Comodidad y seguridad (tipado, migraciones) a cambio de control: trampas N+1, planes genéricos, queries ocultas. Baja a SQL crudo para bulk, queries críticas de tuning y window functions." }
+      ],
+      quiz: [
+        { q: "Un dashboard agrega millones de filas en cada carga. ¿El arreglo durable más barato?", options: ["Indexar todas las columnas", "Una vista materializada refrescada por agenda", "Pasar a NoSQL", "Subir el connection pool"], answer: 1, explain: "Precalcula la agregación; paga un refresh en vez de cada lectura. Una vista sola igual corre la query por carga." },
+        { q: "Requests con timeout 'adquiriendo conexión' tras un release. ¿Primer lugar a mirar?", options: ["Subir el límite del pool", "Un camino con conexión fuga/sin dispose", "Agregar réplicas de lectura", "Reescribir las queries del ORM"], answer: 1, explain: "El agotamiento del pool suele ser fuga o transacciones largas; subir el límite solo retrasa el outage." },
+        { q: "Las llaves GUID aleatorias frenan los inserts a escala porque…", options: ["Son muy anchas de parsear", "La inserción aleatoria fragmenta el índice B-tree", "La BD no puede indexar strings", "Rompen la replicación"], answer: 1, explain: "Las llaves ordenadas se agregan al final; los GUIDs aleatorios esparcen las escrituras entre páginas. Los UUIDs secuenciales (v7) arreglan la localidad." },
+        { q: "Debes renombrar una tabla muy usada con cero downtime. El patrón es…", options: ["Una migración: renombrar + desplegar juntos", "Expand-contract: agregar lo nuevo, doble escritura, backfill, cambiar, eliminar", "Tomar la ventana de mantenimiento", "Usar un alias de vista para siempre"], answer: 1, explain: "Pasados compatibles con ambos despliegues (expandir → migrar → contraer) para que el código viejo y nuevo coexistan durante el rollout." },
+        { q: "Cada query olvidando WHERE deleted_at IS NULL es un olor de…", options: ["Mala indexación", "Impuesto del soft delete — considera tablas de auditoría + deletes duros", "Un bug de normalización", "Agotamiento del pool"], answer: 1, explain: "Los soft deletes se filtran en cada camino de acceso; las tablas de alta rotación suelen ir mejor con deletes reales + historial de auditoría." },
+        { q: "3NF elimina qué dependencia?", options: ["Grupos repetidos", "Dependencia parcial de una llave compuesta", "Dependencia transitiva de no-llave", "Llaves foráneas"], answer: 2, explain: "3NF elimina dependencias no-llave → no-llave; 2NF maneja las parciales de llave." }
+      ]
+    },
+
+    "js-core": {
+      title: "JavaScript Esencial",
+      track: "frontend",
+      icon: "🟨",
+      blurb: "JavaScript es el lenguaje de la web: single-threaded con event loop, basado en prototipos y con closures y funciones de primera clase. Este tema cubre la semántica que sondea una entrevista — scopes, this, prototipos y asincronía.",
+      read: `
+        <p><strong>var/let/const y TDZ:</strong> let/const tienen alcance de bloque y se izan sin inicializar (temporal dead zone — acceder antes de la declaración lanza); var tiene alcance de función y vale undefined al izarse. Default a const, let al reasignar, nunca var.</p>
+        <p><strong>Closures:</strong> una función conserva acceso al scope donde fue creada. Impulsa patrones de módulo, cachés de memoización y handlers — y causa el bug clásico: capturar una variable de bucle (arregla con let o una factory por iteración).</p>
+        <p><strong>this:</strong> lo define la llamada — método (el objeto), llamada suelta (undefined/global), new (la instancia), .call/.apply/.bind (explícito). Las arrow functions no ligan this; capturan el del entorno — por eso sirven de callbacks y fallan como métodos que necesitan su propio this.</p>
+        <p><strong>Prototipos y clases:</strong> los objetos delegan a una cadena de prototipos; class es azúcar sobre constructores prototipales + métodos en el prototipo compartido. Métodos en el prototipo = una copia para todas las instancias.</p>
+        <p><strong>Event loop:</strong> una pila de llamadas; al vaciarse, las microtasks (callbacks de Promise, queueMicrotask) se drenan completas antes de la siguiente macrotask (timers, I/O). Así Promise.then corre antes que setTimeout(fn, 0).</p>
+        <p><strong>Promises y async/await:</strong> las funciones async devuelven promises; await = then con sintaxis síncrona; los errores fluyen al try/catch. Ejecuta trabajo independiente con Promise.all (falla rápido), allSettled cuando quieres todos los resultados.</p>
+        <p><strong>Igualdad:</strong> == coacciona tipos antes de comparar ('1' == 1), === no. Usa === siempre; el único == aceptado es x == null para atrapar null y undefined juntos.</p>
+        <p><strong>Copias:</strong> spread/Object.assign copian un nivel (los objetos anidados se comparten — el bug #1 de "muté mi estado"); clona profundo con structuredClone cuando haga falta.</p>
+        <p><strong>Debounce vs throttle:</strong> debounce espera silencio (buscar al teclear); throttle limita la frecuencia (scroll/resize).</p>
+        <p><strong>Módulos:</strong> los ES modules (import/export) son estáticos — analizables y tree-shakeables; CommonJS (require) es dinámico y síncrono.</p>`,
+      cards: [
+        { q: "¿Qué es la temporal dead zone?", a: "Las declaraciones let/const se izan pero quedan sin inicializar hasta su línea; accederlas antes lanza ReferenceError — a diferencia de var, que vale undefined al izarse." },
+        { q: "¿Qué es un closure y para qué sirve?", a: "Una función conserva acceso vivo al scope donde fue definida. Impulsa privacidad de módulos, cachés de memoización y aplicación parcial — y el bug clásico de capturar una variable vieja de bucle (arreglo: let, o factory por iteración)." },
+        { q: "¿Cómo se determina this?", a: "Por la llamada: método → el objeto; llamada suelta → undefined (o global en sloppy mode); new → la instancia; call/apply/bind → explícito. Las arrows ignoran todo eso y capturan el this del entorno." },
+        { q: "¿Por qué las arrow functions fallan como métodos pero sirven como callbacks?", a: "No tienen this propio — capturan el del scope envolvente. Como callback es exactamente correcto (el this circundante sobrevive); como obj.method() obtienes el this exterior, no obj." },
+        { q: "¿Cómo se relacionan las clases con los prototipos?", a: "class es azúcar: el constructor arma la instancia, los métodos viven en el prototipo compartido — una copia para todas las instancias, con delegación por la cadena de prototipos." },
+        { q: "¿Microtasks vs macrotasks — quién gana?", a: "Al vaciarse la pila, la cola completa de microtasks (callbacks de Promise, queueMicrotask) se drena antes de cualquier macrotask (setTimeout, I/O). Por eso then() corre antes que setTimeout(fn, 0)." },
+        { q: "¿Promise.all vs allSettled?", a: "all rechaza rápido con el primer fallo y no devuelve nada (úsalo para éxitos-juntos); allSettled espera cada resultado y devuelve cada status — para trabajo independiente donde el fallo parcial es aceptable." },
+        { q: "¿== vs === y la única excepción permitida?", a: "== coacciona tipos primero ('1' == 1 es true); === no. Usa === siempre, excepto x == null como modismo deliberado que matchea null y undefined." },
+        { q: "¿Por qué el spread no copia un objeto completo?", a: "Spread copia un nivel; los objetos anidados son referencias compartidas — mutar copy.inner también muta source.inner. Clona profundo con structuredClone si importa la independencia." },
+        { q: "¿Debounce vs throttle?", a: "Debounce dispara una vez tras el silencio (input de búsqueda); throttle dispara a lo sumo una vez por intervalo durante actividad continua (scroll, resize)." },
+        { q: "¿Por qué los ES modules son tree-shakeables y CommonJS no?", a: "import/export es estático — los imports se conocen en parseo, así que los exports sin uso se eliminan en build; require() es dinámico y se resuelve en runtime, así que todo debe enviarse." }
+      ],
+      quiz: [
+        { q: "console.log(x) una línea arriba de let x = 1 lanza. ¿Por qué?", options: ["Hoisting de var", "La temporal dead zone", "Strict mode", "Un bug de closure"], answer: 1, explain: "let/const se izan sin inicializar hasta que la ejecución los alcanza — acceder antes es ReferenceError." },
+        { q: "Orden de logs: setTimeout(()=>log(1)); Promise.resolve().then(()=>log(2)); log(3)?", options: ["1 2 3", "3 2 1", "3 1 2", "2 3 1"], answer: 1, explain: "Sincrónico 3 primero; luego la cola de microtasks se drena (2) antes de cualquier macrotask de timer (1)." },
+        { q: "const copy = {...user}; copy.address.city = 'X'. ¿Qué pasa con user.address.city?", options: ["Sin cambio — spread copia todo", "Cambia también — los anidados se comparten", "Lanza error", "Undefined"], answer: 1, explain: "Spread es de un nivel: el objeto interno es la misma referencia. Usa structuredClone para independencia." },
+        { q: "Tres llamadas de API independientes que deben triunfar juntas. Usa…", options: ["Awaits secuenciales", "Promise.all", "Promise.allSettled", "setTimeout"], answer: 1, explain: "all las corre en concurrently y rechaza con el primer fallo — la semántica de todo-o-nada." },
+        { q: "obj = { name: 'a', greet: () => this.name }. greet() devuelve…", options: ["'a'", "undefined — las arrows capturan el this del entorno", "Lanza error", "El objeto global"], answer: 1, explain: "Las arrow functions no tienen this propio; el método recibe el binding del scope exterior, no obj." },
+        { q: "Buscar-mientras-tecleas debería disparar la query…", options: ["En cada tecla", "Con debounce — tras una pausa de tipeo", "Con throttle a 1/s", "Solo al salir del campo"], answer: 1, explain: "El debounce espera el silencio para consultar intenciones, no teclas; el throttle va bien con flujos continuos como el scroll." }
+      ]
+    },
+
+    "css-web": {
+      title: "CSS y Layout",
+      track: "frontend",
+      icon: "🎨",
+      blurb: "CSS describe la presentación en la web. Dominarlo significa la cascada y la especificidad, el box model, y el layout moderno con Flexbox y Grid — más unidades responsivas y por qué los elementos se apilan como se apilan.",
+      read: `
+        <p><strong>Box model:</strong> contenido → padding → border → margin; box-sizing: border-box hace que width incluya padding+border (ponlo global). Los márgenes colapsan verticalmente entre hermanos; el padding no.</p>
+        <p><strong>Cascada y especificidad:</strong> los estilos se resuelven por origen, luego especificidad (inline > id > clase/attr/pseudo-clase > elemento), luego orden de fuente. Un id supera a cualquier cantidad de clases — la razón por la que se propagan los !important. Prefiere estilos por clases de baja especificidad.</p>
+        <p><strong>Flexbox vs Grid:</strong> Flexbox = una dimensión, guiado por el contenido (toolbars, filas de tarjetas); Grid = dos dimensiones, guiado por el layout (carcasa de página). Se componen: grid a la página, flex a los componentes de adentro.</p>
+        <p><strong>Posicionamiento:</strong> relative (se desplaza de sí mismo, conserva el espacio), absolute (fuera del flujo, vs el ancestro posicionado más cercano), fixed (viewport), sticky (scrollea y luego se pega).</p>
+        <p><strong>Stacking contexts y z-index:</strong> z-index solo compara dentro del mismo contexto de apilamiento — creado por transform, opacity &lt; 1, position+z-index, etc. "z-index: 9999 no funciona" casi siempre significa que un padre creó un contexto.</p>
+        <p><strong>Unidades y responsivo:</strong> rem (tamaño raíz — escala con los ajustes del usuario; para tipografía) vs em (fuente del elemento — se compone confusamente) vs px (fijo) vs vw/vh (viewport). Las media queries adaptan al viewport; las container queries adaptan a la propia caja del componente — la primitiva de la era de componentes.</p>
+        <p><strong>Pseudo-clases vs pseudo-elementos:</strong> :hover/:focus/:nth-child() seleccionan elementos en un estado; ::before/::after crean fantasmas dentro del elemento (content obligatorio).</p>
+        <p><strong>Costos de animación:</strong> las transitions animan cambios de estado; @keyframes secuencian pasos. Anima solo transform y opacity — compuestos en GPU; animar propiedades de layout (top/width) dispara reflows.</p>
+        <p><strong>CSS moderno:</strong> :has() (selector de padre), clamp() para tipografía fluida, nesting, gap en flexbox, custom properties para theming.</p>`,
+      cards: [
+        { q: "¿Qué cambia box-sizing: border-box?", a: "width/height pasan a incluir padding y border, así un elemento width: 100px mide realmente 100px. Ponlo global — el content-box por defecto suma padding y border encima." },
+        { q: "¿Cómo resuelve la cascada reglas que compiten?", a: "Origen → especificidad (inline > id > clase/attr/pseudo-clase > elemento) → orden de fuente. Un id supera cualquier cantidad de clases; mantén la especificidad baja y basada en clases para evitar guerras de !important." },
+        { q: "¿Cuándo Flexbox, cuándo Grid?", a: "Flexbox: una dimensión, guiado por el contenido — filas de tarjetas, toolbars, nav. Grid: dos dimensiones, guiado por el layout — carcasa de la página. Compónlos: grid a la página, flex dentro de componentes." },
+        { q: "¿Relative vs absolute vs fixed vs sticky?", a: "Relative se desplaza de sí mismo pero conserva su espacio. Absolute sale del flujo, posicionado vs el ancestro posicionado más cercano. Fixed se fija al viewport. Sticky scrollea normal y luego se pega al alcanzar su umbral." },
+        { q: "¿Por qué a veces z-index: 9999 no hace nada?", a: "z-index compara solo dentro de un contexto de apilamiento; un padre con transform, opacity < 1 o position+z-index crea uno — tu elemento queda atrapado en otra liga distinta a la que debe vencer." },
+        { q: "¿rem vs em vs px?", a: "rem escala con el tamaño de fuente raíz (amigable con el zoom del usuario — tipografía y espaciado); em es relativo a la fuente del elemento (se compone confusamente); px es fijo (bien para bordes, pobre para tipografía)." },
+        { q: "¿Media query vs container query?", a: "Las media queries responden al viewport; las container queries responden a la propia caja del componente — así una tarjeta se adapta tanto si vive en una barra lateral como en la columna principal. La primitiva de la era de componentes." },
+        { q: "¿Pseudo-clase vs pseudo-elemento?", a: ":hover, :focus, :nth-child() seleccionan elementos existentes en un estado; ::before/::after insertan hijos fantasma (necesitan la propiedad content) para decoraciones." },
+        { q: "¿Qué propiedades CSS son baratas de animar, y por qué?", a: "transform y opacity — las maneja el compositor en GPU. Animar top/left/width fuerza layout (reflow) en cada frame: jank." },
+        { q: "¿Qué te da clamp()?", a: "Valores fluidos con límites: font-size: clamp(1rem, 2.5vw, 1.5rem) escala con el viewport pero nunca baja/pasa de los límites — tipografía responsiva sin media queries." },
+        { q: "¿Qué es :has()?", a: "El selector de padre: .card:has(img) estiliza una tarjeta que contiene una imagen — antes imposible sin JS o clases extra." }
+      ],
+      quiz: [
+        { q: "Un modal debe cubrir todo pero z-index: 9999 pierde contra un header. Causa más probable?", options: ["El modal necesita position: fixed", "Un contexto de apilamiento padre atrapa al modal", "Los navegadores capan z-index a 9999", "El header tiene !important"], answer: 1, explain: "z-index compara dentro de un contexto de apilamiento; un ancestro con transform/position aísla al modal. Reestructura contextos o mueve el modal." },
+        { q: "Carcasa de página (sidebar + main + bandas de footer) — ¿mejor herramienta?", options: ["Floats", "Flexbox", "CSS Grid", "Tablas"], answer: 2, explain: "La estructura bidimensional guiada por layout es trabajo de Grid; Flexbox para las piezas unidimensionales de adentro." },
+        { q: "Tu animación a 60fps hace jank. Anima…", options: ["transform", "opacity", "top y width", "color"], answer: 2, explain: "top/width disparan reflow por frame; transform/opacity son solo del compositor. Anima esos." },
+        { q: "Un componente tarjeta debe adaptarse al ir a una barra lateral angosta. ¿Enfoque moderno más limpio?", options: ["Más media queries", "Una container query", "Overrides con !important", "Duplicar el componente"], answer: 1, explain: "Las container queries dejan al componente responder a su propia caja en vez del viewport." },
+        { q: "width: 100px + padding: 10px + border: 2px renderiza 100px de ancho cuando…", options: ["box-sizing: content-box (default)", "box-sizing: border-box", "display: flex", "Siempre"], answer: 1, explain: "border-box incluye padding y border en el ancho declarado." },
+        { q: "Un ::before no muestra nada. Razón habitual?", options: ["Falta z-index", "Falta la propiedad content", "Orden del selector", "Override de flexbox"], answer: 1, explain: "Los pseudo-elementos requieren content (aunque sea string vacío) para renderizar." }
+      ]
+    },
+
+    "web-rt": {
+      title: "WebSockets y Tiempo Real",
+      track: "frontend",
+      icon: "📡",
+      blurb: "Los WebSockets son un canal TCP persistente y bidireccional abierto mediante un único upgrade HTTP — la herramienta correcta cuando el servidor debe enviar al cliente al instante. Elegir el transporte (polling, SSE, WS) es la verdadera pregunta de entrevista.",
+      read: `
+        <table><thead><tr><th>Transporte</th><th>Dirección</th><th>Trade-off</th></tr></thead><tbody>
+        <tr><td>Short polling</td><td>El cliente pregunta</td><td>Trivial; latencia = intervalo, requests desperdiciados</td></tr>
+        <tr><td>Long polling</td><td>El cliente pregunta, el servidor retiene</td><td>Casi real-time; cada mensaje cuesta una reconexión, sobrecosto de cabeceras</td></tr>
+        <tr><td>SSE</td><td>Solo servidor → cliente</td><td>Simple, nativo HTTP, auto-reconnect; unidireccional, conexiones limitadas por navegador en HTTP/1.1</td></tr>
+        <tr><td>WebSocket</td><td>Bidireccional</td><td>Baja latencia en ambos sentidos tras un handshake; tú eres dueño del protocolo</td></tr>
+        </tbody></table>
+        <p><strong>Handshake:</strong> un GET HTTP con Upgrade: websocket + un Sec-WebSocket-Key aleatorio; el servidor responde 101 Switching Protocols. Usa siempre wss:// (TLS) — ws:// va en claro y las páginas HTTPS lo bloquean.</p>
+        <p><strong>La confiabilidad es tuya:</strong> heartbeats/ping-pong para detectar conexiones half-open; reconexión con backoff exponencial + jitter; replay de eventos perdidos vía event id o fetch-on-reconnect; protección contra desorden.</p>
+        <p><strong>Escalado:</strong> cualquier instancia puede servir el handshake de cualquier cliente (sticky sessions), pero el fan-out necesita un bus compartido — Redis pub/sub (o un broker) entre instancias; las rooms enrutan mensajes al subconjunto correcto.</p>
+        <p><strong>Socket.IO vs WS crudo:</strong> una librería que agrega rooms, fallbacks automáticos, acks y lógica de reconexión — al costo de un protocolo propio (ambos extremos deben ser Socket.IO). WS crudo cuando necesitas estándares puros o clientes no-JS.</p>
+        <p><strong>Backpressure y tamaño:</strong> bufferiza los mensajes salientes y frena con highWaterMark; trocea o mueve los payloads grandes a object storage + envía una referencia — no empujes megas por el socket.</p>
+        <p><strong>Auth:</strong> los navegadores no pueden poner cabeceras custom en WS — pasa un token de vida corta como query param/subprotocolo al conectar, valida durante el handshake y rechaza con 401 antes de que el upgrade se complete.</p>
+        <p><strong>Cuándo NO WebSockets:</strong> trabajo con forma request/response (HTTP plano), streams solo de servidor (SSE es más simple) o actualizaciones esporádicas (gana polling). WS se paga con urgencia genuinamente bidireccional — chat, presencia, edición colaborativa, dashboards en vivo.</p>`,
+      cards: [
+        { q: "¿WebSocket vs SSE vs long polling?", a: "Long polling: el cliente pregunta y el servidor retiene el request — casi real-time pero cada mensaje cuesta una reconexión. SSE: stream unidireccional servidor→cliente sobre HTTP con auto-reconnect. WebSocket: canal bidireccional persistente tras un handshake — tú eres dueño del protocolo." },
+        { q: "Describe el handshake de WebSocket.", a: "Un GET HTTP con Upgrade: websocket y un Sec-WebSocket-Key; el servidor valida y responde 101 Switching Protocols — la conexión TCP pasa a hablar frames WS en vez de HTTP." },
+        { q: "¿Por qué wss:// y no ws://?", a: "wss es WS sobre TLS: encriptado, y la única opción desde páginas HTTPS — los navegadores bloquean ws:// en claro ahí." },
+        { q: "¿Qué confiabilidad debes construir tú sobre WS?", a: "Heartbeats/ping-pong para detectar conexiones muertas, reconexión con backoff exponencial + jitter, replay de eventos perdidos (event ids o fetch-on-reconnect) y guards de orden." },
+        { q: "¿Por qué las conexiones half-open necesitan heartbeats?", a: "TCP puede quedar 'establecido' tras un corte silencioso de red; sin timeouts de ping-pong mantienes una sesión muerta y nunca te enteras de que el cliente se fue." },
+        { q: "¿Cómo escalas WebSockets entre instancias?", a: "Cualquier nodo puede sostener cualquier conexión (sticky sessions lo simplifican), y un bus compartido — Redis pub/sub — lleva el fan-out para que la instancia A empuje a un cliente conectado a la B. Las rooms enrutan subconjuntos." },
+        { q: "¿Qué agrega Socket.IO sobre WS crudo?", a: "Rooms, transportes de fallback, acks, reconexión automática y bufferizado — a cambio de su protocolo propio (ambos extremos deben ser Socket.IO)." },
+        { q: "¿Cómo manejas el backpressure en un socket?", a: "Vigila el buffer de envío/highWaterMark y pausa o descarta cuando el consumidor es lento; trocea payloads grandes o manda una referencia de storage en vez de megas." },
+        { q: "¿Cómo autenticas una conexión WS?", a: "Los navegadores no pueden poner cabeceras custom en el upgrade — pasa un token de vida corta por query param o subprotocolo y valida durante el handshake, rechazando con 401 antes de completar el upgrade." },
+        { q: "¿Cuándo NO usar WebSockets?", a: "Formas request/response (HTTP plano), streams solo de servidor (SSE es más simple y nativo HTTP) o actualizaciones esporádicas (polling alcanza). WS se paga con trabajo bidireccional sensible a latencia." }
+      ],
+      quiz: [
+        { q: "El servidor debe streamear precios al cliente; el cliente no envía nada de vuelta. ¿Transporte correcto más simple?", options: ["WebSocket", "Server-Sent Events", "Long polling", "gRPC streaming"], answer: 1, explain: "Unidireccional servidor→cliente es exactamente SSE: nativo HTTP, auto-reconnect, sin protocolo propio que mantener." },
+        { q: "Dos instancias detrás de un load balancer; los mensajes de un usuario deben llegar a su socket en el otro nodo. ¿Arreglo estándar?", options: ["Solo sticky sessions", "Un bus pub/sub compartido como Redis entre instancias", "HTTP directo instancia-a-instancia", "El cliente conecta a ambas"], answer: 1, explain: "El bus lleva el fan-out entre nodos; la stickiness sola no enruta mensajes entre procesos." },
+        { q: "Los sockets mueren en silencio tras redes móviles inestables. Pieza faltante?", options: ["Buffers más grandes", "Heartbeat ping/pong con timeouts", "HTTP/2", "Reconectar al refrescar la página"], answer: 1, explain: "Las conexiones TCP half-open parecen vivas; pings periódicos las detectan para reconectar (con backoff)." },
+        { q: "Debes rechazar clientes WS no autenticados. ¿Dónde?", options: ["Tras conectar, cierra el socket", "Durante el handshake, antes de completar el upgrade", "En el primer mensaje", "En el navegador"], answer: 1, explain: "Valida el token durante el request de upgrade y devuelve 401 — no aceptes canales sin autenticar." },
+        { q: "Un dashboard se actualiza una vez por hora. Mejor transporte?", options: ["WebSocket", "SSE", "Polling / refetch al enfocar", "Long polling"], answer: 2, explain: "Las actualizaciones esporádicas no justifican un canal persistente — pollea o refetch por visibilidad." },
+        { q: "Empujar archivos de 50MB por WS es mala idea porque…", options: ["Los frames WS no pasan de 64KB", "Bloquea el canal y derota el backpressure; manda una referencia y descarga por HTTP", "Los navegadores prohíben WS binario", "TLS no cubre binario"], answer: 1, explain: "Los payloads grandes monopolizan la conexión y los buffers — sube a storage y empuja la URL." }
       ]
     }
   }

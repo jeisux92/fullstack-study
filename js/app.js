@@ -286,7 +286,7 @@
     const t = DATA.tracks[trackId];
     if (!t) return renderHome();
     const s = trackStats(trackId);
-    const rows = t.topics.map(id => {
+    const rowFor = (id) => {
       const topic = DATA.topics[id], st = topicStats(id);
       const quizLabel = st.quiz ? L().best(st.quiz.best) : L().notTried;
       return `<div class="topic-row" data-go="#/study/${trackId}/${id}/read">
@@ -306,7 +306,16 @@
           <a class="btn" href="#/study/${trackId}/${id}/quiz">${L().btnQuiz}</a>
         </div>
       </div>`;
-    }).join("");
+    };
+    let rows = "";
+    if (t.groups) {
+      t.groups.forEach(g => {
+        rows += `<div class="group-head">${esc(g.name)}</div>`;
+        rows += g.topics.map(rowFor).join("");
+      });
+    } else {
+      rows = t.topics.map(rowFor).join("");
+    }
     app.innerHTML = `
       <div class="page-head">
         <a class="back" href="#/">${L().allTracks}</a>
@@ -333,9 +342,19 @@
   function renderGuide(trackId) {
     const t = DATA.tracks[trackId];
     if (!t) return renderHome();
-    const toc = t.topics.map(id =>
-      `<button class="toc-link" data-target="sec-${id}">${DATA.topics[id].icon} ${esc(DATA.topics[id].title)}</button>`
-    ).join("");
+    let toc = "";
+    if (t.groups) {
+      t.groups.forEach(g => {
+        toc += `<div class="toc-group">${esc(g.name)}</div>`;
+        toc += g.topics.map(id =>
+          `<button class="toc-link" data-target="sec-${id}">${DATA.topics[id].icon} ${esc(DATA.topics[id].title)}</button>`
+        ).join("");
+      });
+    } else {
+      toc = t.topics.map(id =>
+        `<button class="toc-link" data-target="sec-${id}">${DATA.topics[id].icon} ${esc(DATA.topics[id].title)}</button>`
+      ).join("");
+    }
     const sections = t.topics.map(id => {
       const topic = DATA.topics[id];
       return `<section class="guide-section" id="sec-${id}">

@@ -137,6 +137,11 @@ p { margin: 0 0 .8em; }
 
 /* ---------- topic list ---------- */
 .topic-list { display: flex; flex-direction: column; gap: 12px; }
+.group-head {
+  font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--accent); margin: 20px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.group-head:first-child { margin-top: 0; }
 .topic-row {
   background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
   display: flex; align-items: center; gap: 18px; flex-wrap: wrap; transition: .15s;
@@ -281,6 +286,11 @@ p { margin: 0 0 .8em; }
   border-radius: 14px; padding: 16px; max-height: calc(100vh - 110px); overflow: auto;
 }
 .guide-toc h4 { margin: 0 0 10px; font-size: .78rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+.toc-group {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--muted); margin: 12px 0 4px;
+}
+.toc-group:first-of-type { margin-top: 0; }
 .toc-link {
   display: block; width: 100%; text-align: left; background: none; border: none; cursor: pointer;
   color: var(--muted); font-size: .86rem; padding: 6px 9px; border-radius: 8px; font-family: inherit; transition: .12s;

@@ -5,20 +5,42 @@ window.STUDY_DATA = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Architecture, APIs, databases, concurrency, caching, security, principles & OOP.",
-      topics: ["architecture", "distributed", "apis", "databases", "cache-messaging", "security", "principles", "patterns", "oop", "antipatterns"]
+      tagline: "Architecture, APIs, databases & concurrency, caching, security, Node.js & .NET, principles, patterns & OOP.",
+      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns"],
+      groups: [
+        { name: "System Design", topics: ["architecture", "distributed", "apis"] },
+        { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
+        { name: "Security", topics: ["security"] },
+        { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
+        { name: "Code Design", topics: ["principles", "patterns", "oop", "antipatterns"] }
+      ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "React.js: fundamentals, hooks, rendering, performance, state, SSR & testing.",
-      topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"]
+      tagline: "JavaScript & CSS fundamentals, React in depth, and real-time WebSockets.",
+      topics: ["js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      groups: [
+        { name: "Web Fundamentals", topics: ["js-core", "css-web"] },
+        { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
+        { name: "Real-Time Web", topics: ["web-rt"] }
+      ]
     },
     fullstack: {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Everything: the complete back-end and front-end curriculum in one track.",
-      topics: ["architecture", "distributed", "apis", "databases", "cache-messaging", "security", "principles", "patterns", "oop", "antipatterns", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"]
+      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns", "js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      groups: [
+        { name: "System Design", topics: ["architecture", "distributed", "apis"] },
+        { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
+        { name: "Security", topics: ["security"] },
+        { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
+        { name: "Code Design", topics: ["principles", "patterns", "oop", "antipatterns"] },
+        { name: "Web Fundamentals", topics: ["js-core", "css-web"] },
+        { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
+        { name: "Real-Time Web", topics: ["web-rt"] }
+      ]
     }
   },
 
@@ -259,37 +281,53 @@ window.STUDY_DATA = {
       icon: "🧱",
       blurb: "A design pattern is a named, reusable solution to a problem that recurs in software design. The classic Gang-of-Four catalog covers object creation and structure; backend development adds architectural ones like Repository, Saga, and Outbox.",
       read: `
-        <table><thead><tr><th>Pattern</th><th>Backend use</th></tr></thead><tbody>
-        <tr><td>Repository</td><td>Abstracts data access; domain doesn't know SQL/Mongo/API; no ORM leakage</td></tr>
-        <tr><td>Unit of Work</td><td>Groups operations into one transaction</td></tr>
-        <tr><td>DTO / Mapper</td><td>Transport objects; convert between domain/DTO/persistence</td></tr>
-        <tr><td>DI</td><td>Receive dependencies via constructor — testability</td></tr>
-        <tr><td>Factory / Builder</td><td>Encapsulate creation / step-by-step complex objects</td></tr>
-        <tr><td>Strategy</td><td>Swap algorithms at runtime (gateways, discounts)</td></tr>
-        <tr><td>Adapter / Facade</td><td>Fit external interface / simplify a subsystem</td></tr>
-        <tr><td>Decorator / Proxy</td><td>Add logging/cache/retry around a service / lazy load, access control</td></tr>
-        <tr><td>Observer</td><td>Notify without coupling — root of messaging</td></tr>
-        <tr><td>Chain of Responsibility / Template Method</td><td>Middleware pipelines / fixed skeleton, variable steps</td></tr>
-        <tr><td>Singleton</td><td>Prefer DI container scope over hand-rolled getInstance()</td></tr>
-        </tbody></table>
-        <p><strong>Strategy vs State:</strong> Strategy = algorithm chosen from outside; State = object changes its own behavior by internal state (Order in NEW/PAID/SHIPPED).</p>
-        <p><strong>When NOT to apply:</strong> single implementation with no second use (YAGNI), layers that add nothing, patterns as decoration. Over-engineering is itself an anti-pattern.</p>`,
+        <p>A design pattern is a named, reusable solution to a recurring design problem. They group into <strong>creational</strong> (how objects get built), <strong>structural</strong> (how they compose), <strong>behavioral</strong> (how they collaborate) — plus the <strong>data & architectural</strong> staples backend work adds.</p>
+        <h4>Creational — how objects are built</h4>
+        <p><strong>Factory Method.</strong> A method decides which concrete class to instantiate, so callers depend on an abstraction instead of constructors. Example: <code>SenderFactory.forProvider(config)</code> returning a SendGrid or SES sender. Skip it when construction is a single <code>new</code> with no variation.</p>
+        <p><strong>Builder.</strong> Assembles a complex object step by step with a fluent API instead of telescoping constructors. Example: <code>Query.select(...).where(...).limit(...)</code>. Skip it when the object has two fields.</p>
+        <p><strong>Singleton.</strong> Guarantees one shared instance with global access. In backend, prefer the DI container's singleton scope over a hand-rolled <code>getInstance()</code> — a static singleton hides dependencies, blocks testing, and causes concurrency surprises.</p>
+        <h4>Structural — how objects compose</h4>
+        <p><strong>Adapter.</strong> Converts an external interface into the one your system expects. Example: wrapping a vendor SMS SDK behind your own <code>SmsSender</code> port so the vendor can be swapped. Trade-off: it's deliberate indirection — don't adapt interfaces you own.</p>
+        <p><strong>Facade.</strong> One simplified entry point over a complicated subsystem. Example: <code>PaymentFacade.charge()</code> hiding fraud-check + gateway + ledger calls. Unlike Adapter (converts an interface), Facade hides complexity behind a new, simpler one.</p>
+        <p><strong>Decorator.</strong> Wraps a component to add behavior — logging, caching, retry — without modifying it: same interface, stacked responsibilities. Skip it when a single cross-cutting concern would do with plain middleware.</p>
+        <p><strong>Proxy.</strong> A stand-in that controls access to the real subject: lazy loading, access control, caching, remote calls. Decorator adds behavior; Proxy controls access.</p>
+        <p><strong>DTO & Mapper.</strong> DTOs are inert transport objects at API boundaries; mappers convert between domain entities, DTOs, and persistence models. They keep internal structure out of your contracts, at the cost of mapping boilerplate.</p>
+        <h4>Behavioral — how objects collaborate</h4>
+        <p><strong>Strategy.</strong> Defines a family of interchangeable algorithms behind one interface; the caller picks one at runtime. Example: payment gateways (<code>CardStrategy</code>, <code>PayPalStrategy</code>). Kill switch: when there is only ever one implementation (YAGNI).</p>
+        <p><strong>State.</strong> Structurally identical to Strategy, but the object changes its own behavior as its internal state changes (Order in NEW/PAID/SHIPPED) — the "strategy" isn't chosen from outside.</p>
+        <p><strong>Observer.</strong> A subject emits events; observers subscribe without the subject knowing them. Conceptual root of domain events and message brokers. Risk: hidden flows that are hard to trace — keep events few and meaningful.</p>
+        <p><strong>Chain of Responsibility.</strong> A request passes through a pipeline of handlers, each deciding to act, mutate, or pass it along. Example: HTTP middleware (auth → validation → handler).</p>
+        <p><strong>Template Method.</strong> A base class fixes the algorithm skeleton and lets subclasses override individual steps. Prefer composition (Strategy) when steps vary independently.</p>
+        <h4>Data & architectural — backend staples</h4>
+        <p><strong>Repository.</strong> Mediates between the domain and persistence behind a collection-like interface (<code>findByEmail()</code>), so the domain never sees SQL, Mongo, or ORM types. Common misuse: leaking ORM entities and query types through it.</p>
+        <p><strong>Unit of Work.</strong> Tracks everything loaded and changed in a business transaction, then commits or rolls it back as one — what EF Core's <code>DbContext</code> does for you, or a transaction script does manually.</p>
+        <p><strong>Dependency Injection.</strong> Dependencies are handed in from outside (constructor) instead of instantiated inside, enabling mocks and swaps. It's a pattern, not a framework — the container just automates the wiring.</p>
+        <p><strong>When NOT to reach for any pattern:</strong> one implementation with no second use in sight (YAGNI, rule of three), a layer that adds nothing, patterns as decoration. Over-engineering is itself an anti-pattern.</p>`,
       cards: [
-        { q: "What does the Repository pattern do?", a: "Abstracts data access: the domain calls UserRepository.findByEmail() without knowing if it's SQL, Mongo, or an API. It must not leak ORM details." },
-        { q: "Strategy vs State pattern?", a: "Structurally similar. Strategy: the algorithm is chosen from outside (caller/config). State: the object changes its own behavior based on internal state (Order in NEW/PAID/SHIPPED)." },
-        { q: "Adapter vs Facade?", a: "Adapter fits an external interface to the one your system expects (email provider). Facade simplifies a complex subsystem behind one clean interface (PaymentFacade over many providers)." },
-        { q: "What does a Decorator add?", a: "Behavior around a service without modifying it — logging, caching, retry — by wrapping it." },
-        { q: "How should you implement Singleton?", a: "Prefer the DI container's singleton scope over a hand-rolled getInstance(). Hidden global state hurts testability and concurrency." },
-        { q: "What is Unit of Work?", a: "Groups several operations into one transaction and commits/rolls back at the end." },
-        { q: "Why use DTOs?", a: "Transport objects between layers/APIs so you never expose DB entities directly; a Mapper converts between domain, DTO, and persistence models." },
-        { q: "When should you NOT create an abstraction?", a: "Single implementation with no second use in sight (YAGNI/rule of three), a layer that adds nothing, or an interface nobody mocks or implements twice." },
-        { q: "Observer pattern's significance?", a: "Notify changes without coupling emitter to receivers — the conceptual root of messaging/pub-sub." }
+        { q: "Explain the Factory Method pattern.", a: "A method that decides which concrete class to instantiate, so callers depend on an abstraction instead of constructors — e.g. SenderFactory.forProvider(config) returning SendGrid or SES. Skip it when construction is a single new with no variation." },
+        { q: "Explain the Builder pattern.", a: "Assembles a complex object step by step via a fluent API instead of telescoping constructors — Query.select().where().limit(). Skip it for objects with two fields." },
+        { q: "How should you implement Singleton in backend code?", a: "Prefer the DI container's singleton scope over a hand-rolled getInstance(). A static singleton hides dependencies, blocks testing, and causes concurrency surprises." },
+        { q: "Explain the Adapter pattern.", a: "Converts an external interface into the one your system expects — wrapping a vendor SMS SDK behind your own SmsSender port so the vendor can be swapped. It's deliberate indirection: don't adapt interfaces you own." },
+        { q: "Explain the Facade pattern and how it differs from Adapter.", a: "One simplified entry point over a complicated subsystem (PaymentFacade.charge() hiding fraud-check + gateway + ledger). Adapter converts an existing interface; Facade hides complexity behind a new, simpler one." },
+        { q: "Explain the Decorator pattern.", a: "Wraps a component to add behavior — logging, caching, retry — without modifying it: same interface, stacked responsibilities. For a single cross-cutting concern, plain middleware may be simpler." },
+        { q: "Decorator vs Proxy?", a: "Decorator adds behavior around a component (same interface, stacked responsibilities). Proxy controls access to the real subject: lazy loading, access control, caching, remote calls." },
+        { q: "What are DTOs and Mappers for?", a: "DTOs are inert transport objects at API boundaries; mappers convert between domain entities, DTOs, and persistence models. They keep internal structure out of your contracts, at the cost of mapping boilerplate." },
+        { q: "Explain the Strategy pattern.", a: "Defines a family of interchangeable algorithms behind one interface; the caller picks one at runtime — payment gateways (CardStrategy, PayPalStrategy). Kill switch: when there is only ever one implementation (YAGNI)." },
+        { q: "Strategy vs State?", a: "Structurally identical. Strategy: the algorithm is chosen from outside (caller/config). State: the object changes its own behavior as its internal state changes (Order in NEW/PAID/SHIPPED)." },
+        { q: "Explain the Observer pattern and its risk.", a: "A subject emits events; observers subscribe without the subject knowing them — the conceptual root of domain events and message brokers. Risk: hidden flows that are hard to trace — keep events few and meaningful." },
+        { q: "Explain Chain of Responsibility.", a: "A request passes through a pipeline of handlers, each deciding to act, mutate, or pass it along — HTTP middleware (auth → validation → handler) is the classic backend case." },
+        { q: "Explain Template Method and its modern preference.", a: "A base class fixes the algorithm skeleton and lets subclasses override individual steps. Prefer composition (Strategy) when steps vary independently." },
+        { q: "Explain the Repository pattern and its common misuse.", a: "Mediates between domain and persistence behind a collection-like interface (findByEmail()), so the domain never sees SQL, Mongo, or ORM types. Misuse: leaking ORM entities and query types through it." },
+        { q: "Explain Unit of Work.", a: "Tracks everything loaded and changed in a business transaction, then commits or rolls back as one — what EF Core's DbContext does for you, or a transaction script does manually." },
+        { q: "What is Dependency Injection, really?", a: "Dependencies handed in from outside (constructor) instead of instantiated inside, enabling mocks and swaps. It's a pattern, not a framework — the container just automates the wiring." }
       ],
       quiz: [
         { q: "An Order behaves differently in NEW, PAID, SHIPPED based on its own state. Which pattern?", options: ["Strategy", "State", "Adapter", "Facade"], answer: 1, explain: "State: the object changes its own behavior by internal state. Strategy is chosen from outside." },
         { q: "Wrapping a service to add retry without editing it is…", options: ["Proxy", "Decorator", "Facade", "Builder"], answer: 1, explain: "Decorator adds behavior around a component without modifying it." },
         { q: "The recommended way to get a Singleton is…", options: ["A static getInstance()", "The DI container's singleton scope", "A global variable", "A new instance each call"], answer: 1, explain: "Container-managed scope avoids hidden global state and keeps testability." },
         { q: "Fitting an external email SDK behind your own interface is…", options: ["Facade", "Adapter", "Strategy", "Observer"], answer: 1, explain: "Adapter converts an external interface to the one your system expects." },
+        { q: "Code must create SendGrid or SES clients based on config, without callers knowing the concrete classes. Which pattern?", options: ["Factory Method", "Observer", "Template Method", "Proxy"], answer: 0, explain: "Factory Method encapsulates which concrete class gets instantiated behind an abstraction." },
+        { q: "A request flows through auth → validation → handler, each able to stop the chain. This is…", options: ["Observer", "Chain of Responsibility", "Mediator", "Command"], answer: 1, explain: "Chain of Responsibility passes a request through handlers that act, mutate, or pass it along — HTTP middleware in essence." },
         { q: "Creating an interface for a single implementation with no second use is…", options: ["Good DIP practice", "Over-engineering (YAGNI)", "Required by SOLID", "The rule of three"], answer: 1, explain: "Don't abstract prematurely; wait for a real second use." }
       ]
     },
@@ -581,6 +619,232 @@ window.STUDY_DATA = {
         { q: "Error boundaries catch…", options: ["Event-handler errors", "Async errors", "Render-tree errors below them", "All errors"], answer: 2, explain: "They catch render errors below them; event-handler and async errors need try/catch." },
         { q: "An effect running twice in dev is caused by…", options: ["A bug in your code", "StrictMode double-invocation", "React.memo", "Hydration"], answer: 1, explain: "StrictMode intentionally double-invokes to reveal missing cleanup; not in production." },
         { q: "For realistic interaction tests, prefer…", options: ["fireEvent", "userEvent", "Direct state mutation", "Snapshot only"], answer: 1, explain: "userEvent simulates full real-user event sequences." }
+      ]
+    },
+
+    "nodejs": {
+      title: "Node.js Runtime",
+      track: "backend",
+      icon: "🟩",
+      blurb: "Node.js is a JavaScript runtime built on Chrome's V8 engine and libuv that executes code on a single thread with non-blocking, event-driven I/O — ideal for I/O-heavy services, and scaled horizontally via cluster or worker threads.",
+      read: `
+        <p><strong>Event loop (libuv):</strong> your JS runs on one thread; the loop drains the call stack, then processes <strong>microtasks</strong> (Promises) before each <strong>macrotask</strong> (timers, I/O callbacks). Blocking calls (sync fs, huge JSON.parse, long loops) starve everything — Node is fast at coordination, not at CPU work.</p>
+        <p><strong>Thread pool:</strong> libuv offloads fs, crypto, dns and zlib work to 4 threads by default (UV_THREADPOOL_SIZE). That's why "single-threaded" Node still does parallel disk/crypto work.</p>
+        <p><strong>CPU work:</strong> <code>worker_threads</code> (parallel JS in one process) vs <code>cluster</code> (N processes, one per core, behind a shared port — also your zero-downtime restart unit). For scale-out, prefer more containers/processes over bigger machines.</p>
+        <p><strong>Streams & backpressure:</strong> process data in chunks (pipeline(), transform streams) instead of buffering whole payloads; backpressure (highWaterMark + await drain) keeps a fast producer from overflowing a slow consumer.</p>
+        <p><strong>Buffers & EventEmitter:</strong> Buffers handle raw bytes outside V8's heap; EventEmitter is the in-process pub/sub that streams, servers and most APIs are built on (error events have no default handler — they throw).</p>
+        <p><strong>npm & semver:</strong> <code>^</code> allows minor+patch, <code>~</code> only patch; lockfiles make installs reproducible — commit them. Audit dependencies (supply chain).</p>
+        <p><strong>Production hygiene:</strong> config from env (12-factor), graceful shutdown (stop accepting connections, drain, close DB pools), log as streams, and handle <code>uncaughtException</code>/<code>unhandledRejection</code> by logging and exiting — let the orchestrator restart you.</p>`,
+      cards: [
+        { q: "How does the Node.js event loop work?", a: "Your JS runs on one thread; libuv's loop drains the call stack, then processes microtasks (Promises) before each macrotask (timers, I/O callbacks). Node is event-driven I/O coordination — not parallel computation." },
+        { q: "What blocks the event loop and why is it fatal in Node?", a: "Sync fs calls, huge JSON.parse/stringify, long CPU loops, complex regex. Everything else shares that one thread — one blocked request stalls every request. Offload to worker threads or queues." },
+        { q: "If Node is single-threaded, how do fs/crypto run in parallel?", a: "libuv's thread pool — 4 threads by default (UV_THREADPOOL_SIZE) — handles fs, crypto, dns and zlib work off the main thread." },
+        { q: "cluster vs worker_threads?", a: "cluster forks N processes (one per core) sharing a port — process-level scaling and the zero-downtime restart unit. worker_threads runs parallel JS threads inside one process — for CPU-bound work sharing memory." },
+        { q: "What is backpressure in streams?", a: "A fast producer overwhelming a slow consumer. Streams signal capacity (highWaterMark); write() returns false / pipeline() awaits drain so the producer pauses instead of buffering unbounded memory." },
+        { q: "Why streams instead of buffering whole payloads?", a: "Constant memory: process a 2GB file in chunks via pipeline() and transform streams instead of loading it (or its JSON) into RAM." },
+        { q: "What is a Buffer?", a: "A fixed-length chunk of raw bytes allocated outside V8's heap — how Node reads/writes files, sockets and binary protocols without JS string overhead." },
+        { q: "What is EventEmitter — and its sharpest edge?", a: "Node's in-process pub/sub (on/emit), the base of streams and servers. Sharp edge: an 'error' event with no listener throws and can crash the process — always handle errors." },
+        { q: "What do ^ and ~ mean in package.json, and why commit the lockfile?", a: "^ allows minor+patch upgrades, ~ only patch. The lockfile pins the exact resolved tree so every install (and CI) is reproducible — commit it." },
+        { q: "What does graceful shutdown mean in Node?", a: "On SIGTERM: stop accepting new connections, finish in-flight requests, close DB/pool handles, then exit — orchestrated so the load balancer and orchestrator restart you without dropped requests." },
+        { q: "How should you handle uncaughtException?", a: "Log it, release what you can, and exit — the process may be in an undefined state. Let PM2/Kubernetes restart it; don't try to keep running after a crash." }
+      ],
+      quiz: [
+        { q: "An endpoint reads a 2GB file into memory with fs.readFileSync and parses it. Under load the service dies. Root cause?", options: ["Too few cluster workers", "Blocking the single event-loop thread + unbounded memory", "V8 garbage collection bug", "Missing thread pool"], answer: 1, explain: "Sync I/O blocks the loop for every request while buffering gigabytes — stream it with pipeline() instead." },
+        { q: "Your API does heavy image resizing and the event loop stalls. Best fix?", options: ["Increase UV_THREADPOOL_SIZE to 128", "Move resizing to worker_threads or a queue", "Add more RAM", "Use promises everywhere"], answer: 1, explain: "CPU-bound work belongs off the loop — worker threads in-process, or a job queue/worker service out-of-process." },
+        { q: "cluster module primarily gives you…", options: ["Parallel JS threads sharing memory", "N processes on N cores behind one port", "Async file I/O", "A thread pool for crypto"], answer: 1, explain: "Cluster forks processes sharing the server port — process-level scaling and the rolling-restart unit." },
+        { q: "write() on a stream keeps returning false. What is the stream telling you?", options: ["The stream is closed", "Backpressure: the consumer can't keep up — pause producing until drain", "You must retry the write", "The buffer is corrupted"], answer: 1, explain: "That's backpressure — respect it by pausing/resuming or letting pipeline() pace production." },
+        { q: "An 'error' event fires on a stream with no error listener. Node…", options: ["Ignores it", "Throws — potentially crashing the process", "Emits a warning", "Retries the operation"], answer: 1, explain: "Unhandled 'error' events throw; always attach error handlers or use pipeline() which propagates errors." },
+        { q: "uncaughtException fires. The correct response is…", options: ["Keep serving — it's just a warning", "Log, cleanup, and exit; let the supervisor restart", "Restart the event loop", "Swallow it with an empty handler"], answer: 1, explain: "After an uncaught exception the process state is undefined — exit cleanly and let PM2/K8s restart it." }
+      ]
+    },
+
+    "dotnet": {
+      title: ".NET / C# for Back-End",
+      track: "backend",
+      icon: "⚙️",
+      blurb: ".NET (with ASP.NET Core) is Microsoft's managed runtime and web framework: C# compiles to IL, runs on the CLR with the Kestrel web server, and ships a built-in DI container, EF Core ORM and middleware pipeline.",
+      read: `
+        <p><strong>Runtime:</strong> C# compiles to IL, JIT-compiled by the CLR (GC, type safety). ASP.NET Core apps self-host on <strong>Kestrel</strong> (cross-platform web server); IIS/Nginx typically sit in front as reverse proxies.</p>
+        <p><strong>Middleware pipeline:</strong> request flows through components registered in order (app.Use(...)) — each can act and short-circuit or call the next: auth → routing → custom cross-cutting → endpoints. Order matters.</p>
+        <p><strong>Built-in DI:</strong> constructor injection via IServiceProvider with three lifetimes: <strong>Transient</strong> (new every resolve), <strong>Scoped</strong> (one per HTTP request), <strong>Singleton</strong> (one forever). Classic trap: the <em>captive dependency</em> — a singleton holding a scoped service (like a DbContext) keeps it alive beyond its request, causing stale state and concurrency bugs.</p>
+        <p><strong>EF Core:</strong> DbContext is a Unit of Work + change tracker; LINQ queries are IQueryable translated to SQL. N+1 pitfall: IQueryable returned and enumerated later, or lazy loading — fix with eager loading (.Include). Migrations are versioned, reversible schema scripts (the expand-contract pattern for zero-downtime deploys).</p>
+        <p><strong>async/await:</strong> scales by releasing threads during I/O. Avoid <code>.Result/.Wait()</code> (sync-over-async deadlocks under a sync context, thread starvation); prefer Task.WhenAll for independent calls.</p>
+        <p><strong>Minimal APIs vs MVC:</strong> minimal APIs (endpoint-routing lambdas) for microservices and small services; MVC controllers + filters for larger, convention-heavy apps. Both share the same pipeline and DI.</p>
+        <p><strong>Configuration & options:</strong> appsettings + env vars + secrets merged into IConfiguration, bound to typed Options&lt;T&gt; classes validated at startup.</p>`,
+      cards: [
+        { q: "What are the CLR, IL and Kestrel in one breath?", a: "C# compiles to IL, which the CLR JIT-compiles and runs (GC, type safety). ASP.NET Core apps self-host on Kestrel, a cross-platform web server, usually behind a reverse proxy like Nginx or IIS." },
+        { q: "How does the ASP.NET Core middleware pipeline work?", a: "Components registered in order (app.Use); each sees the HttpContext, can act/short-circuit or call the next — auth → routing → cross-cutting → endpoint. Registration order matters." },
+        { q: "Explain the three DI service lifetimes.", a: "Transient: new instance per resolve. Scoped: one per HTTP request. Singleton: one for the app's lifetime. Choose by statefulness and thread-safety, and never let a longer-lived service capture a shorter one." },
+        { q: "What is a captive dependency?", a: "A singleton injecting a scoped service (e.g. DbContext) — it captures it beyond the request, causing stale data and concurrency bugs. Fix: inject IServiceScopeFactory and create a scope per unit of work." },
+        { q: "What is DbContext in EF Core terms?", a: "Unit of Work + change tracker: tracks loaded entities, translates LINQ (IQueryable) to SQL, and saves changes as one transaction via SaveChanges()." },
+        { q: "How does the classic EF Core N+1 happen and how do you fix it?", a: "Enumerating related data lazily, or returning IQueryable that gets queried per row. Fix with eager loading (.Include/.ThenInclude), projection (.Select exactly what you need), or batching." },
+        { q: "Why are EF Core migrations more than schema scripts?", a: "They're versioned, ordered, reversible C# snapshots of the model — apply with expand-contract (add column → deploy code → backfill → drop old) for zero-downtime deploys." },
+        { q: "Why is .Result/.Wait() dangerous?", a: "Sync-over-async: blocks a thread pool thread waiting on async completion — thread starvation, and deadlocks when a SynchronizationContext exists (classic ASP.NET). Await instead." },
+        { q: "When Task.WhenAll vs sequential awaits?", a: "WhenAll runs independent I/O concurrently and fails fast on the first fault; sequential awaits serialize latency. Only use WhenAll when the calls are truly independent." },
+        { q: "Minimal APIs vs MVC controllers — when each?", a: "Minimal APIs: endpoint-routed lambdas, less ceremony — microservices and small services. MVC: controllers, filters, model-binding conventions — larger apps that want the structure. Same pipeline and DI underneath." },
+        { q: "What is the Options pattern?", a: "Typed configuration: IConfiguration sources (appsettings, env vars, secrets) bind to Options<T> classes validated at startup — no magic strings sprinkled through code." }
+      ],
+      quiz: [
+        { q: "A singleton service injects a scoped DbContext. Over time it serves stale rows and throws concurrency errors. This is…", options: ["A thread pool leak", "A captive dependency", "An N+1 query", "A middleware ordering bug"], answer: 1, explain: "The singleton captures the scoped instance beyond its request. Inject IServiceScopeFactory and scope per unit of work." },
+        { q: "An endpoint does three independent API calls with sequential awaits. Simplest performance win?", options: ["Wrap in Task.Run", "Task.WhenAll the three calls", "Make the service a singleton", "Add caching headers"], answer: 1, explain: "WhenAll runs independent I/O concurrently instead of paying three latencies in series." },
+        { q: "In ASP.NET Core, middleware registered after one that short-circuits will…", options: ["Run anyway in parallel", "Not run for that request", "Run twice", "Throw"], answer: 1, explain: "A short-circuited pipeline stops there — which is why auth/authorization middleware comes before the work." },
+        { q: "Lazy-loading navigation properties inside a loop produces…", options: ["A deadlock", "N+1 queries", "A captive dependency", "View bloat"], answer: 1, explain: "One query per access — fix with .Include eager loading or projection." },
+        { q: "Scoped lifetime means…", options: ["One instance per resolve", "One instance per HTTP request", "One instance for the app lifetime", "One instance per thread"], answer: 1, explain: "Scoped ties the instance to the current request — right for DbContext-style per-request state." },
+        { q: "Calling .Result on an async method in a request can deadlock because…", options: ["The GC pauses", "It blocks the thread the continuation needs (sync-over-async)", "Kestrel forbids sync I/O", "Options aren't bound"], answer: 1, explain: "Blocking a thread waiting for a continuation that needs that context = deadlock/starvation. Await all the way down." }
+      ]
+    },
+
+    "db-advanced": {
+      title: "Databases — Advanced",
+      track: "backend",
+      icon: "🧮",
+      blurb: "Beyond the basics: schema design trade-offs (normalization vs denormalization), keys, views and materialized views, connection pooling, auditing patterns, and zero-downtime production migrations.",
+      read: `
+        <p><strong>Normalization (1NF–3NF):</strong> 1NF atomic values, 2NF no partial key dependency, 3NF no transitive dependency. Normalized = one fact in one place (no update anomalies), at the cost of joins. <strong>Denormalize deliberately</strong> for read-heavy paths: duplicated columns, precomputed counters, summary tables — with a strategy to keep them in sync (triggers, events, or accepted staleness).</p>
+        <p><strong>Keys:</strong> auto-increment ints are small and index-friendly; GUIDs are collision-free and generated client-side but random ones fragment B-trees — prefer sequential/ordered UUIDs (UUIDv7) at scale.</p>
+        <p><strong>Views vs materialized views:</strong> a view is a stored query (always fresh, costs the query each time); a materialized view stores the query's result (fast reads, needs refresh — trade staleness for speed).</p>
+        <p><strong>Stored procedures:</strong> logic in the database — fewer round trips, hard to version/test/debug, splits the codebase. Modern default: logic in the app, SQL for data; stored procs for genuine bulk/set operations.</p>
+        <p><strong>Connection pooling:</strong> connections are expensive (TCP + auth + session state); a pool reuses them. Sizing rule: pool size ≈ cores for OLTP (little's law), not "as many as possible". Starvation symptoms: timeouts acquiring connections — look for leaks (unclosed connections) before raising the limit.</p>
+        <p><strong>Soft deletes & auditing:</strong> deleted_at flags keep rows recoverable but pollute every query (remember the filter!) and unique constraints; audit trails (append-only change tables or CDC) answer "who changed what when" without violating theSingle source of truth.</p>
+        <p><strong>Zero-downtime migrations (expand-contract):</strong> add the new column/table (deploy 1) → dual-write/backfill (deploy 2) → switch reads → remove old (contract). Never run a destructive ALTER on the hot path during a release.</p>`,
+      cards: [
+        { q: "What do 1NF, 2NF and 3NF each eliminate?", a: "1NF: non-atomic/repeating values. 2NF: partial dependencies on part of a composite key. 3NF: transitive dependencies (non-key → non-key). Each step puts one fact in one place." },
+        { q: "When is denormalization the right call?", a: "Read-heavy hot paths where joins cost too much: duplicated columns, precomputed counters, summary tables — accepted in exchange for a sync strategy (events, triggers) or accepted staleness." },
+        { q: "Auto-increment int vs GUID primary keys?", a: "Ints: small, sequential, index-friendly. GUIDs: collision-free, client-generatable — but random ones fragment B-trees; prefer ordered UUIDs (UUIDv7) at scale." },
+        { q: "View vs materialized view?", a: "A view is a stored query — always fresh, pays the query cost per read. A materialized view persists the result — fast reads, must be refreshed (staleness for speed)." },
+        { q: "What's the modern take on stored procedures?", a: "Default: logic in the app (testable, versionable), SQL for data. Keep stored procs for genuine bulk/set operations where round trips dominate — not business logic." },
+        { q: "Why do connections need pooling, and how do you size it?", a: "Connections are expensive (TCP + auth + session). A pool reuses them; for OLTP, size ≈ core count per node — more just adds contention. Timeouts acquiring connections usually mean a leak, not a small pool." },
+        { q: "Symptoms and cause of pool exhaustion?", a: "Requests hang then time out waiting for a connection. Cause: leaked connections (unclosed/undisposed) or long transactions holding them — fix the leak before raising the limit." },
+        { q: "Trade-offs of soft deletes?", a: "deleted_at keeps rows recoverable, but every query must remember the filter, unique constraints need care, and tables grow forever. Consider audit tables + real deletes for high-churn data." },
+        { q: "How do you audit changes without corrupting the model?", a: "Append-only audit/change tables (who/what/when/diff) or CDC from the WAL — read-side history, while the live table stays the single source of truth." },
+        { q: "Explain expand-contract migrations.", a: "Zero-downtime schema change: expand (add new column/table) → deploy code that dual-writes → backfill → switch reads → contract (drop old). Never destructive-ALTER on the hot path during release." },
+        { q: "What does an ORM trade away vs raw SQL?", a: "Convenience and safety (typing, migrations) for control: N+1 traps, generic plans, hidden queries. Drop to raw SQL for bulk ops, tuning-critical queries, and window functions." }
+      ],
+      quiz: [
+        { q: "A dashboard aggregates millions of rows on every load. Cheapest durable fix?", options: ["Add an index on every column", "A materialized view refreshed on schedule", "Move to NoSQL", "Increase the connection pool"], answer: 1, explain: "Precompute the aggregation; pay a refresh instead of every read. A view alone still runs the query per load." },
+        { q: "Requests time out 'acquiring connection' after a release. First place to look?", options: ["Raise the pool limit", "A leaked/undisposed connection path", "Add read replicas", "Rewrite the ORM queries"], answer: 1, explain: "Pool exhaustion is usually a leak or long transactions; raising the limit only delays the outage." },
+        { q: "Random GUID keys slow down inserts at scale because…", options: ["They're too wide to parse", "Random insertion fragments the B-tree index", "The DB can't index strings", "They break replication"], answer: 1, explain: "Ordered keys append; random GUIDs scatter writes across pages. Sequential UUIDs (v7) fix locality." },
+        { q: "You must rename a busy table with zero downtime. The pattern is…", options: ["One migration: rename + deploy together", "Expand-contract: add new, dual-write, backfill, switch, drop", "Take the maintenance window", "Use a view alias forever"], answer: 1, explain: "Deploy-compatible steps (expand → migrate → contract) so old and new code coexist during the rollout." },
+        { q: "Every query forgetting WHERE deleted_at IS NULL is a smell of…", options: ["Poor indexing", "Soft-delete tax — consider audit tables + hard deletes", "A normalization bug", "Pool exhaustion"], answer: 1, explain: "Soft deletes leak into every access path; high-churn tables often do better with real deletes + audit history." },
+        { q: "3NF removes which dependency?", options: ["Repeating groups", "Partial dependency on a composite key", "Transitive non-key dependency", "Foreign keys"], answer: 2, explain: "3NF eliminates non-key → non-key dependencies; 2NF handles partial key dependencies." }
+      ]
+    },
+
+    "js-core": {
+      title: "JavaScript Core",
+      track: "frontend",
+      icon: "🟨",
+      blurb: "JavaScript is the language of the web: single-threaded with an event loop, prototype-based with closures and first-class functions. This topic covers the semantics interviews probe — scopes, this, prototypes, and async.",
+      read: `
+        <p><strong>var/let/const & TDZ:</strong> let/const are block-scoped and hoisted-but-uninitialized (temporal dead zone — accessing before declaration throws); var is function-scoped and undefined-when-hoisted. Default to const, let when reassigning, never var.</p>
+        <p><strong>Closures:</strong> a function keeps access to the scope where it was created. Powers module patterns, memoization caches and event handlers — and causes the classic bug: capturing a loop variable (fix with let, or a factory per iteration).</p>
+        <p><strong>this:</strong> set by the call — method call (the object), plain call (undefined/global), new (the instance), .call/.apply/.bind (explicit). Arrow functions don't bind this; they capture the enclosing one — which is exactly why they work as callbacks and break as object methods needing their own this.</p>
+        <p><strong>Prototypes & classes:</strong> objects delegate to a prototype chain; class is sugar over prototype constructors + methods on the shared prototype. Methods on the prototype = one copy for all instances.</p>
+        <p><strong>Event loop:</strong> one call stack; when empty, microtasks (Promise callbacks, queueMicrotask) drain fully before the next macrotask (timers, I/O). So Promise.then runs before setTimeout(fn, 0).</p>
+        <p><strong>Promises & async/await:</strong> async functions return promises; await = then with sync-looking syntax; errors flow to try/catch. Run independent work with Promise.all (fails fast), allSettled when you want every result.</p>
+        <p><strong>Equality:</strong> == coerces types before comparing ("1" == 1), === doesn't. Use === always; the one accepted == is x == null to catch both null and undefined.</p>
+        <p><strong>Copies:</strong> spread/Object.assign copy one level (nested objects are shared — the #1 "I mutated my state" bug); deep-clone with structuredClone when needed.</p>
+        <p><strong>Debounce vs throttle:</strong> debounce waits for silence (search-as-you-type); throttle caps the rate (scroll/resize handlers).</p>
+        <p><strong>Modules:</strong> ES modules (import/export) are static — analyzable, tree-shakeable; CommonJS (require) is dynamic and synchronous.</p>`,
+      cards: [
+        { q: "What is the temporal dead zone?", a: "let/const declarations are hoisted but stay uninitialized until their line executes; accessing them in between throws a ReferenceError — unlike var, which is undefined when hoisted." },
+        { q: "What is a closure and what's it good for?", a: "A function keeps live access to the scope where it was defined. It powers module privacy, memoization caches and partial application — and the classic bug of capturing a stale loop variable (fix: let, or a per-iteration factory)." },
+        { q: "How is this determined?", a: "By the call: method call → the object; plain call → undefined (or global in sloppy mode); new → the instance; call/apply/bind → explicit. Arrow functions ignore all of that and capture the enclosing this." },
+        { q: "Why do arrow functions break as object methods but work as callbacks?", a: "They have no own this — they capture the enclosing scope's. As a callback that's exactly right (the surrounding this survives); as obj.method() you get the outer this, not obj." },
+        { q: "How do classes relate to prototypes?", a: "class is sugar: the constructor builds the instance, methods live on the shared prototype — one copy for all instances, delegation up the prototype chain for lookups." },
+        { q: "Microtasks vs macrotasks — who wins?", a: "After the stack empties, the entire microtask queue drains (Promise callbacks, queueMicrotask) before any macrotask (setTimeout, I/O). Hence then() fires before setTimeout(fn, 0)." },
+        { q: "Promise.all vs allSettled?", a: "all rejects fast on the first failure and returns nothing (use for must-succeed- together); allSettled waits for every outcome and returns each status — for independent work where partial failure is fine." },
+        { q: "== vs === and the one allowed exception?", a: "== coerces types first ('1' == 1 is true); === doesn't. Use === always, except x == null as a deliberate idiom matching both null and undefined." },
+        { q: "Why does spreading an object not fully copy it?", a: "Spread copies one level; nested objects are shared references — mutating copy.inner also mutates source.inner. Deep-clone with structuredClone when independence matters." },
+        { q: "Debounce vs throttle?", a: "Debounce fires once after activity stops (search input); throttle fires at most once per interval during continuous activity (scroll, resize)." },
+        { q: "Why are ES modules tree-shakeable when CommonJS isn't?", a: "import/export is static — imports are known at parse time, so unused exports can be dropped at build; require() is dynamic and runtime-resolved, so everything must ship." }
+      ],
+      quiz: [
+        { q: "console.log(x) one line above let x = 1 throws. Why?", options: ["var hoisting", "The temporal dead zone", "Strict mode", "A closure bug"], answer: 1, explain: "let/const are hoisted but uninitialized until execution reaches them — accessing earlier is a ReferenceError." },
+        { q: "Order of logs: setTimeout(()=>log(1)); Promise.resolve().then(()=>log(2)); log(3)?", options: ["1 2 3", "3 2 1", "3 1 2", "2 3 1"], answer: 1, explain: "Sync 3 first; then the microtask queue drains (2) before any timer macrotask (1)." },
+        { q: "const copy = {...user}; copy.address.city = 'X'; What happens to user.address.city?", options: ["Unchanged — spread copies everything", "Changes too — nested objects are shared", "Throws", "Undefined"], answer: 1, explain: "Spread is one level deep: the inner object is the same reference. Use structuredClone for independence." },
+        { q: "Three independent API calls must all succeed together. Use…", options: ["Sequential awaits", "Promise.all", "Promise.allSettled", "setTimeout"], answer: 1, explain: "all runs them concurrently and rejects on the first failure — the together-or-nothing semantics." },
+        { q: "obj = { name: 'a', greet: () => this.name }. greet() returns…", options: ["'a'", "undefined — arrows capture the enclosing this", "Throws", "The global object"], answer: 1, explain: "Arrow functions have no own this; the method gets the outer scope's binding, not obj." },
+        { q: "Search-as-you-type should fire the query…", options: ["On every keystroke", "Debounced — after typing pauses", "Throttled at 1/s", "On blur only"], answer: 1, explain: "Debounce waits for silence so you query intentions, not keystrokes; throttle suits continuous streams like scroll." }
+      ]
+    },
+
+    "css-web": {
+      title: "CSS & Layout",
+      track: "frontend",
+      icon: "🎨",
+      blurb: "CSS describes presentation on the web. Mastering it means the cascade and specificity, the box model, and modern layout with Flexbox and Grid — plus responsive units and when (and why) elements stack the way they do.",
+      read: `
+        <p><strong>Box model:</strong> content → padding → border → margin; box-sizing: border-box makes width include padding+border (set it globally). Margins collapse vertically between siblings; padding doesn't.</p>
+        <p><strong>Cascade & specificity:</strong> styles resolve by origin, then specificity (inline > id > class/attr/pseudo-class > element), then source order. One id in a selector outweighs any number of classes — the reason !important spreads. Prefer low-specificity, class-based styles.</p>
+        <p><strong>Flexbox vs Grid:</strong> Flexbox = one dimension, content-driven (toolbars, card rows); Grid = two dimensions, layout-driven (page shells). They compose: grid the page, flex the components inside.</p>
+        <p><strong>Positioning:</strong> relative (offset from self, keeps space), absolute (out of flow vs nearest positioned ancestor), fixed (viewport), sticky (scrolls then sticks).</p>
+        <p><strong>Stacking contexts & z-index:</strong> z-index only compares within the same stacking context — created by transform, opacity &lt; 1, position+z-index, etc. "z-index: 9999 doesn't work" almost always means a parent created a context.</p>
+        <p><strong>Units & responsive:</strong> rem (root font size — scales with user settings; use for type) vs em (element font — tricky compounding) vs px (fixed) vs vw/vh (viewport). Media queries adapt to the viewport; container queries adapt to a component's own box — the component-era primitive.</p>
+        <p><strong>Pseudo-classes vs pseudo-elements:</strong> :hover/:focus/:nth-child() select elements in a state; ::before/::after create phantoms inside an element (content required).</p>
+        <p><strong>Animation costs:</strong> transitions animate state changes; @keyframes sequence steps. Animate transform and opacity only — GPU-composited; animating layout properties (top/width) triggers reflows.</p>
+        <p><strong>Modern CSS:</strong> :has() (parent selector), clamp() for fluid type, nesting, gap in flexbox, custom properties for theming.</p>`,
+      cards: [
+        { q: "What does box-sizing: border-box change?", a: "width/height then include padding and border, so a width: 100px element is actually 100px. Set it globally — the default content-box adds padding/border on top." },
+        { q: "How does the cascade resolve competing rules?", a: "Origin → specificity (inline > id > class/attr/pseudo-class > element) → source order. One id outweighs any number of classes; keep specificity low and class-based to avoid !important wars." },
+        { q: "When Flexbox, when Grid?", a: "Flexbox: one dimension, content-driven — rows of cards, toolbars, nav. Grid: two dimensions, layout-driven — page shells. Compose them: grid the page, flex inside components." },
+        { q: "relative vs absolute vs fixed vs sticky?", a: "Relative offsets from itself but keeps its space. Absolute leaves the flow, positioned vs the nearest positioned ancestor. Fixed pins to the viewport. Sticky scrolls normally, then sticks at its threshold." },
+        { q: "Why does z-index: 9999 sometimes do nothing?", a: "z-index compares only within a stacking context; a parent with transform, opacity < 1, or position+z-index creates one — your element is trapped in a different league than the one it must beat." },
+        { q: "rem vs em vs px?", a: "rem scales with the root font size (user zoom-friendly — type and spacing); em is relative to the element's font (compounds confusingly); px is fixed (fine for borders/hairlines, poor for type)." },
+        { q: "Media query vs container query?", a: "Media queries respond to the viewport; container queries respond to the component's own container — so a card adapts whether it sits in a sidebar or the main column. The component-era primitive." },
+        { q: "Pseudo-class vs pseudo-element?", a: ":hover, :focus, :nth-child() select existing elements in a state; ::before/::after insert phantom children (need the content property) for decorations." },
+        { q: "Which CSS properties are cheap to animate, and why?", a: "transform and opacity — handled by the compositor on the GPU. Animating top/left/width forces layout (reflow) every frame: jank." },
+        { q: "What does clamp() give you?", a: "Fluid values with bounds: font-size: clamp(1rem, 2.5vw, 1.5rem) scales with the viewport but never below/above the limits — responsive type without media queries." },
+        { q: "What is :has()?", a: "The parent selector: .card:has(img) styles a card that contains an image — previously impossible without JS or extra classes." }
+      ],
+      quiz: [
+        { q: "A modal must overlay everything but z-index: 9999 loses to a header. Most likely cause?", options: ["Modal needs position: fixed", "A parent stacking context traps the modal", "Browsers cap z-index at 9999", "The header has !important"], answer: 1, explain: "z-index compares within a stacking context; a transformed/positioned ancestor isolates the modal. Restructure contexts or move the modal." },
+        { q: "Page shell (sidebar + main + footer bands) — best tool?", options: ["Floats", "Flexbox", "CSS Grid", "Tables"], answer: 2, explain: "Two-dimensional, layout-driven structure is Grid's job; Flexbox handles the one-dimensional pieces inside." },
+        { q: "Your 60fps animation janks. It animates…", options: ["transform", "opacity", "top and width", "color"], answer: 2, explain: "top/width trigger reflow per frame; transform/opacity are compositor-only. Animate those." },
+        { q: "A card component must adapt when placed in a narrow sidebar. Cleanest modern approach?", options: ["More media queries", "A container query", "!important overrides", "Duplicate the component"], answer: 1, explain: "Container queries let the component respond to its own box instead of the viewport." },
+        { q: "width: 100px + padding: 10px + border: 2px renders 100px wide when…", options: ["box-sizing: content-box (default)", "box-sizing: border-box", "display: flex", "Always"], answer: 1, explain: "border-box includes padding and border in the declared width." },
+        { q: "::before does nothing. The usual reason?", options: ["Missing z-index", "Missing the content property", "Wrong selector order", "Flexbox override"], answer: 1, explain: "Pseudo-elements require content (even an empty string) to render." }
+      ]
+    },
+
+    "web-rt": {
+      title: "WebSockets & Real-Time",
+      track: "frontend",
+      icon: "📡",
+      blurb: "WebSockets are a persistent, bidirectional TCP channel opened through one HTTP upgrade — the right tool when the server must push to the client instantly. Choosing the transport (polling, SSE, WS) is the real interview question.",
+      read: `
+        <table><thead><tr><th>Transport</th><th>Direction</th><th>Trade-off</th></tr></thead><tbody>
+        <tr><td>Short polling</td><td>Client pulls</td><td>Trivial; latency = interval, wasteful requests</td></tr>
+        <tr><td>Long polling</td><td>Client pulls, server holds</td><td>Near-real-time; each message costs a reconnect, header overhead</td></tr>
+        <tr><td>SSE</td><td>Server → client only</td><td>Simple, HTTP-native, auto-reconnect; one-way, limited concurrent connections per browser over HTTP/1.1</td></tr>
+        <tr><td>WebSocket</td><td>Bi-directional</td><td>Low latency both ways after one handshake; you own the protocol</td></tr>
+        </tbody></table>
+        <p><strong>Handshake:</strong> an HTTP GET with Upgrade: websocket + a random Sec-WebSocket-Key; the server answers 101 Switching Protocols. Use wss:// (TLS) always — ws:// is cleartext and blocked on HTTPS pages.</p>
+        <p><strong>Reliability is yours:</strong> heartbeats/ping-pong to detect half-open connections; reconnect with exponential backoff + jitter; replay missed events via an event id or fetch-on-reconnect; guard against out-of-order delivery.</p>
+        <p><strong>Scaling:</strong> any server instance can serve any client's handshake (sticky sessions), but fan-out needs a shared bus — Redis pub/sub (or a broker) between instances; rooms/groups route messages to the right subset.</p>
+        <p><strong>Socket.IO vs raw WS:</strong> a library adding rooms, automatic fallbacks, acks and reconnection logic — at the cost of a custom protocol (both ends must be Socket.IO). Raw WS stays when you need plain standards or non-JS clients.</p>
+        <p><strong>Backpressure & size:</strong> buffer outgoing messages and slow down on highWaterMark; chunk or move big payloads to object storage + send a reference — don't push megabytes through the socket.</p>
+        <p><strong>Auth:</strong> browsers can't set custom headers on WS — pass a short-lived token as query param/subprotocol at connect, validate during the handshake, and reject with 401 before the upgrade completes.</p>
+        <p><strong>When NOT WebSockets:</strong> request/response shaped work (plain HTTP), server-only streams (SSE is simpler), or rare updates (polling wins). WS pays off for true bidirectional urgency — chat, presence, collaborative editing, live dashboards.</p>`,
+      cards: [
+        { q: "WebSocket vs SSE vs long polling?", a: "Long polling: client pulls, server holds the request open — near-real-time but each message costs a reconnect. SSE: simple one-way server→client stream over HTTP with auto-reconnect. WebSocket: persistent bidirectional channel after one handshake — you own the protocol." },
+        { q: "Describe the WebSocket handshake.", a: "An HTTP GET with Upgrade: websocket and a Sec-WebSocket-Key; the server validates and answers 101 Switching Protocols — the TCP connection then speaks WS frames instead of HTTP." },
+        { q: "Why wss:// instead of ws://?", a: "wss is WS over TLS: encrypted, and the only option from HTTPS pages — browsers block cleartext ws:// there." },
+        { q: "What reliability do you build yourself on WS?", a: "Heartbeats/ping-pong to detect dead connections, reconnect with exponential backoff + jitter, replay of missed events (event ids or fetch-on-reconnect), and ordering guards." },
+        { q: "Why do half-open connections need heartbeats?", a: "TCP can stay 'established' after a silent network drop; without ping-pong timeouts you keep a dead session and never learn the client is gone." },
+        { q: "How do you scale WebSockets across instances?", a: "Any node can hold any connection (sticky sessions simplify), and a shared bus — Redis pub/sub — carries fan-out so instance A can push to a client connected to instance B. Rooms route subsets." },
+        { q: "What does Socket.IO add over raw WS?", a: "Rooms, fallback transports, acks, automatic reconnection and buffering — in exchange for its custom protocol (both ends must be Socket.IO)." },
+        { q: "How do you handle backpressure on a socket?", a: "Watch the send buffer/highWaterMark and pause or drop when the consumer is slow; chunk large payloads or ship a storage reference instead of megabytes." },
+        { q: "How do you authenticate a WS connection?", a: "Browsers can't set custom headers on upgrades — pass a short-lived token via query param or subprotocol and validate during the handshake, rejecting with 401 before the upgrade completes." },
+        { q: "When should you NOT use WebSockets?", a: "Request/response shapes (plain HTTP), server-only streams (SSE is simpler and HTTP-native), or rare updates (polling is fine). WS pays for genuinely bidirectional, latency-sensitive work." }
+      ],
+      quiz: [
+        { q: "Server must stream prices to the client; the client sends nothing back. Simplest correct transport?", options: ["WebSocket", "Server-Sent Events", "Long polling", "gRPC streaming"], answer: 1, explain: "One-way server→client is exactly SSE: HTTP-native, auto-reconnect, no custom protocol to own." },
+        { q: "Two app instances behind a load balancer; a user's messages must reach their socket on the other node. Standard fix?", options: ["Sticky sessions only", "A shared pub/sub bus like Redis between instances", "Direct instance-to-instance HTTP", "Client connects to both"], answer: 1, explain: "The bus carries fan-out across nodes; stickiness alone doesn't route messages between processes." },
+        { q: "Sockets die silently behind flaky mobile networks. Missing piece?", options: ["Bigger buffers", "Heartbeat ping/pong with timeouts", "HTTP/2", "Reconnect on page refresh"], answer: 1, explain: "Half-open TCP connections look alive; periodic pings detect them so you can reconnect (with backoff)." },
+        { q: "You must reject unauthenticated WS clients. Where?", options: ["After connecting, close the socket", "During the handshake, before the upgrade completes", "On the first message", "In the browser"], answer: 1, explain: "Validate the token during the upgrade request and return 401 — don't accept unauthenticated channels." },
+        { q: "A dashboard updates once an hour. Best transport?", options: ["WebSocket", "SSE", "Polling / refetch on focus", "Long polling"], answer: 2, explain: "Rare updates don't justify a persistent channel — poll or refetch on visibility." },
+        { q: "Pushing 50MB files over WS is a bad idea because…", options: ["WS frames can't exceed 64KB", "It blocks the channel and defeats backpressure; send a reference and download via HTTP", "Browsers forbid binary WS", "TLS doesn't cover binary"], answer: 1, explain: "Big payloads monopolize the connection and buffers — upload to storage and push the URL." }
       ]
     }
   }
