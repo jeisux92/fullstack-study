@@ -154,34 +154,34 @@ window.STUDY_DATA = {
       icon: "🗃️",
       blurb: "A database stores and retrieves application data. SQL databases keep data in tables with ACID transaction guarantees; NoSQL trades some guarantees for flexible schemas and horizontal scale — while concurrency control keeps simultaneous readers and writers from corrupting it.",
       read: `
-        <p><strong>SQL vs NoSQL:</strong> SQL = rigid schema, ACID, joins/reporting; traditionally vertical scaling (sharding complex). NoSQL = flexible schema, eventual consistency, horizontal scaling, high volume. Caveat: Vitess/CockroachDB/Spanner/Aurora scale SQL horizontally too — choose by guarantees and query patterns, not possibility.</p>
-        <p><strong>ACID:</strong> Atomicity, Consistency, Isolation, Durability. <strong>CAP:</strong> during a Partition you must choose Consistency or Availability; tunable per operation; PACELC adds latency-vs-consistency even without partitions.</p>
-        <p><strong>Indexing:</strong> B-Tree speeds reads, slows writes. Index WHERE/JOIN/ORDER BY columns. Composite order: equality first, then range/sort. Covering index = index-only scan. Functions on columns, leading wildcards, low selectivity break index use.</p>
-        <p><strong>Isolation levels:</strong> Read Uncommitted → Read Committed → Repeatable Read → Serializable, preventing dirty reads, non-repeatable reads, phantoms respectively. MVCC: readers don't block writers. Postgres RR = snapshot isolation (allows write skew). Lost updates fixed by locks or atomic updates.</p>
-        <p><strong>Deadlocks:</strong> two txns each hold a lock the other needs; DB aborts a victim. Prevent with consistent lock ordering, short transactions, proper indexes; retry on deadlock.</p>
-        <p><strong>Optimistic</strong> (version check, low contention) vs <strong>pessimistic</strong> (row lock, high contention) locking. Replication = HA + read scaling (watch lag). Sharding = write scaling (cross-shard joins hurt).</p>`,
+        <p><strong>SQL vs NoSQL:</strong> SQL gives you a rigid schema, ACID transactions, joins and reporting — traditionally scaled vertically (bigger machine), though Vitess/CockroachDB/Spanner/Aurora now shard SQL horizontally too. NoSQL gives flexible/schema-less documents, eventual consistency and horizontal scale by design, for massive or rapidly-evolving data. <em>Choose by guarantees and query patterns, not by possibility</em>: a ledger needs ACID; an event log needs volume.</p>
+        <p><strong>ACID &amp; CAP:</strong> ACID = <em>Atomicity</em> (all-or-nothing), <em>Consistency</em> (valid state in → valid state out), <em>Isolation</em> (concurrent transactions don't interfere), <em>Durability</em> (committed survives crashes). CAP says: <em>during a network Partition</em>, a distributed system must choose Consistency or Availability — you can't have both at that moment. Precise phrasing matters: partitions are inevitable, so the choice only exists when one happens; many systems tune per operation (quorum reads: CP for payments, AP for a feed). PACELC adds the next axis: even without partitions there's a Latency-vs-Consistency trade-off.</p>
+        <p><strong>Indexing:</strong> a B-Tree keeps keys sorted so lookups are O(log n) — faster <code>SELECT</code>, but every <code>INSERT/UPDATE</code> must maintain it (slower writes, extra storage). Index the columns in <code>WHERE</code>, <code>JOIN</code> and <code>ORDER BY</code>. <em>Composite index order matters</em>: equality columns first, then range/sort — <code>(user_id, created_at)</code> serves <code>WHERE user_id=? ORDER BY created_at</code>, the reverse doesn't. A <strong>covering index</strong> contains every column the query needs, so the DB never touches the table. What breaks index use: functions on the column (<code>LOWER(email)</code>), leading wildcards (<code>LIKE '%foo'</code>), low selectivity, stale statistics. The senior move for "slow query" is to read the plan (<code>EXPLAIN ANALYZE</code>): look for seq scans where an index scan belongs, row-estimate mismatches (stale stats), and expensive join types.</p>
+        <p><strong>Isolation & MVCC:</strong> the SQL standard's four levels — Read Uncommitted, Read Committed, Repeatable Read, Serializable — each prevent more anomalies: dirty reads, then non-repeatable reads, then phantoms. <em>MVCC</em> (multi-version concurrency) is how modern engines implement them: each transaction sees a consistent <strong>snapshot</strong>, so <em>readers never block writers</em>. Nuance to know: Postgres' Repeatable Read is actually snapshot isolation — it prevents phantoms but still allows <strong>write skew</strong> (two transactions read overlapping data and write disjoint updates, each invalidating the other's assumption); only true Serializable catches it. Lost updates (two txns read-modify-write the same row) are fixed by locking (<code>SELECT ... FOR UPDATE</code>) or atomic SQL (<code>SET x = x + 1</code>).</p>
+        <p><strong>Deadlocks:</strong> two transactions each hold a lock the other needs, so both wait forever — the DB detects the cycle and aborts one as a victim (your code must retry; SQLSTATE 40001). Prevention: consistent lock ordering across code paths, short transactions (never do network calls mid-transaction), and appropriate indexes — without them a query locks far more rows than intended.</p>
+        <p><strong>Optimistic vs pessimistic locking:</strong> optimistic stores a version column and does <code>UPDATE ... WHERE version = n</code> — if 0 rows changed, someone else won (low contention, no locks held). Pessimistic does <code>SELECT ... FOR UPDATE</code> and holds the row lock (high contention, but serializes writers). Replication copies data to other nodes for high availability and read scaling (watch replica lag — stale reads). Sharding splits data by key across nodes for write scaling (cross-shard joins/transactions become painful — that's the price).</p>`,
       cards: [
-        { q: "How do you choose SQL vs NoSQL?", a: "SQL for structured data, transactions, joins, reporting (ACID). NoSQL for massive volume, semi-structured data, fast schema evolution, horizontal scale. Choose by guarantees and query patterns — modern SQL can scale horizontally too." },
-        { q: "State ACID.", a: "Atomicity (all-or-nothing), Consistency (valid state in → valid out), Isolation (concurrent txns don't interfere), Durability (committed data survives crashes)." },
-        { q: "Precisely state the CAP theorem.", a: "During a network Partition, a distributed system must choose Consistency or Availability — not both at that moment. Partitions are inevitable; with no partition you can have both. Many systems tune per operation (CP payments, AP feeds). PACELC adds latency-vs-consistency even without partitions." },
-        { q: "What's the trade-off of an index?", a: "Faster reads (SELECT) at the cost of slower writes (INSERT/UPDATE must maintain it) and extra storage. Index columns used in WHERE, JOIN, ORDER BY." },
-        { q: "How should you order columns in a composite index?", a: "Equality-filtered columns first, then range/sort columns. (user_id, created_at) serves WHERE user_id=? ORDER BY created_at; the reverse does not." },
-        { q: "What breaks index usage?", a: "Functions on the indexed column (LOWER(email)), leading wildcards (LIKE '%foo'), low-selectivity columns, and stale optimizer statistics." },
-        { q: "Name the four isolation levels and what they prevent.", a: "Read Uncommitted (nothing), Read Committed (dirty reads), Repeatable Read (non-repeatable reads), Serializable (phantoms too). Higher isolation = more safety, less concurrency." },
-        { q: "What is MVCC?", a: "Multi-Version Concurrency Control: readers see a consistent snapshot and never block writers. It's the implementation behind modern isolation. Postgres defaults to Read Committed; MySQL InnoDB to Repeatable Read." },
-        { q: "What is write skew?", a: "Under snapshot isolation, two txns read overlapping data and write disjoint updates, each invalidating the other's assumption. Postgres Repeatable Read allows it; only true Serializable catches it." },
-        { q: "How do you prevent deadlocks?", a: "Consistent lock ordering across code paths, short transactions (no network/user interaction mid-txn), appropriate indexes (so you don't lock extra rows), and retry on the deadlock error." },
-        { q: "Optimistic vs pessimistic locking?", a: "Optimistic: version column, UPDATE WHERE version=n; if 0 rows changed, conflict. Best under low contention, no locks held. Pessimistic: SELECT FOR UPDATE holds a row lock; safe under high contention but reduces concurrency." },
-        { q: "Replication vs sharding?", a: "Replication copies the same data → high availability + read scaling (watch replica lag). Sharding splits data by key → write scaling + storage beyond one machine (cross-shard joins/transactions hurt)." }
+        { q: "How do you choose SQL vs NoSQL?", a: "SQL: rigid schema, ACID transactions, joins, reporting — scale traditionally vertical (or modern distributed SQL). NoSQL: flexible schema, eventual consistency, horizontal scale for massive or fast-evolving data. Decide by guarantees and query patterns: a ledger needs ACID, an event log needs volume — 'can it scale?' is the wrong question." },
+        { q: "State ACID.", a: "Atomicity: all-or-nothing. Consistency: valid state in → valid state out. Isolation: concurrent transactions don't interfere with each other. Durability: committed data survives crashes (WAL + fsync). ACID is the SQL contract; NoSQL often trades parts of it for availability and scale (BASE)." },
+        { q: "Precisely state the CAP theorem.", a: "During a network Partition — not at all times — a distributed system must choose Consistency or Availability, since it can't guarantee both while the partition lasts. With no partition you can have both, and most systems tune per operation (CP for payments, AP for feeds). PACELC adds: even without partitions there's a Latency-vs-Consistency trade-off (e.g. quorum reads)." },
+        { q: "What's the trade-off of an index?", a: "Faster reads (B-Tree, O(log n)) at the cost of slower writes — every INSERT/UPDATE must maintain the index — plus extra storage. Index columns in WHERE, JOIN and ORDER BY; leave write-heavy or rarely-queried columns alone." },
+        { q: "How should you order columns in a composite index?", a: "Equality-filtered columns first, then range/sort: (user_id, created_at) serves WHERE user_id=? ORDER BY created_at, because equality narrows the B-Tree walk and the remaining entries are already sorted by time. The reverse order can't use it for sorting — it would scan and sort instead." },
+        { q: "What breaks index usage?", a: "Functions on the column (WHERE LOWER(email) = ...), leading wildcards (LIKE '%foo'), low-selectivity columns (a flag that's 90% true), and stale optimizer statistics. Fix: expression indexes, full-text search, or update statistics — don't guess, read EXPLAIN ANALYZE." },
+        { q: "Name the four isolation levels and what they prevent.", a: "Read Uncommitted: prevents nothing (sees uncommitted data). Read Committed: prevents dirty reads. Repeatable Read: prevents non-repeatable reads (re-reads return the same row). Serializable: also prevents phantom reads. Each level buys more correctness with less concurrency — that's the whole trade-off." },
+        { q: "What is MVCC?", a: "Multi-Version Concurrency Control: the engine keeps old row versions so each transaction reads a consistent snapshot — readers never block writers and vice versa. It's the implementation behind modern isolation. Postgres defaults to Read Committed, MySQL InnoDB to Repeatable Read; snapshot isolation (Postgres RR) prevents phantoms but allows write skew." },
+        { q: "What is write skew?", a: "Under snapshot isolation: two transactions read overlapping data, each makes a disjoint write that violates the other's assumption (e.g., each checks '≥1 doctor on shift' before going off — both pass, zero remain). The reads were consistent snapshots, so no write conflict is detected. Only true Serializable (or explicit locking) prevents it." },
+        { q: "How do you prevent deadlocks?", a: "Consistent lock ordering across all code paths (touch rows/tables in the same order), short transactions — never hold locks across network calls — and proper indexes so queries lock few rows instead of table-scanning. On top: retry the deadlock error (40001); it's an expected error, not a crash." },
+        { q: "Optimistic vs pessimistic locking?", a: "Optimistic: a version column; UPDATE ... WHERE version = n, and if 0 rows changed, someone else won — no locks held, perfect for low contention. Pessimistic: SELECT ... FOR UPDATE holds a row lock until commit — safe under high contention, but serializes writers and risks deadlocks. Pick by collision probability, not by safety alone." },
+        { q: "Replication vs sharding?", a: "Replication: the same data on multiple nodes — high availability (failover) and read scaling (serve reads from replicas), but replicas lag, so reads can be stale. Sharding: data split by key across nodes — write scaling and storage beyond one machine, but cross-shard joins and transactions become hard, and resharding is surgery. Different problems: HA/reads vs writes/storage." }
       ],
       quiz: [
-        { q: "During a network partition, CAP says you must choose between…", options: ["Consistency and Availability", "Atomicity and Durability", "Latency and Throughput", "SQL and NoSQL"], answer: 0, explain: "The C-vs-A choice exists only during a partition. With no partition you can have both; many systems tune per operation." },
-        { q: "Which composite index serves WHERE user_id=? ORDER BY created_at?", options: ["(created_at, user_id)", "(user_id, created_at)", "(user_id) only", "No index can help"], answer: 1, explain: "Equality column first, then the sort column. The reverse order can't use the index for the ordering." },
-        { q: "Which query defeats an index on email?", options: ["WHERE email = ?", "WHERE LOWER(email) = ?", "WHERE email LIKE 'a%'", "ORDER BY email"], answer: 1, explain: "A function on the indexed column prevents the optimizer from using the index directly." },
-        { q: "Two transactions read overlapping rows and write disjoint updates, each breaking the other's assumption. This is…", options: ["A dirty read", "A phantom read", "Write skew", "A lost update"], answer: 2, explain: "Write skew occurs under snapshot isolation; only true Serializable prevents it." },
-        { q: "Best locking strategy for a low-contention record edit?", options: ["Pessimistic row lock", "Optimistic version check", "Table lock", "Serializable everything"], answer: 1, explain: "Optimistic locking holds no locks and detects conflicts via a version column — ideal when collisions are rare." },
-        { q: "You need to scale writes beyond one machine. You use…", options: ["Read replicas", "Sharding", "A bigger CPU", "More indexes"], answer: 1, explain: "Replication scales reads/HA; sharding partitions data to scale writes and storage." },
-        { q: "The senior first step for 'this query is slow' is…", options: ["Add an index immediately", "Read the query plan (EXPLAIN ANALYZE)", "Switch to NoSQL", "Cache everything"], answer: 1, explain: "Diagnose with the plan: look for seq scans, estimate mismatches, and join types before changing anything." }
+        { q: "During a network partition, CAP says you must choose between…", options: ["Consistency and Availability", "Atomicity and Durability", "Latency and Throughput", "SQL and NoSQL"], answer: 0, explain: "The C-vs-A choice exists only during a partition — with no partition you can have both, and most systems tune per operation (CP payments, AP feeds)." },
+        { q: "Which composite index serves WHERE user_id=? ORDER BY created_at?", options: ["(created_at, user_id)", "(user_id, created_at)", "(user_id) only", "No index can help"], answer: 1, explain: "Equality first narrows the B-Tree walk, then the entries are already sorted by created_at — the reverse index would scan and sort instead." },
+        { q: "Which query defeats an index on email?", options: ["WHERE email = ?", "WHERE LOWER(email) = ?", "WHERE email LIKE 'a%'", "ORDER BY email"], answer: 1, explain: "A function on the column forces a full scan; an expression index on LOWER(email) or a normalized column fixes it." },
+        { q: "Two transactions read overlapping rows and write disjoint updates, each breaking the other's assumption. This is…", options: ["A dirty read", "A phantom read", "Write skew", "A lost update"], answer: 2, explain: "Snapshot isolation sees no write conflict because the writes are disjoint — only true Serializable catches the violated invariant." },
+        { q: "Best locking strategy for a low-contention record edit?", options: ["Pessimistic row lock", "Optimistic version check", "Table lock", "Serializable everything"], answer: 1, explain: "Optimistic holds no locks and detects conflicts via the version column — zero overhead when collisions are rare." },
+        { q: "You need to scale writes beyond one machine. You use…", options: ["Read replicas", "Sharding", "A bigger CPU", "More indexes"], answer: 1, explain: "Replication scales reads and availability; sharding partitions data by key to scale writes and storage." },
+        { q: "The senior first step for 'this query is slow' is…", options: ["Add an index immediately", "Read the query plan (EXPLAIN ANALYZE)", "Switch to NoSQL", "Cache everything"], answer: 1, explain: "Diagnose first: seq scans, estimate mismatches (stale stats) and join types tell you what's actually wrong before you change anything." }
       ]
     },
 
@@ -281,25 +281,172 @@ window.STUDY_DATA = {
       icon: "🧱",
       blurb: "A design pattern is a named, reusable solution to a problem that recurs in software design. The classic Gang-of-Four catalog covers object creation and structure; backend development adds architectural ones like Repository, Saga, and Outbox.",
       read: `
-        <p>A design pattern is a named, reusable solution to a recurring design problem. They group into <strong>creational</strong> (how objects get built), <strong>structural</strong> (how they compose), <strong>behavioral</strong> (how they collaborate) — plus the <strong>data & architectural</strong> staples backend work adds.</p>
-        <h4>Creational — how objects are built</h4>
+        <p>A design pattern is a named, reusable solution to a recurring design problem. Each pattern has four parts: a <strong>context</strong> (when it applies), a <strong>problem</strong> (what forces repeat the design), a <strong>solution</strong> (object structure and collaboration), and <strong>consequences</strong> (the results and trade-offs). Patterns are a vocabulary: saying "I'd use a Strategy here" replaces a paragraph of explanation in a design review.</p>
+        <pre><code>The Gang-of-Four taxonomy (1994) — by WHAT VARIES:
+
+Design patterns
+├── Creational    — how objects are created
+│   ├── Factory Method · Abstract Factory · Builder · Prototype · Singleton
+├── Structural    — how classes and objects are composed
+│   └── Adapter · Facade · Decorator · Proxy · DTO/Mapper
+└── Behavioral    — how objects collaborate and distribute responsibilities
+    ├── Strategy · State · Template Method · Observer · Chain of Responsibility</code></pre>
+        <p><strong>The three categories at a glance:</strong></p>
+        <table><thead><tr><th>Type</th><th>Question it answers</th><th>What varies</th></tr></thead><tbody>
+        <tr><td>Creational</td><td>How do objects get created?</td><td>What concrete classes get instantiated</td></tr>
+        <tr><td>Structural</td><td>How do classes and objects compose?</td><td>How pieces connect without coupling them directly</td></tr>
+        <tr><td>Behavioral</td><td>How do objects collaborate?</td><td>Algorithms and responsibility distribution at runtime</td></tr>
+        </tbody></table>
+        <p>Below, each category gets its definition, the patterns in it, and when it applies. The backend staples — Repository, Unit of Work, Dependency Injection — aren't Gang-of-Four; they're listed at the end because interviews ask them anyway.</p>
+
+        <h4>1 · Creational — how objects are created</h4>
+        <p><strong>Definition:</strong> creational patterns abstract <em>instantiation</em> so a system is decoupled from how its objects are created, composed, and represented. They matter when object creation is complex, varies by configuration, or would otherwise force callers to hardcode concrete classes — the coupling creational patterns remove. They do <em>not</em> change how objects behave afterward; they only control how they come into existence.</p>
+        <p><strong>Factory Method</strong> (class) · <strong>Abstract Factory</strong> (families of related products) · <strong>Builder</strong> (step-by-step construction) · <strong>Prototype</strong> (clone a prototypical instance) · <strong>Singleton</strong> (one shared instance). The two shown here are the ones you'll actually meet in backend interviews.</p>
         <p><strong>Factory Method.</strong> A method decides which concrete class to instantiate, so callers depend on an abstraction instead of constructors. Example: <code>SenderFactory.forProvider(config)</code> returning a SendGrid or SES sender. Skip it when construction is a single <code>new</code> with no variation.</p>
+        <pre><code>// The caller knows ISender, never SendGridSender or SesSender.
+ISender CreateSender(string provider) =&gt;
+    provider switch {
+        "sendgrid" =&gt; new SendGridSender(),
+        "ses"      =&gt; new SesSender(),
+        _          =&gt; throw new ArgumentException(provider)
+    };</code></pre>
         <p><strong>Builder.</strong> Assembles a complex object step by step with a fluent API instead of telescoping constructors. Example: <code>Query.select(...).where(...).limit(...)</code>. Skip it when the object has two fields.</p>
+        <pre><code>var q = new SqlQueryBuilder()
+    .Select("id", "name")
+    .From("users")
+    .Where("age &gt; 18")
+    .OrderBy("created_at")
+    .Build(); // an object nobody would construct in one call</code></pre>
         <p><strong>Singleton.</strong> Guarantees one shared instance with global access. In backend, prefer the DI container's singleton scope over a hand-rolled <code>getInstance()</code> — a static singleton hides dependencies, blocks testing, and causes concurrency surprises.</p>
-        <h4>Structural — how objects compose</h4>
+
+        <h4>2 · Structural — how classes and objects compose</h4>
+        <p><strong>Definition:</strong> structural patterns compose classes and objects into larger structures while keeping them flexible and efficient. They answer "how do these pieces connect?" by introducing indirection — a wrapper, a bridge, a stand-in — so parts can change or be added without touching the whole. They add relationships <em>between</em> objects (aggregation, delegation) rather than behavior inside them; the price is one extra indirection layer, so they pay off only when the coupling they remove is real.</p>
+        <pre><code>Client ──uses──► [Abstraction] ◄──implements── Concrete
+                      ▲
+                      │ (structural patterns insert one of these)
+        ┌─────────────┴──────────────┐
+   Adapter: vendor API → our port   Facade: many calls → one
+   Decorator/Proxy: wrapper around  DTO/Mapper: entity ↔ contract
+        │                          │
+   same interface, new behavior    new surface, same subsystem</code></pre>
+        <p><strong>Adapter</strong> (converts an interface) · <strong>Facade</strong> (simplifies a subsystem) · <strong>Decorator</strong> (adds behavior by wrapping) · <strong>Proxy</strong> (controls access to a subject) · <strong>DTO &amp; Mapper</strong> (transport shapes between layers). Below are the four you'll actually meet in backend work.</p>
         <p><strong>Adapter.</strong> Converts an external interface into the one your system expects. Example: wrapping a vendor SMS SDK behind your own <code>SmsSender</code> port so the vendor can be swapped. Trade-off: it's deliberate indirection — don't adapt interfaces you own.</p>
+        <pre><code>// The SDK's interface is the vendor's, not ours:
+class AcmeSms { public bool SendSms(string n, string t) { /* vendor */ } }
+
+// Our port — what the rest of the app depends on:
+interface ISmsSender { void Send(string phone, string text); }
+
+class AcmeAdapter : ISmsSender {
+    private readonly AcmeSms _sdk = new();
+    public void Send(string p, string t) =&gt; _sdk.SendSms(p, t);
+}</code></pre>
         <p><strong>Facade.</strong> One simplified entry point over a complicated subsystem. Example: <code>PaymentFacade.charge()</code> hiding fraud-check + gateway + ledger calls. Unlike Adapter (converts an interface), Facade hides complexity behind a new, simpler one.</p>
+        <pre><code>class PaymentFacade {
+    // The caller makes ONE call instead of orchestrating three subsystems:
+    public void Charge(decimal amount) {
+        _fraud.Check(amount);       // subsystem 1
+        _gateway.Charge(amount);    // subsystem 2
+        _ledger.Record(amount);     // subsystem 3
+    }
+}</code></pre>
         <p><strong>Decorator.</strong> Wraps a component to add behavior — logging, caching, retry — without modifying it: same interface, stacked responsibilities. Skip it when a single cross-cutting concern would do with plain middleware.</p>
+        <pre><code>interface Notifier { void Send(string msg); }
+
+class EmailNotifier : Notifier { public void Send(string m) { /* send */ } }
+
+// Same interface, behavior stacked — the client sees a Notifier:
+class RetryDecorator : Notifier {
+    private readonly Notifier _inner;
+    private readonly int _tries;
+    public RetryDecorator(Notifier inner, int tries) { _inner = inner; _tries = tries; }
+    public void Send(string m) {
+        for (var i = 0; i &lt; _tries; i++) {
+            try { _inner.Send(m); return; } catch { /* retry */ }
+        }
+    }
+}
+
+// client: new LoggingDecorator(new RetryDecorator(new EmailNotifier(), 3))</code></pre>
+        <pre><code>Diagram — who wraps whom (client calls the outermost):
+
+EmailNotifier  (implements Notifier)
+      ▲
+RetryDecorator ───────► EmailNotifier
+      ▲
+LoggingDecorator ─────► RetryDecorator
+   (client calls LoggingDecorator.Send)</code></pre>
         <p><strong>Proxy.</strong> A stand-in that controls access to the real subject: lazy loading, access control, caching, remote calls. Decorator adds behavior; Proxy controls access.</p>
-        <p><strong>DTO & Mapper.</strong> DTOs are inert transport objects at API boundaries; mappers convert between domain entities, DTOs, and persistence models. They keep internal structure out of your contracts, at the cost of mapping boilerplate.</p>
-        <h4>Behavioral — how objects collaborate</h4>
+        <p><strong>DTO &amp; Mapper.</strong> DTOs are inert transport objects at API boundaries; mappers convert between domain entities, DTOs, and persistence models. They keep internal structure out of your contracts, at the cost of mapping boilerplate.</p>
+
+        <h4>3 · Behavioral — how objects collaborate</h4>
+        <p><strong>Definition:</strong> behavioral patterns characterize how objects interact and distribute responsibilities — they move beyond structure to algorithms, message flow, and the <em>dynamic</em> wiring between objects. Instead of answering "how is this built?", they answer "who decides what, when, and who gets notified?" The coupling they remove is <em>algorithmic</em>: the client picks a policy (Strategy), the object picks its own (State), or the subject fans out to whoever subscribed (Observer). They trade explicit call sites for indirection you have to follow — so they pay off exactly when the behavior genuinely varies.</p>
+        <pre><code>Caller ──calls──► Context ◄──holds── Strategy (algorithm)
+                       └──policy──► State (internal mood)
+
+Subject ──emit──► Observer(s)      Request ──chain──► H1 ─► H2 ─► H3
+   (one event, many subscribers)   (each link decides: act / mutate / pass)</code></pre>
+        <p><strong>Strategy</strong> (interchangeable algorithms) · <strong>State</strong> (behavior per internal state) · <strong>Template Method</strong> (skeleton + variable steps) · <strong>Observer</strong> (event fan-out) · <strong>Chain of Responsibility</strong> (handler pipelines). The four with code below cover the ones that appear most in backend interviews.</p>
         <p><strong>Strategy.</strong> Defines a family of interchangeable algorithms behind one interface; the caller picks one at runtime. Example: payment gateways (<code>CardStrategy</code>, <code>PayPalStrategy</code>). Kill switch: when there is only ever one implementation (YAGNI).</p>
+        <pre><code>interface IPaymentGateway { void Charge(decimal amount); }
+
+class CardGateway   : IPaymentGateway { public void Charge(decimal a) { /* auth + capture */ } }
+class PayPalGateway : IPaymentGateway { public void Charge(decimal a) { /* redirect flow */ } }
+
+// Context chooses at runtime; a new gateway needs NO change here:
+class Checkout {
+    private readonly IPaymentGateway _gw;
+    public Checkout(IPaymentGateway gw) =&gt; _gw = gw;
+    public void Pay(decimal amount) =&gt; _gw.Charge(amount);
+}</code></pre>
+        <pre><code>Diagram — the context picks one implementation:
+
+            ┌─ CardGateway ──┐
+Context ────┼─ PayPalGateway ─┼── runtime choice
+            └─ BankTransfer ─┘
+  (new gateway = new class, Checkout untouched)</code></pre>
         <p><strong>State.</strong> Structurally identical to Strategy, but the object changes its own behavior as its internal state changes (Order in NEW/PAID/SHIPPED) — the "strategy" isn't chosen from outside.</p>
         <p><strong>Observer.</strong> A subject emits events; observers subscribe without the subject knowing them. Conceptual root of domain events and message brokers. Risk: hidden flows that are hard to trace — keep events few and meaningful.</p>
+        <pre><code>// The subject knows only the callback type — not its subscribers:
+class StockTicker {
+    private readonly List&lt;Action&lt;int&gt;&gt; _observers = new();
+    public void Subscribe(Action&lt;int&gt; cb) =&gt; _observers.Add(cb);
+    public void PriceChanged(int price) { foreach (var cb in _observers) cb(price); }
+}
+
+var ticker = new StockTicker();
+ticker.Subscribe(p =&gt; Console.WriteLine(p));  // display
+ticker.Subscribe(p =&gt; Alert(p));              // alerts
+ticker.PriceChanged(100); // all observers notified</code></pre>
+        <pre><code>Diagram — one emit fans out to every subscriber:
+
+StockTicker ──PriceChanged──► ObserverA (price display)
+                          └──► ObserverB (alerts)</code></pre>
         <p><strong>Chain of Responsibility.</strong> A request passes through a pipeline of handlers, each deciding to act, mutate, or pass it along. Example: HTTP middleware (auth → validation → handler).</p>
+        <pre><code>// Each link decides: handle it, or pass to the next.
+class AuthHandler {
+    private readonly Func&lt;Request, Task&gt; _next;
+    public async Task Run(Request r) {
+        if (!r.TokenValid) { r.Response = 401; return; } // short-circuit
+        await _next(r);                                 // pass along
+    }
+}</code></pre>
         <p><strong>Template Method.</strong> A base class fixes the algorithm skeleton and lets subclasses override individual steps. Prefer composition (Strategy) when steps vary independently.</p>
-        <h4>Data & architectural — backend staples</h4>
+
+        <h4>4 · Backend staples — not Gang-of-Four, but interviews ask them</h4>
+        <p><strong>Definition:</strong> these three don't appear in the Gang-of-Four catalog, but they answer the question every backend system faces — <em>how do domain code and infrastructure stay decoupled?</em> Repository and Unit of Work draw the boundary around persistence; Dependency Injection is the mechanism that wires everything behind that boundary. Interviews expect them by name, and confusing DI (the pattern) with a DI container (the tool) is a classic mistake.</p>
         <p><strong>Repository.</strong> Mediates between the domain and persistence behind a collection-like interface (<code>findByEmail()</code>), so the domain never sees SQL, Mongo, or ORM types. Common misuse: leaking ORM entities and query types through it.</p>
+        <pre><code>// The domain depends on the port; persistence is a detail:
+interface IUserRepository {
+    User? FindByEmail(string email);
+    void Add(User user);
+}
+
+class EfUserRepository : IUserRepository {
+    private readonly AppDbContext _db;
+    public User? FindByEmail(string e) =&gt;
+        _db.Users.FirstOrDefault(u =&gt; u.Email == e); // DbContext never escapes
+}</code></pre>
         <p><strong>Unit of Work.</strong> Tracks everything loaded and changed in a business transaction, then commits or rolls it back as one — what EF Core's <code>DbContext</code> does for you, or a transaction script does manually.</p>
         <p><strong>Dependency Injection.</strong> Dependencies are handed in from outside (constructor) instead of instantiated inside, enabling mocks and swaps. It's a pattern, not a framework — the container just automates the wiring.</p>
         <p><strong>When NOT to reach for any pattern:</strong> one implementation with no second use in sight (YAGNI, rule of three), a layer that adds nothing, patterns as decoration. Over-engineering is itself an anti-pattern.</p>`,
@@ -628,33 +775,34 @@ window.STUDY_DATA = {
       icon: "🟩",
       blurb: "Node.js is a JavaScript runtime built on Chrome's V8 engine and libuv that executes code on a single thread with non-blocking, event-driven I/O — ideal for I/O-heavy services, and scaled horizontally via cluster or worker threads.",
       read: `
-        <p><strong>Event loop (libuv):</strong> your JS runs on one thread; the loop drains the call stack, then processes <strong>microtasks</strong> (Promises) before each <strong>macrotask</strong> (timers, I/O callbacks). Blocking calls (sync fs, huge JSON.parse, long loops) starve everything — Node is fast at coordination, not at CPU work.</p>
-        <p><strong>Thread pool:</strong> libuv offloads fs, crypto, dns and zlib work to 4 threads by default (UV_THREADPOOL_SIZE). That's why "single-threaded" Node still does parallel disk/crypto work.</p>
-        <p><strong>CPU work:</strong> <code>worker_threads</code> (parallel JS in one process) vs <code>cluster</code> (N processes, one per core, behind a shared port — also your zero-downtime restart unit). For scale-out, prefer more containers/processes over bigger machines.</p>
-        <p><strong>Streams & backpressure:</strong> process data in chunks (pipeline(), transform streams) instead of buffering whole payloads; backpressure (highWaterMark + await drain) keeps a fast producer from overflowing a slow consumer.</p>
-        <p><strong>Buffers & EventEmitter:</strong> Buffers handle raw bytes outside V8's heap; EventEmitter is the in-process pub/sub that streams, servers and most APIs are built on (error events have no default handler — they throw).</p>
-        <p><strong>npm & semver:</strong> <code>^</code> allows minor+patch, <code>~</code> only patch; lockfiles make installs reproducible — commit them. Audit dependencies (supply chain).</p>
-        <p><strong>Production hygiene:</strong> config from env (12-factor), graceful shutdown (stop accepting connections, drain, close DB pools), log as streams, and handle <code>uncaughtException</code>/<code>unhandledRejection</code> by logging and exiting — let the orchestrator restart you.</p>`,
+        <p><strong>One tick of the event loop:</strong> your JS runs on one thread. When the call stack empties, libuv works through the phases in order — <strong>timers</strong> (setTimeout), <strong>pending callbacks</strong>, the <strong>poll</strong> phase (completed I/O: fs, sockets), the <strong>check</strong> phase (setImmediate) — and between each macrotask the <strong>microtask queue</strong> (promise callbacks, queueMicrotask) drains <em>completely</em>. That ordering gives the classic result: <code>setTimeout(() =&gt; log(1)); Promise.resolve().then(() =&gt; log(2)); log(3)</code> prints <strong>3 → 2 → 1</strong> — sync first, then the microtask, then the timer.</p>
+        <p><strong>Blocking the loop:</strong> sync fs calls, huge JSON.parse/stringify, CPU loops, catastrophic regex. Everything shares that single thread, so one blocked request stalls <em>every</em> request — Node is fast at coordinating I/O, not at doing CPU work. Push CPU off the loop (worker_threads) or into a queue.</p>
+        <p><strong>Thread pool:</strong> libuv offloads fs, crypto, dns and zlib to 4 worker threads by default (UV_THREADPOOL_SIZE). That's why <code>readFileSync</code> blocks — you're synchronously waiting on a thread — while <code>readFile</code> returns immediately and the worker does the waiting. "Single-threaded" describes your JavaScript, not the runtime's I/O.</p>
+        <p><strong>CPU work:</strong> <code>worker_threads</code> runs JavaScript on multiple threads inside one process, sharing memory via SharedArrayBuffer — right for CPU-bound work (hashing, image processing). <code>cluster</code> forks N whole processes (one per core) that share a server port — process-level scaling, isolation, and the rolling-restart unit. Processes for scale, threads for CPU.</p>
+        <p><strong>Streams & backpressure:</strong> streams process data in chunks — readable, writable, duplex, transform — so a 2GB file flows through constant memory instead of being buffered whole. Backpressure: when the internal buffer passes highWaterMark, <code>write()</code> returns false, meaning the consumer (socket, HTTP) is slower than you're producing — pause and await <code>drain</code>, or let <code>pipeline()</code> pace it and handle errors/cleanup for you. <code>objectMode</code> streams carry objects instead of bytes.</p>
+        <p><strong>Buffers & EventEmitter:</strong> a Buffer is a fixed-length block of raw bytes allocated outside V8's heap — how you read/write files, sockets and binary protocols without JS string overhead. EventEmitter (<code>on</code>/<code>emit</code>) is Node's in-process pub/sub that streams and servers are built on; its sharpest edge is that an <code>'error'</code> event with no listener <em>throws</em> and can crash the process.</p>
+        <p><strong>npm & semver:</strong> <code>^</code> allows minor+patch upgrades, <code>~</code> only patch. The lockfile pins the exact resolved tree so every install (and CI, with npm ci) is reproducible — commit it. Audit dependencies: the registry is your supply chain.</p>
+        <p><strong>Production hygiene:</strong> on SIGTERM, do a graceful shutdown — stop accepting new connections, finish in-flight requests, close DB pools, exit — and let PM2/Kubernetes restart you without dropping requests. Handle <code>uncaughtException</code>/<code>unhandledRejection</code> by logging and exiting: after a crash the process state is undefined; the supervisor's job is to restart, not to keep running. Config comes from env vars (12-factor); logs are streams.</p>`,
       cards: [
-        { q: "How does the Node.js event loop work?", a: "Your JS runs on one thread; libuv's loop drains the call stack, then processes microtasks (Promises) before each macrotask (timers, I/O callbacks). Node is event-driven I/O coordination — not parallel computation." },
-        { q: "What blocks the event loop and why is it fatal in Node?", a: "Sync fs calls, huge JSON.parse/stringify, long CPU loops, complex regex. Everything else shares that one thread — one blocked request stalls every request. Offload to worker threads or queues." },
-        { q: "If Node is single-threaded, how do fs/crypto run in parallel?", a: "libuv's thread pool — 4 threads by default (UV_THREADPOOL_SIZE) — handles fs, crypto, dns and zlib work off the main thread." },
-        { q: "cluster vs worker_threads?", a: "cluster forks N processes (one per core) sharing a port — process-level scaling and the zero-downtime restart unit. worker_threads runs parallel JS threads inside one process — for CPU-bound work sharing memory." },
-        { q: "What is backpressure in streams?", a: "A fast producer overwhelming a slow consumer. Streams signal capacity (highWaterMark); write() returns false / pipeline() awaits drain so the producer pauses instead of buffering unbounded memory." },
-        { q: "Why streams instead of buffering whole payloads?", a: "Constant memory: process a 2GB file in chunks via pipeline() and transform streams instead of loading it (or its JSON) into RAM." },
-        { q: "What is a Buffer?", a: "A fixed-length chunk of raw bytes allocated outside V8's heap — how Node reads/writes files, sockets and binary protocols without JS string overhead." },
-        { q: "What is EventEmitter — and its sharpest edge?", a: "Node's in-process pub/sub (on/emit), the base of streams and servers. Sharp edge: an 'error' event with no listener throws and can crash the process — always handle errors." },
-        { q: "What do ^ and ~ mean in package.json, and why commit the lockfile?", a: "^ allows minor+patch upgrades, ~ only patch. The lockfile pins the exact resolved tree so every install (and CI) is reproducible — commit it." },
-        { q: "What does graceful shutdown mean in Node?", a: "On SIGTERM: stop accepting new connections, finish in-flight requests, close DB/pool handles, then exit — orchestrated so the load balancer and orchestrator restart you without dropped requests." },
-        { q: "How should you handle uncaughtException?", a: "Log it, release what you can, and exit — the process may be in an undefined state. Let PM2/Kubernetes restart it; don't try to keep running after a crash." }
+        { q: "How does the Node.js event loop work?", a: "Your JS runs on one thread; when the stack empties, libuv runs its phases — timers (setTimeout), pending, poll (completed I/O), check (setImmediate) — and between each macrotask the microtask queue (promise callbacks) drains fully. That ordering is why setTimeout(fn,0) fires after Promise.then: sync → microtask → timer." },
+        { q: "What blocks the event loop and why is it fatal in Node?", a: "Sync fs calls, huge JSON.parse/stringify, CPU loops, bad regexes — they hold the single thread, so every other request waits. Node coordinates I/O; it doesn't parallelize compute. Offload to worker threads or a queue." },
+        { q: "If Node is single-threaded, how do fs/crypto run in parallel?", a: "libuv's thread pool — 4 worker threads by default (UV_THREADPOOL_SIZE) — takes fs, crypto, dns and zlib work off the main thread. That's why readFileSync blocks (you synchronously wait on the worker) while readFile returns immediately." },
+        { q: "cluster vs worker_threads?", a: "cluster forks N processes (one per core) that share one server port — process-level scaling, isolation, and the rolling-restart unit. worker_threads runs JavaScript on multiple threads within one process sharing memory (SharedArrayBuffer) — for CPU-bound work. Processes to scale, threads for CPU." },
+        { q: "What is backpressure in streams?", a: "write() returning false means the internal buffer passed highWaterMark — the consumer (socket, HTTP) is slower than you're producing. Pause the producer and await drain, or use pipeline() which paces it and propagates errors. Otherwise buffers grow until you OOM." },
+        { q: "Why streams instead of buffering whole payloads?", a: "Constant memory: a 2GB file through pipeline() flows in chunks (readable/transform/writable) instead of being loaded — or its JSON parsed — into RAM. objectMode streams carry objects rather than bytes." },
+        { q: "What is a Buffer?", a: "A fixed-length block of raw bytes allocated outside V8's heap — how Node reads and writes files, sockets and binary protocols without JS string overhead. create with Buffer.alloc (zeroed) or Buffer.allocUnsafe (faster, uninitialized)." },
+        { q: "What is EventEmitter — and its sharpest edge?", a: "Node's in-process pub/sub (on/emit) that streams and servers are built on. The sharp edge: an 'error' event with no listener throws — an unhandled error event can crash the process, so attach handlers (or use pipeline, which propagates errors)." },
+        { q: "What do ^ and ~ mean in package.json, and why commit the lockfile?", a: "^ allows minor+patch upgrades, ~ only patch. The lockfile pins the exact resolved tree so every install — and CI with npm ci — is reproducible. Commit it and audit the tree: the registry is your supply chain." },
+        { q: "What does graceful shutdown mean in Node?", a: "On SIGTERM: stop accepting new connections, finish in-flight requests, close DB pools and handles, then exit — so the load balancer and orchestrator restart you without dropping requests. It's the difference between a clean rollout and a blip." },
+        { q: "How should you handle uncaughtException?", a: "Log it, clean up what you can, and exit — after a crash the process state is undefined (partially written data, broken invariants). Let PM2/Kubernetes restart you; don't try to keep serving from a corrupted process." }
       ],
       quiz: [
-        { q: "An endpoint reads a 2GB file into memory with fs.readFileSync and parses it. Under load the service dies. Root cause?", options: ["Too few cluster workers", "Blocking the single event-loop thread + unbounded memory", "V8 garbage collection bug", "Missing thread pool"], answer: 1, explain: "Sync I/O blocks the loop for every request while buffering gigabytes — stream it with pipeline() instead." },
-        { q: "Your API does heavy image resizing and the event loop stalls. Best fix?", options: ["Increase UV_THREADPOOL_SIZE to 128", "Move resizing to worker_threads or a queue", "Add more RAM", "Use promises everywhere"], answer: 1, explain: "CPU-bound work belongs off the loop — worker threads in-process, or a job queue/worker service out-of-process." },
-        { q: "cluster module primarily gives you…", options: ["Parallel JS threads sharing memory", "N processes on N cores behind one port", "Async file I/O", "A thread pool for crypto"], answer: 1, explain: "Cluster forks processes sharing the server port — process-level scaling and the rolling-restart unit." },
-        { q: "write() on a stream keeps returning false. What is the stream telling you?", options: ["The stream is closed", "Backpressure: the consumer can't keep up — pause producing until drain", "You must retry the write", "The buffer is corrupted"], answer: 1, explain: "That's backpressure — respect it by pausing/resuming or letting pipeline() pace production." },
-        { q: "An 'error' event fires on a stream with no error listener. Node…", options: ["Ignores it", "Throws — potentially crashing the process", "Emits a warning", "Retries the operation"], answer: 1, explain: "Unhandled 'error' events throw; always attach error handlers or use pipeline() which propagates errors." },
-        { q: "uncaughtException fires. The correct response is…", options: ["Keep serving — it's just a warning", "Log, cleanup, and exit; let the supervisor restart", "Restart the event loop", "Swallow it with an empty handler"], answer: 1, explain: "After an uncaught exception the process state is undefined — exit cleanly and let PM2/K8s restart it." }
+        { q: "An endpoint reads a 2GB file into memory with fs.readFileSync and parses it. Under load the service dies. Root cause?", options: ["Too few cluster workers", "Blocking the single event-loop thread + unbounded memory", "V8 garbage collection bug", "Missing thread pool"], answer: 1, explain: "readFileSync holds the one thread every request shares, and buffering gigabytes (or JSON.parse of them) spikes memory. Stream it with pipeline()." },
+        { q: "Your API does heavy image resizing and the event loop stalls. Best fix?", options: ["Increase UV_THREADPOOL_SIZE to 128", "Move resizing to worker_threads or a queue", "Add more RAM", "Use promises everywhere"], answer: 1, explain: "CPU-bound work doesn't belong on the loop — the thread pool only covers fs/crypto/dns/zlib. worker_threads in-process, or a job queue/worker service." },
+        { q: "The cluster module primarily gives you…", options: ["Parallel JS threads sharing memory", "N processes on N cores behind one port", "Async file I/O", "A thread pool for crypto"], answer: 1, explain: "Cluster forks whole processes sharing the server port — process-level scaling, isolation, and the rolling-restart unit." },
+        { q: "write() on a stream keeps returning false. What is the stream telling you?", options: ["The stream is closed", "Backpressure: the consumer can't keep up — pause producing until drain", "You must retry the write", "The buffer is corrupted"], answer: 1, explain: "The internal buffer passed highWaterMark; keep writing and memory grows until OOM. Pause, await drain, or let pipeline() pace it." },
+        { q: "An 'error' event fires on a stream with no error listener. Node…", options: ["Ignores it", "Throws — potentially crashing the process", "Emits a warning", "Retries the operation"], answer: 1, explain: "Unhandled 'error' events throw — attach error handlers or use pipeline(), which forwards errors to your promise chain." },
+        { q: "uncaughtException fires. The correct response is…", options: ["Keep serving — it's just a warning", "Log, cleanup, and exit; let the supervisor restart", "Restart the event loop", "Swallow it with an empty handler"], answer: 1, explain: "After an uncaught exception the process may hold partial writes and broken state — exit cleanly and let PM2/Kubernetes restart you." }
       ]
     },
 
@@ -664,33 +812,34 @@ window.STUDY_DATA = {
       icon: "⚙️",
       blurb: ".NET (with ASP.NET Core) is Microsoft's managed runtime and web framework: C# compiles to IL, runs on the CLR with the Kestrel web server, and ships a built-in DI container, EF Core ORM and middleware pipeline.",
       read: `
-        <p><strong>Runtime:</strong> C# compiles to IL, JIT-compiled by the CLR (GC, type safety). ASP.NET Core apps self-host on <strong>Kestrel</strong> (cross-platform web server); IIS/Nginx typically sit in front as reverse proxies.</p>
-        <p><strong>Middleware pipeline:</strong> request flows through components registered in order (app.Use(...)) — each can act and short-circuit or call the next: auth → routing → custom cross-cutting → endpoints. Order matters.</p>
-        <p><strong>Built-in DI:</strong> constructor injection via IServiceProvider with three lifetimes: <strong>Transient</strong> (new every resolve), <strong>Scoped</strong> (one per HTTP request), <strong>Singleton</strong> (one forever). Classic trap: the <em>captive dependency</em> — a singleton holding a scoped service (like a DbContext) keeps it alive beyond its request, causing stale state and concurrency bugs.</p>
-        <p><strong>EF Core:</strong> DbContext is a Unit of Work + change tracker; LINQ queries are IQueryable translated to SQL. N+1 pitfall: IQueryable returned and enumerated later, or lazy loading — fix with eager loading (.Include). Migrations are versioned, reversible schema scripts (the expand-contract pattern for zero-downtime deploys).</p>
-        <p><strong>async/await:</strong> scales by releasing threads during I/O. Avoid <code>.Result/.Wait()</code> (sync-over-async deadlocks under a sync context, thread starvation); prefer Task.WhenAll for independent calls.</p>
-        <p><strong>Minimal APIs vs MVC:</strong> minimal APIs (endpoint-routing lambdas) for microservices and small services; MVC controllers + filters for larger, convention-heavy apps. Both share the same pipeline and DI.</p>
-        <p><strong>Configuration & options:</strong> appsettings + env vars + secrets merged into IConfiguration, bound to typed Options&lt;T&gt; classes validated at startup.</p>`,
+        <p><strong>Runtime:</strong> C# source compiles to Intermediate Language (IL) assemblies. The CLR JIT-compiles IL per method on first call and runs it with garbage collection and type safety — you write C#, the runtime manages memory and types. ASP.NET Core apps self-host on <strong>Kestrel</strong>, a cross-platform HTTP server that listens on sockets and parses requests; Nginx or IIS usually sit in front for TLS termination, static files and forwarding.</p>
+        <p><strong>Middleware pipeline:</strong> the pipeline is a linked chain of <code>Func&lt;RequestDelegate, RequestDelegate&gt;</code>. Each component receives the <code>HttpContext</code> and the <em>next</em> delegate, so <code>app.Use((ctx, next) =&gt; { log(); await next(ctx); log(); })</code> can act <strong>both on the way in and on the way out</strong> — like an onion. "Short-circuiting" simply means not calling <code>next</code>: an auth middleware that returns 401 stops the request there, so routing/endpoints never run. Registration order <em>is</em> execution order.</p>
+        <p><strong>Built-in DI & lifetimes:</strong> services are resolved from the container by constructor injection. <strong>Transient</strong> = a new instance on <em>every</em> resolve — twice in the same request means two objects. <strong>Scoped</strong> = one instance shared by everything resolved within the current HTTP request, disposed when it ends. <strong>Singleton</strong> = one instance for the app's lifetime, shared across requests and threads — only safe if it's thread-safe. Resolving a service from a scope shorter than its lifetime (or the reverse) is where bugs come from.</p>
+        <p><strong>The captive dependency:</strong> a singleton's constructor runs <em>once</em>, on the first request. If it captures a scoped service there — the classic case is a scoped <code>DbContext</code> — every later request shares that first request's context: stale tracked entities, cross-request state leakage, and concurrency exceptions under load. Fix: inject <code>IServiceScopeFactory</code> and create a scope per unit of work.</p>
+        <p><strong>EF Core:</strong> <code>DbContext</code> is Unit of Work + change tracker: it tracks loaded entities, translates LINQ (<code>IQueryable</code>) into SQL, and flushes changes as one transaction on <code>SaveChanges()</code>. Queries stay lazy — <code>IQueryable</code> builds SQL, enumeration executes it. Lazy-loading proxies issue a query <em>per navigation access</em>, so a loop over 100 orders = 1 + 100 queries (N+1); <code>.Include()</code> folds the relation into a single JOIN query, and <code>.Select()</code> projection fetches exactly the needed columns. Migrations are ordered, reversible C# snapshots of the model; apply them with <strong>expand-contract</strong> (add new column/table → deploy code that dual-writes → backfill → switch reads → drop old) so old and new code coexist during the rollout.</p>
+        <p><strong>async/await:</strong> when an I/O-bound task hits <code>await</code>, the <em>thread is returned to the pool</em> while the operation runs — that's how one request scales without one thread per waiting request. <code>.Result/.Wait()</code> does the opposite: it blocks a pool thread waiting for a task whose continuation also needs a thread (deadlock with a sync context, starvation under load). For independent calls, <code>Task.WhenAll</code> starts them all immediately — total latency ≈ the slowest, not the sum. In library code use <code>ConfigureAwait(false)</code> to avoid capturing the request context.</p>
+        <p><strong>Minimal APIs vs MVC:</strong> minimal APIs route endpoint-routed lambdas with binding and filters — less ceremony, the default for microservices and small services. MVC gives controllers, actions, model binding and conventions — more structure for large apps. Both share the same pipeline and DI container, so switching is a presentation choice, not a rearchitecture.</p>
+        <p><strong>Configuration & options:</strong> <code>IConfiguration</code> merges appsettings.json, environment variables and secret stores (in that priority). The Options pattern binds typed <code>Options&lt;T&gt;</code> classes and validates them at startup (<code>ValidateDataAnnotations</code>) — failing fast at boot instead of throwing magic-string exceptions deep in a request.</p>`,
       cards: [
-        { q: "What are the CLR, IL and Kestrel in one breath?", a: "C# compiles to IL, which the CLR JIT-compiles and runs (GC, type safety). ASP.NET Core apps self-host on Kestrel, a cross-platform web server, usually behind a reverse proxy like Nginx or IIS." },
-        { q: "How does the ASP.NET Core middleware pipeline work?", a: "Components registered in order (app.Use); each sees the HttpContext, can act/short-circuit or call the next — auth → routing → cross-cutting → endpoint. Registration order matters." },
-        { q: "Explain the three DI service lifetimes.", a: "Transient: new instance per resolve. Scoped: one per HTTP request. Singleton: one for the app's lifetime. Choose by statefulness and thread-safety, and never let a longer-lived service capture a shorter one." },
-        { q: "What is a captive dependency?", a: "A singleton injecting a scoped service (e.g. DbContext) — it captures it beyond the request, causing stale data and concurrency bugs. Fix: inject IServiceScopeFactory and create a scope per unit of work." },
-        { q: "What is DbContext in EF Core terms?", a: "Unit of Work + change tracker: tracks loaded entities, translates LINQ (IQueryable) to SQL, and saves changes as one transaction via SaveChanges()." },
-        { q: "How does the classic EF Core N+1 happen and how do you fix it?", a: "Enumerating related data lazily, or returning IQueryable that gets queried per row. Fix with eager loading (.Include/.ThenInclude), projection (.Select exactly what you need), or batching." },
-        { q: "Why are EF Core migrations more than schema scripts?", a: "They're versioned, ordered, reversible C# snapshots of the model — apply with expand-contract (add column → deploy code → backfill → drop old) for zero-downtime deploys." },
-        { q: "Why is .Result/.Wait() dangerous?", a: "Sync-over-async: blocks a thread pool thread waiting on async completion — thread starvation, and deadlocks when a SynchronizationContext exists (classic ASP.NET). Await instead." },
-        { q: "When Task.WhenAll vs sequential awaits?", a: "WhenAll runs independent I/O concurrently and fails fast on the first fault; sequential awaits serialize latency. Only use WhenAll when the calls are truly independent." },
-        { q: "Minimal APIs vs MVC controllers — when each?", a: "Minimal APIs: endpoint-routed lambdas, less ceremony — microservices and small services. MVC: controllers, filters, model-binding conventions — larger apps that want the structure. Same pipeline and DI underneath." },
-        { q: "What is the Options pattern?", a: "Typed configuration: IConfiguration sources (appsettings, env vars, secrets) bind to Options<T> classes validated at startup — no magic strings sprinkled through code." }
+        { q: "What are the CLR, IL and Kestrel in one breath?", a: "C# source compiles to Intermediate Language (IL); the CLR JIT-compiles IL per method on first call and executes it with GC and type safety. ASP.NET Core apps self-host on Kestrel, a cross-platform HTTP server that listens on sockets and parses requests — typically fronted by Nginx or IIS for TLS and static files." },
+        { q: "How does the ASP.NET Core middleware pipeline work?", a: "It's a linked chain of components: each receives the HttpContext and the next() delegate, so app.Use((ctx, next) => { log(); await next(ctx); log(); }) acts both on the way in and out — an onion. Short-circuiting = not calling next (auth returns 401, routing never runs). Registration order is execution order." },
+        { q: "Explain the three DI service lifetimes.", a: "Transient: a new instance on every resolve — even twice inside one request. Scoped: one instance shared across everything resolved within the current HTTP request, disposed when it ends. Singleton: one for the app's lifetime, shared across requests and threads — only safe if thread-safe. The bug zone is resolving a service from a scope shorter or longer than its lifetime." },
+        { q: "What is a captive dependency?", a: "A singleton's constructor runs once, on the first request — so a scoped service captured there (typically DbContext) is kept alive forever. Every later request shares that stale context: outdated tracked entities, leaked state, concurrency exceptions under load. Fix: inject IServiceScopeFactory and create a scope per unit of work." },
+        { q: "What is DbContext in EF Core terms?", a: "Unit of Work + change tracker: it tracks loaded entities, translates LINQ (IQueryable) into SQL lazily — the query builds when declared, executes when enumerated — and flushes all changes as one transaction on SaveChanges(). Its scoped lifetime ties it to the HTTP request." },
+        { q: "How does the classic EF Core N+1 happen and how do you fix it?", a: "Lazy-loading proxies issue one query per navigation access: a loop over 100 orders runs 1 query for the orders + 100 for order.Customer. .Include() eager-loads the relation as one JOIN query; .Select() projection fetches exactly the columns needed. IQueryable vs IEnumerable matters too — materialize too early and the filter runs in memory, not SQL." },
+        { q: "Why are EF Core migrations more than schema scripts?", a: "Each migration is an ordered, reversible C# snapshot of the model that generates versioned SQL. Apply them with expand-contract for zero downtime: add the new column/table → deploy code that dual-writes → backfill → switch reads → drop the old — old and new code coexist through the rollout." },
+        { q: "Why is .Result/.Wait() dangerous?", a: "Sync-over-async: the calling thread blocks until the task finishes, but the task's continuation also needs a thread. With a SynchronizationContext (classic ASP.NET) that's a deadlock; under load it's thread-pool starvation. await all the way down; ConfigureAwait(false) in libraries." },
+        { q: "When Task.WhenAll vs sequential awaits?", a: "WhenAll starts all tasks immediately and awaits them concurrently — latency ≈ the slowest call. Sequential awaits serialize — latency ≈ the sum. Use it only when the calls are truly independent; shared mutable state still needs coordination." },
+        { q: "Minimal APIs vs MVC controllers — when each?", a: "Minimal APIs: endpoint-routed lambdas with binding and filters, less ceremony — microservices and small services. MVC: controllers, actions, model binding, conventions — structure for large apps. Same middleware pipeline and DI container underneath, so it's a presentation choice." },
+        { q: "What is the Options pattern?", a: "IConfiguration merges appsettings.json, environment variables and secrets; the Options pattern binds those into typed Options<T> classes validated at startup (ValidateDataAnnotations). Fail fast at boot with a clear error instead of magic strings throwing deep in a request." }
       ],
       quiz: [
-        { q: "A singleton service injects a scoped DbContext. Over time it serves stale rows and throws concurrency errors. This is…", options: ["A thread pool leak", "A captive dependency", "An N+1 query", "A middleware ordering bug"], answer: 1, explain: "The singleton captures the scoped instance beyond its request. Inject IServiceScopeFactory and scope per unit of work." },
-        { q: "An endpoint does three independent API calls with sequential awaits. Simplest performance win?", options: ["Wrap in Task.Run", "Task.WhenAll the three calls", "Make the service a singleton", "Add caching headers"], answer: 1, explain: "WhenAll runs independent I/O concurrently instead of paying three latencies in series." },
-        { q: "In ASP.NET Core, middleware registered after one that short-circuits will…", options: ["Run anyway in parallel", "Not run for that request", "Run twice", "Throw"], answer: 1, explain: "A short-circuited pipeline stops there — which is why auth/authorization middleware comes before the work." },
-        { q: "Lazy-loading navigation properties inside a loop produces…", options: ["A deadlock", "N+1 queries", "A captive dependency", "View bloat"], answer: 1, explain: "One query per access — fix with .Include eager loading or projection." },
-        { q: "Scoped lifetime means…", options: ["One instance per resolve", "One instance per HTTP request", "One instance for the app lifetime", "One instance per thread"], answer: 1, explain: "Scoped ties the instance to the current request — right for DbContext-style per-request state." },
-        { q: "Calling .Result on an async method in a request can deadlock because…", options: ["The GC pauses", "It blocks the thread the continuation needs (sync-over-async)", "Kestrel forbids sync I/O", "Options aren't bound"], answer: 1, explain: "Blocking a thread waiting for a continuation that needs that context = deadlock/starvation. Await all the way down." }
+        { q: "A singleton service injects a scoped DbContext. Over time it serves stale rows and throws concurrency errors. This is…", options: ["A thread pool leak", "A captive dependency", "An N+1 query", "A middleware ordering bug"], answer: 1, explain: "The singleton's constructor ran once, on the first request, capturing that request's scoped DbContext — every later request shares the stale instance. Inject IServiceScopeFactory and create a scope per unit of work." },
+        { q: "An endpoint does three independent API calls with sequential awaits. Simplest performance win?", options: ["Wrap in Task.Run", "Task.WhenAll the three calls", "Make the service a singleton", "Add caching headers"], answer: 1, explain: "Sequential awaits pay three latencies in series; WhenAll starts all three immediately, so total latency ≈ the slowest call." },
+        { q: "In ASP.NET Core, middleware registered after one that short-circuits will…", options: ["Run anyway in parallel", "Not run for that request", "Run twice", "Throw"], answer: 1, explain: "Short-circuiting = not calling next, so the chain stops — which is exactly why auth middleware sits before routing/endpoints." },
+        { q: "Lazy-loading navigation properties inside a loop produces…", options: ["A deadlock", "N+1 queries", "A captive dependency", "View bloat"], answer: 1, explain: "Each navigation access is a separate lazy query: 1 + N round trips. .Include() folds the relation into a single JOIN query, or project with .Select()." },
+        { q: "Scoped lifetime means…", options: ["One instance per resolve", "One instance per HTTP request", "One instance for the app lifetime", "One instance per thread"], answer: 1, explain: "Scoped ties the instance to the current HTTP request — right for DbContext-style per-request state; transient is per-resolve, singleton app-wide." },
+        { q: "Calling .Result on an async method in a request can deadlock because…", options: ["The GC pauses", "It blocks the thread the continuation needs (sync-over-async)", "Kestrel forbids sync I/O", "Options aren't bound"], answer: 1, explain: "The caller blocks a pool thread waiting for a continuation that needs a thread — deadlock with a sync context, starvation under load. await all the way down." }
       ]
     },
 
@@ -700,33 +849,34 @@ window.STUDY_DATA = {
       icon: "🧮",
       blurb: "Beyond the basics: schema design trade-offs (normalization vs denormalization), keys, views and materialized views, connection pooling, auditing patterns, and zero-downtime production migrations.",
       read: `
-        <p><strong>Normalization (1NF–3NF):</strong> 1NF atomic values, 2NF no partial key dependency, 3NF no transitive dependency. Normalized = one fact in one place (no update anomalies), at the cost of joins. <strong>Denormalize deliberately</strong> for read-heavy paths: duplicated columns, precomputed counters, summary tables — with a strategy to keep them in sync (triggers, events, or accepted staleness).</p>
-        <p><strong>Keys:</strong> auto-increment ints are small and index-friendly; GUIDs are collision-free and generated client-side but random ones fragment B-trees — prefer sequential/ordered UUIDs (UUIDv7) at scale.</p>
-        <p><strong>Views vs materialized views:</strong> a view is a stored query (always fresh, costs the query each time); a materialized view stores the query's result (fast reads, needs refresh — trade staleness for speed).</p>
-        <p><strong>Stored procedures:</strong> logic in the database — fewer round trips, hard to version/test/debug, splits the codebase. Modern default: logic in the app, SQL for data; stored procs for genuine bulk/set operations.</p>
-        <p><strong>Connection pooling:</strong> connections are expensive (TCP + auth + session state); a pool reuses them. Sizing rule: pool size ≈ cores for OLTP (little's law), not "as many as possible". Starvation symptoms: timeouts acquiring connections — look for leaks (unclosed connections) before raising the limit.</p>
-        <p><strong>Soft deletes & auditing:</strong> deleted_at flags keep rows recoverable but pollute every query (remember the filter!) and unique constraints; audit trails (append-only change tables or CDC) answer "who changed what when" without violating theSingle source of truth.</p>
-        <p><strong>Zero-downtime migrations (expand-contract):</strong> add the new column/table (deploy 1) → dual-write/backfill (deploy 2) → switch reads → remove old (contract). Never run a destructive ALTER on the hot path during a release.</p>`,
+        <p><strong>Normalization (1NF–3NF):</strong> the normal forms progressively remove redundancy. <em>1NF</em>: every column holds a single atomic value — no comma-lists in a column. <em>2NF</em>: every non-key column depends on the <em>whole</em> composite key — no partial dependencies (order_line items keyed by (order_id, line_no), with product_name depending only on product_id). <em>3NF</em>: no transitive dependencies — a non-key column must not determine another non-key column (store product_name in products, not repeated in every order line). The payoff: <em>one fact, one place</em> — no update anomalies, where correcting a name in one row leaves stale copies elsewhere. The cost: joins. <em>Denormalize deliberately</em> for read-heavy hot paths — duplicated columns, precomputed counters, summary tables — but only with a sync strategy (events, triggers, or accepted staleness).</p>
+        <p><strong>Keys:</strong> auto-increment integers are small and sequential — they append to the end of the B-Tree, so inserts stay cheap and pages stay dense. GUIDs are collision-free and generatable client-side (good for distributed writes), but <em>random</em> GUIDs scatter inserts across the index, fragmenting pages; at scale prefer ordered UUIDs (UUIDv7), which keep time-order locality. Natural keys (emails, SKUs) look clean until the business renames one — surrogate keys absorb that churn.</p>
+        <p><strong>Views vs materialized views:</strong> a view is a stored <em>query</em> — always reflects current data, but pays the query cost on every read. A materialized view stores the query's <em>result</em> — reads are a single table scan, but the data is frozen until refreshed (REFRESH MATERIALIZED VIEW, or incremental refresh on a schedule). The trade-off is explicit: staleness for speed. Perfect for dashboards that aggregate millions of rows; wrong for anything needing per-request freshness.</p>
+        <p><strong>Stored procedures:</strong> logic compiled inside the database — fewer round trips and set-oriented power, but it's hard to version (lives outside your repo), hard to test, hard to debug, and it splits the codebase across two runtimes. Modern default: <em>logic in the app, SQL for data</em>. Keep stored procedures for genuine bulk/set operations where round trips dominate; business rules belong in versioned application code.</p>
+        <p><strong>Connection pooling:</strong> opening a connection costs TCP handshake + authentication + session setup — far more than a query. A pool keeps N connections open and hands them out. Sizing: for OLTP, <em>pool size ≈ core count per node</em> — more connections just move the queue into the database and add context-switching contention (Little's Law: queue time = concurrency ÷ throughput). Starvation symptom: requests hang, then time out "acquiring connection". First suspect is a <em>leak</em> — a code path that never closes/disposes a connection (or a long transaction holding one) — not a too-small pool. Raising the limit only delays the outage.</p>
+        <p><strong>Soft deletes &amp; auditing:</strong> a <code>deleted_at</code> flag keeps rows recoverable, but it leaks into <em>every</em> query — every <code>SELECT</code>, <code>JOIN</code> and unique constraint must remember the filter, and the table grows forever. Audit trails (append-only change tables: who/what/when/old→new, or CDC reading the WAL) answer "who changed what when" <em>without</em> polluting the live model — the live table stays the single source of truth, the audit log is read-side history. For high-churn tables, hard deletes + an audit log beat soft deletes + forgotten filters.</p>
+        <p><strong>Zero-downtime migrations (expand-contract):</strong> never run a destructive ALTER on the hot path during a release — old and new code run simultaneously. Expand: add the new column/table (nullable, unused) and deploy. Migrate: code dual-writes both shapes; backfill old rows. Switch: reads move to the new shape. Contract: once all instances are on the new code, drop the old column/table in a later deploy. Each step is deployable alone, so a rollback never corrupts data.</p>
+        <p><strong>ORMs vs raw SQL:</strong> an ORM trades control for convenience and safety — typed queries, migrations, lazy relations — but hides the SQL: N+1 traps, generic plans, and queries you can't see. Drop to raw SQL for bulk operations, tuning-critical queries, window functions, and anything where the generated plan matters. Most mature codebases use both: ORM for CRUD, SQL for the hot path.</p>`,
       cards: [
-        { q: "What do 1NF, 2NF and 3NF each eliminate?", a: "1NF: non-atomic/repeating values. 2NF: partial dependencies on part of a composite key. 3NF: transitive dependencies (non-key → non-key). Each step puts one fact in one place." },
-        { q: "When is denormalization the right call?", a: "Read-heavy hot paths where joins cost too much: duplicated columns, precomputed counters, summary tables — accepted in exchange for a sync strategy (events, triggers) or accepted staleness." },
-        { q: "Auto-increment int vs GUID primary keys?", a: "Ints: small, sequential, index-friendly. GUIDs: collision-free, client-generatable — but random ones fragment B-trees; prefer ordered UUIDs (UUIDv7) at scale." },
-        { q: "View vs materialized view?", a: "A view is a stored query — always fresh, pays the query cost per read. A materialized view persists the result — fast reads, must be refreshed (staleness for speed)." },
-        { q: "What's the modern take on stored procedures?", a: "Default: logic in the app (testable, versionable), SQL for data. Keep stored procs for genuine bulk/set operations where round trips dominate — not business logic." },
-        { q: "Why do connections need pooling, and how do you size it?", a: "Connections are expensive (TCP + auth + session). A pool reuses them; for OLTP, size ≈ core count per node — more just adds contention. Timeouts acquiring connections usually mean a leak, not a small pool." },
-        { q: "Symptoms and cause of pool exhaustion?", a: "Requests hang then time out waiting for a connection. Cause: leaked connections (unclosed/undisposed) or long transactions holding them — fix the leak before raising the limit." },
-        { q: "Trade-offs of soft deletes?", a: "deleted_at keeps rows recoverable, but every query must remember the filter, unique constraints need care, and tables grow forever. Consider audit tables + real deletes for high-churn data." },
-        { q: "How do you audit changes without corrupting the model?", a: "Append-only audit/change tables (who/what/when/diff) or CDC from the WAL — read-side history, while the live table stays the single source of truth." },
-        { q: "Explain expand-contract migrations.", a: "Zero-downtime schema change: expand (add new column/table) → deploy code that dual-writes → backfill → switch reads → contract (drop old). Never destructive-ALTER on the hot path during release." },
-        { q: "What does an ORM trade away vs raw SQL?", a: "Convenience and safety (typing, migrations) for control: N+1 traps, generic plans, hidden queries. Drop to raw SQL for bulk ops, tuning-critical queries, and window functions." }
+        { q: "What do 1NF, 2NF and 3NF each eliminate?", a: "1NF: non-atomic values (lists in a column). 2NF: partial dependencies — columns that depend on only part of a composite key. 3NF: transitive dependencies — a non-key column determining another non-key column. The goal at every step is one fact in one place, so updates never leave stale copies." },
+        { q: "When is denormalization the right call?", a: "Read-heavy hot paths where joins cost too much: duplicated columns, precomputed counters, summary tables. But only with a deliberate sync strategy (events, triggers) or accepted staleness — denormalization without a sync plan is just corruption waiting to happen." },
+        { q: "Auto-increment int vs GUID primary keys?", a: "Ints: small, sequential — they append to the B-Tree, so inserts are cheap and pages stay dense. GUIDs: collision-free, client-generatable (great for distributed writes), but random ones scatter inserts and fragment the index — use ordered UUIDs (UUIDv7) for locality at scale." },
+        { q: "View vs materialized view?", a: "A view is a stored query: always fresh, but pays the query cost on every read. A materialized view stores the result: reads are one table scan, but the data is frozen until refreshed — explicit staleness for speed. Right for dashboards, wrong for per-request freshness." },
+        { q: "What's the modern take on stored procedures?", a: "Default: logic in the app — testable, versionable, debuggable — with SQL for data. Keep stored procedures for genuine bulk/set operations where round trips dominate. Business rules in stored procs live outside your repo and split the codebase across two runtimes." },
+        { q: "Why do connections need pooling, and how do you size it?", a: "A connection costs TCP + auth + session setup — far more than a query — so a pool reuses them. For OLTP, size ≈ core count per node: more connections don't add throughput, they add queueing and contention inside the DB. Timeouts acquiring connections usually mean a leak, not a small pool." },
+        { q: "Symptoms and cause of pool exhaustion?", a: "Requests hang, then time out waiting for a connection. The cause is usually a leak — a path that never closes/disposes a connection — or long transactions holding one open. Fix the leak first; raising the pool limit only delays the outage and shifts the queue into the database." },
+        { q: "Trade-offs of soft deletes?", a: "deleted_at keeps rows recoverable, but it leaks into every query and constraint — someone always forgets the filter — and the table grows forever. For high-churn data, hard deletes + an audit log beat soft deletes + forgotten filters." },
+        { q: "How do you audit changes without corrupting the model?", a: "Append-only audit tables (who/what/when/old→new) or CDC from the WAL: the live table stays the single source of truth, the history lives read-side. Never let two sources both claim to be 'the data'." },
+        { q: "Explain expand-contract migrations.", a: "Zero-downtime schema change in deployable steps: expand (add nullable new column/table) → migrate (dual-write + backfill) → switch reads → contract (drop old in a later deploy). Each step works with both old and new code running — that's what makes rollback safe." },
+        { q: "What does an ORM trade away vs raw SQL?", a: "Convenience and type safety for control: it hides the SQL, so you get N+1 traps, generic plans and invisible queries. Use raw SQL for bulk operations, hot-path tuning and window functions — ORM for CRUD, SQL where the plan matters." }
       ],
       quiz: [
-        { q: "A dashboard aggregates millions of rows on every load. Cheapest durable fix?", options: ["Add an index on every column", "A materialized view refreshed on schedule", "Move to NoSQL", "Increase the connection pool"], answer: 1, explain: "Precompute the aggregation; pay a refresh instead of every read. A view alone still runs the query per load." },
-        { q: "Requests time out 'acquiring connection' after a release. First place to look?", options: ["Raise the pool limit", "A leaked/undisposed connection path", "Add read replicas", "Rewrite the ORM queries"], answer: 1, explain: "Pool exhaustion is usually a leak or long transactions; raising the limit only delays the outage." },
-        { q: "Random GUID keys slow down inserts at scale because…", options: ["They're too wide to parse", "Random insertion fragments the B-tree index", "The DB can't index strings", "They break replication"], answer: 1, explain: "Ordered keys append; random GUIDs scatter writes across pages. Sequential UUIDs (v7) fix locality." },
-        { q: "You must rename a busy table with zero downtime. The pattern is…", options: ["One migration: rename + deploy together", "Expand-contract: add new, dual-write, backfill, switch, drop", "Take the maintenance window", "Use a view alias forever"], answer: 1, explain: "Deploy-compatible steps (expand → migrate → contract) so old and new code coexist during the rollout." },
-        { q: "Every query forgetting WHERE deleted_at IS NULL is a smell of…", options: ["Poor indexing", "Soft-delete tax — consider audit tables + hard deletes", "A normalization bug", "Pool exhaustion"], answer: 1, explain: "Soft deletes leak into every access path; high-churn tables often do better with real deletes + audit history." },
-        { q: "3NF removes which dependency?", options: ["Repeating groups", "Partial dependency on a composite key", "Transitive non-key dependency", "Foreign keys"], answer: 2, explain: "3NF eliminates non-key → non-key dependencies; 2NF handles partial key dependencies." }
+        { q: "A dashboard aggregates millions of rows on every load. Cheapest durable fix?", options: ["Add an index on every column", "A materialized view refreshed on schedule", "Move to NoSQL", "Increase the connection pool"], answer: 1, explain: "Precompute the aggregation and pay one refresh instead of the full query on every read. A plain view still runs the query per load." },
+        { q: "Requests time out 'acquiring connection' after a release. First place to look?", options: ["Raise the pool limit", "A leaked/undisposed connection path", "Add read replicas", "Rewrite the ORM queries"], answer: 1, explain: "Pool exhaustion is a symptom; the cause is usually a leak or long transactions. Raising the limit just moves the queue into the database." },
+        { q: "Random GUID keys slow down inserts at scale because…", options: ["They're too wide to parse", "Random insertion fragments the B-tree index", "The DB can't index strings", "They break replication"], answer: 1, explain: "Ordered keys append to the index; random GUIDs scatter writes across pages, fragmenting them. Ordered UUIDs (v7) restore locality." },
+        { q: "You must rename a busy table with zero downtime. The pattern is…", options: ["One migration: rename + deploy together", "Expand-contract: add new, dual-write, backfill, switch, drop", "Take the maintenance window", "Use a view alias forever"], answer: 1, explain: "Deploy-compatible steps (expand → migrate → contract) so old and new code coexist during the rollout — each step independently rollback-able." },
+        { q: "Every query forgetting WHERE deleted_at IS NULL is a smell of…", options: ["Poor indexing", "Soft-delete tax — consider audit tables + hard deletes", "A normalization bug", "Pool exhaustion"], answer: 1, explain: "Soft deletes leak into every access path; high-churn tables usually do better with real deletes plus an append-only audit trail." },
+        { q: "3NF removes which dependency?", options: ["Repeating groups", "Partial dependency on a composite key", "Transitive non-key dependency", "Foreign keys"], answer: 2, explain: "3NF eliminates non-key → non-key dependencies; 2NF handles the partial key dependencies and 1NF the repeating groups." }
       ]
     },
 
@@ -736,35 +886,94 @@ window.STUDY_DATA = {
       icon: "🟨",
       blurb: "JavaScript is the language of the web: single-threaded with an event loop, prototype-based with closures and first-class functions. This topic covers the semantics interviews probe — scopes, this, prototypes, and async.",
       read: `
-        <p><strong>var/let/const & TDZ:</strong> let/const are block-scoped and hoisted-but-uninitialized (temporal dead zone — accessing before declaration throws); var is function-scoped and undefined-when-hoisted. Default to const, let when reassigning, never var.</p>
-        <p><strong>Closures:</strong> a function keeps access to the scope where it was created. Powers module patterns, memoization caches and event handlers — and causes the classic bug: capturing a loop variable (fix with let, or a factory per iteration).</p>
-        <p><strong>this:</strong> set by the call — method call (the object), plain call (undefined/global), new (the instance), .call/.apply/.bind (explicit). Arrow functions don't bind this; they capture the enclosing one — which is exactly why they work as callbacks and break as object methods needing their own this.</p>
-        <p><strong>Prototypes & classes:</strong> objects delegate to a prototype chain; class is sugar over prototype constructors + methods on the shared prototype. Methods on the prototype = one copy for all instances.</p>
-        <p><strong>Event loop:</strong> one call stack; when empty, microtasks (Promise callbacks, queueMicrotask) drain fully before the next macrotask (timers, I/O). So Promise.then runs before setTimeout(fn, 0).</p>
-        <p><strong>Promises & async/await:</strong> async functions return promises; await = then with sync-looking syntax; errors flow to try/catch. Run independent work with Promise.all (fails fast), allSettled when you want every result.</p>
-        <p><strong>Equality:</strong> == coerces types before comparing ("1" == 1), === doesn't. Use === always; the one accepted == is x == null to catch both null and undefined.</p>
-        <p><strong>Copies:</strong> spread/Object.assign copy one level (nested objects are shared — the #1 "I mutated my state" bug); deep-clone with structuredClone when needed.</p>
-        <p><strong>Debounce vs throttle:</strong> debounce waits for silence (search-as-you-type); throttle caps the rate (scroll/resize handlers).</p>
-        <p><strong>Modules:</strong> ES modules (import/export) are static — analyzable, tree-shakeable; CommonJS (require) is dynamic and synchronous.</p>`,
+        <p><strong>Scoping: var/let/const & TDZ:</strong> <code>var</code> is function-scoped and hoisted as <code>undefined</code>; <code>let</code>/<code>const</code> are block-scoped and hoisted but <em>uninitialized</em> — reading them before their line executes throws a ReferenceError (the <strong>temporal dead zone</strong>). Default to <code>const</code>, <code>let</code> when you reassign, never <code>var</code>.</p>
+        <pre><code>console.log(a); // undefined (var hoisted, no error)
+var a = 1;
+
+console.log(b); // ReferenceError — temporal dead zone
+let b = 2;</code></pre>
+        <p><strong>Closures:</strong> a function keeps <em>live</em> access to the scope where it was created, even after that scope finished executing. They power module privacy (data hidden from outside), memoization caches, and event handlers that "remember" their setup. The classic bug: closures created in a loop all share the same loop variable — fix with <code>let</code> (per-iteration binding) or a factory function.</p>
+        <pre><code>// The classic loop bug — all three log 3:
+for (var i = 0; i &lt; 3; i++) setTimeout(() =&gt; console.log(i));
+
+// With let, each iteration gets its own binding:
+for (let i = 0; i &lt; 3; i++) setTimeout(() =&gt; console.log(i)); // 0 1 2
+
+// The module pattern — count is private, only inc() is exposed:
+function makeCounter() {
+    let count = 0;                          // hidden in the closure
+    return () =&gt; ++count;                  // the closure keeps it alive
+}</code></pre>
+        <p><strong>this:</strong> resolved <em>at call time</em>, not definition time. A method call passes the object, a plain call gives <code>undefined</code> (or the global object in sloppy mode), <code>new</code> gives the new instance, and <code>.call/.apply/.bind</code> set it explicitly. Arrow functions are the exception: they have no own <code>this</code> — they capture the enclosing scope's, which is why they're perfect as callbacks and broken as object methods that need their own <code>this</code>.</p>
+        <pre><code>const user = {
+    name: 'Ana',
+    regular() { return this.name; },       // this = user → 'Ana'
+    arrow: () =&gt; this.name,              // this = module/global → undefined
+};
+user.regular();   // 'Ana'
+user.arrow();     // undefined — arrows capture the ENCLOSING scope</code></pre>
+        <p><strong>Prototypes & classes:</strong> every object delegates to a <strong>prototype chain</strong>; property lookup walks up until it finds the property or hits null. <code>class</code> is sugar over prototype-based constructors: methods live on the shared prototype (one copy for all instances), not copied per object.</p>
+        <pre><code>class Animal {
+    constructor(name) { this.name = name; }         // own property per instance
+    speak() { return this.name + " makes a sound"; } // on Animal.prototype
+}
+class Dog extends Animal {
+    speak() { return this.name + " barks"; }        // shadows the parent method
+}
+new Dog('Rex').speak(); // 'Rex barks'</code></pre>
+        <p><strong>Event loop:</strong> JS runs one call stack to completion. When it empties, the engine drains the <strong>microtask queue</strong> (promise callbacks, <code>queueMicrotask</code>) <em>completely</em>, then takes the next <strong>macrotask</strong> (timers, I/O callbacks). Since microtasks run between every macrotask, a promise continuation always beats a <code>setTimeout(0)</code> — the classic ordering question.</p>
+        <pre><code>console.log('A');                              // 1 · sync
+setTimeout(() =&gt; console.log('B'), 0);         // 4 · macrotask (timer)
+Promise.resolve().then(() =&gt; console.log('C')); // 3 · microtask
+queueMicrotask(() =&gt; console.log('D'));        // 3 · microtask
+console.log('E');                              // 2 · sync
+// Output: A E C D B — microtasks drain before the timer</code></pre>
+        <p><strong>Promises & async/await:</strong> an <code>async</code> function always returns a promise; <code>await</code> is <code>.then()</code> with synchronous-looking syntax, and errors flow to <code>try/catch</code> instead of <code>.catch</code>. For independent work, <code>Promise.all</code> runs everything concurrently and rejects on the first failure; <code>allSettled</code> waits for every outcome — use it when partial failure is acceptable.</p>
+        <pre><code>// Sequential: 3 calls × latency = slow
+await fetchUser(); await fetchOrders(); await fetchPrefs();
+
+// Concurrent: one round of latency
+const [user, orders, prefs] = await Promise.all([
+    fetchUser(), fetchOrders(), fetchPrefs(),
+]);
+
+// Partial failure is OK — get every outcome
+const results = await Promise.allSettled([a(), b(), c()]);
+results.find(r =&gt; r.status === 'rejected')?.reason;</code></pre>
+        <p><strong>Equality:</strong> <code>==</code> coerces types before comparing (<code>'1' == 1</code> is true, <code>[] == false</code> is true); <code>===</code> compares without coercion. Use <code>===</code> always — the one sanctioned exception is <code>x == null</code>, a deliberate idiom matching both <code>null</code> and <code>undefined</code>.</p>
+        <p><strong>Copies:</strong> <code>{...obj}</code> and <code>Object.assign</code> copy <em>one level</em> — nested objects are shared references, which is the #1 "I mutated my state" bug (React included). Use <code>structuredClone()</code> for a deep, independent copy.</p>
+        <pre><code>const src = { user: { name: 'Ana' } };
+const copy = { ...src };            // shallow: copy.user === src.user
+copy.user.name = 'Beto';
+console.log(src.user.name);         // 'Beto' — the source changed too!
+
+const deep = structuredClone(src);  // truly independent</code></pre>
+        <p><strong>Debounce vs throttle:</strong> debounce <em>waits for silence</em> — fires once after activity stops (search-as-you-type, resize handlers). Throttle <em>caps the rate</em> — fires at most once per interval during continuous activity (scroll, mousemove). Debounce = "do it when they're done", throttle = "do it at most this often".</p>
+        <pre><code>// Debounce: wait 300ms after the LAST keystroke
+const onType = debounce(q =&gt; search(q), 300);
+
+// Throttle: run immediately, then at most once per 100ms
+const onScroll = throttle(updatePosition, 100);</code></pre>
+        <p><strong>Modules:</strong> ES modules (<code>import</code>/<code>export</code>) are <em>static</em> — dependencies are known at parse time, which enables tree-shaking (dead code removal) and static analysis. CommonJS (<code>require</code>) is dynamic and synchronous, resolved at runtime — bundlers must ship everything because they can't know what will be required.</p>`,
       cards: [
-        { q: "What is the temporal dead zone?", a: "let/const declarations are hoisted but stay uninitialized until their line executes; accessing them in between throws a ReferenceError — unlike var, which is undefined when hoisted." },
-        { q: "What is a closure and what's it good for?", a: "A function keeps live access to the scope where it was defined. It powers module privacy, memoization caches and partial application — and the classic bug of capturing a stale loop variable (fix: let, or a per-iteration factory)." },
-        { q: "How is this determined?", a: "By the call: method call → the object; plain call → undefined (or global in sloppy mode); new → the instance; call/apply/bind → explicit. Arrow functions ignore all of that and capture the enclosing this." },
-        { q: "Why do arrow functions break as object methods but work as callbacks?", a: "They have no own this — they capture the enclosing scope's. As a callback that's exactly right (the surrounding this survives); as obj.method() you get the outer this, not obj." },
-        { q: "How do classes relate to prototypes?", a: "class is sugar: the constructor builds the instance, methods live on the shared prototype — one copy for all instances, delegation up the prototype chain for lookups." },
-        { q: "Microtasks vs macrotasks — who wins?", a: "After the stack empties, the entire microtask queue drains (Promise callbacks, queueMicrotask) before any macrotask (setTimeout, I/O). Hence then() fires before setTimeout(fn, 0)." },
-        { q: "Promise.all vs allSettled?", a: "all rejects fast on the first failure and returns nothing (use for must-succeed- together); allSettled waits for every outcome and returns each status — for independent work where partial failure is fine." },
-        { q: "== vs === and the one allowed exception?", a: "== coerces types first ('1' == 1 is true); === doesn't. Use === always, except x == null as a deliberate idiom matching both null and undefined." },
-        { q: "Why does spreading an object not fully copy it?", a: "Spread copies one level; nested objects are shared references — mutating copy.inner also mutates source.inner. Deep-clone with structuredClone when independence matters." },
-        { q: "Debounce vs throttle?", a: "Debounce fires once after activity stops (search input); throttle fires at most once per interval during continuous activity (scroll, resize)." },
-        { q: "Why are ES modules tree-shakeable when CommonJS isn't?", a: "import/export is static — imports are known at parse time, so unused exports can be dropped at build; require() is dynamic and runtime-resolved, so everything must ship." }
+        { q: "What is the temporal dead zone?", a: "let/const declarations are hoisted but stay uninitialized until their line executes; reading them in between throws a ReferenceError. var, by contrast, is hoisted as undefined. It's why console.log(x) before let x = 1 crashes but before var x = 1 prints undefined." },
+        { q: "What is a closure and what's it good for?", a: "A function keeps live access to the scope where it was created, even after that scope finished. Powers module privacy (makeCounter hides count), memoization, and handlers that remember setup. The classic bug: closures in a loop sharing one loop variable — fix with let (per-iteration binding) or a factory." },
+        { q: "How is this determined?", a: "At call time: method call → the object; plain call → undefined (global in sloppy mode); new → the new instance; call/apply/bind → explicit. Arrow functions have no own this — they capture the enclosing scope's, which is why they work as callbacks and break as object methods." },
+        { q: "Why do arrow functions break as object methods but work as callbacks?", a: "They capture the enclosing scope's this instead of having their own. As a callback that's exactly right (the surrounding this survives into the handler); as obj.method() you get the outer this, not obj — so this.name inside the arrow isn't the object's name." },
+        { q: "How do classes relate to prototypes?", a: "class is sugar over prototype-based constructors: the constructor sets own properties per instance, methods live on the shared prototype (one copy for all instances), and property lookup walks the prototype chain until found or null." },
+        { q: "Microtasks vs macrotasks — who wins?", a: "After the current stack empties, the entire microtask queue (promise callbacks, queueMicrotask) drains before any macrotask (setTimeout, I/O). Hence Promise.then always fires before setTimeout(fn, 0) — and a microtask loop starves all timers." },
+        { q: "Promise.all vs allSettled?", a: "all runs the promises concurrently and rejects on the first failure, discarding the rest — use it for together-or-nothing. allSettled waits for every outcome and returns {status, value/reason} per promise — for independent work where partial failure is acceptable." },
+        { q: "== vs === and the one allowed exception?", a: "== coerces types before comparing ('1' == 1 and [] == false are true); === doesn't. Use === always, except x == null — the deliberate idiom matching both null and undefined in one comparison." },
+        { q: "Why does spreading an object not fully copy it?", a: "Spread and Object.assign copy one level: nested objects are shared references, so mutating copy.user.name also mutates source.user.name — the #1 React state bug. Use structuredClone() when you need a truly independent deep copy." },
+        { q: "Debounce vs throttle?", a: "Debounce waits for silence — it fires once after activity stops (search-as-you-type, resize). Throttle caps the rate — at most once per interval during continuous activity (scroll, mousemove). 'When they're done' vs 'at most this often'." },
+        { q: "Why are ES modules tree-shakeable when CommonJS isn't?", a: "import/export is static — dependencies are known at parse time, so bundlers can drop unused exports. require() is dynamic and runtime-resolved, so everything must ship. ESM also gives live bindings and top-level await." }
       ],
       quiz: [
-        { q: "console.log(x) one line above let x = 1 throws. Why?", options: ["var hoisting", "The temporal dead zone", "Strict mode", "A closure bug"], answer: 1, explain: "let/const are hoisted but uninitialized until execution reaches them — accessing earlier is a ReferenceError." },
+        { q: "console.log(x) one line above let x = 1 throws. Why?", options: ["var hoisting", "The temporal dead zone", "Strict mode", "A closure bug"], answer: 1, explain: "let/const are hoisted but uninitialized until execution reaches them — reading earlier is a ReferenceError. var would print undefined instead." },
         { q: "Order of logs: setTimeout(()=>log(1)); Promise.resolve().then(()=>log(2)); log(3)?", options: ["1 2 3", "3 2 1", "3 1 2", "2 3 1"], answer: 1, explain: "Sync 3 first; then the microtask queue drains (2) before any timer macrotask (1)." },
-        { q: "const copy = {...user}; copy.address.city = 'X'; What happens to user.address.city?", options: ["Unchanged — spread copies everything", "Changes too — nested objects are shared", "Throws", "Undefined"], answer: 1, explain: "Spread is one level deep: the inner object is the same reference. Use structuredClone for independence." },
+        { q: "const copy = {...user}; copy.address.city = 'X'. What happens to user.address.city?", options: ["Unchanged — spread copies everything", "Changes too — nested objects are shared", "Throws", "Undefined"], answer: 1, explain: "Spread is one level deep: the inner object is the same reference. Use structuredClone for independence." },
         { q: "Three independent API calls must all succeed together. Use…", options: ["Sequential awaits", "Promise.all", "Promise.allSettled", "setTimeout"], answer: 1, explain: "all runs them concurrently and rejects on the first failure — the together-or-nothing semantics." },
-        { q: "obj = { name: 'a', greet: () => this.name }. greet() returns…", options: ["'a'", "undefined — arrows capture the enclosing this", "Throws", "The global object"], answer: 1, explain: "Arrow functions have no own this; the method gets the outer scope's binding, not obj." },
+        { q: "obj = { name: 'a', greet: () => this.name }. greet() returns…", options: ["'a'", "undefined — arrows capture the enclosing this", "Throws", "The global object"], answer: 1, explain: "Arrow functions have no own this; the method reads the outer scope's binding, not obj." },
         { q: "Search-as-you-type should fire the query…", options: ["On every keystroke", "Debounced — after typing pauses", "Throttled at 1/s", "On blur only"], answer: 1, explain: "Debounce waits for silence so you query intentions, not keystrokes; throttle suits continuous streams like scroll." }
       ]
     },
@@ -775,35 +984,58 @@ window.STUDY_DATA = {
       icon: "🎨",
       blurb: "CSS describes presentation on the web. Mastering it means the cascade and specificity, the box model, and modern layout with Flexbox and Grid — plus responsive units and when (and why) elements stack the way they do.",
       read: `
-        <p><strong>Box model:</strong> content → padding → border → margin; box-sizing: border-box makes width include padding+border (set it globally). Margins collapse vertically between siblings; padding doesn't.</p>
-        <p><strong>Cascade & specificity:</strong> styles resolve by origin, then specificity (inline > id > class/attr/pseudo-class > element), then source order. One id in a selector outweighs any number of classes — the reason !important spreads. Prefer low-specificity, class-based styles.</p>
-        <p><strong>Flexbox vs Grid:</strong> Flexbox = one dimension, content-driven (toolbars, card rows); Grid = two dimensions, layout-driven (page shells). They compose: grid the page, flex the components inside.</p>
-        <p><strong>Positioning:</strong> relative (offset from self, keeps space), absolute (out of flow vs nearest positioned ancestor), fixed (viewport), sticky (scrolls then sticks).</p>
-        <p><strong>Stacking contexts & z-index:</strong> z-index only compares within the same stacking context — created by transform, opacity &lt; 1, position+z-index, etc. "z-index: 9999 doesn't work" almost always means a parent created a context.</p>
-        <p><strong>Units & responsive:</strong> rem (root font size — scales with user settings; use for type) vs em (element font — tricky compounding) vs px (fixed) vs vw/vh (viewport). Media queries adapt to the viewport; container queries adapt to a component's own box — the component-era primitive.</p>
-        <p><strong>Pseudo-classes vs pseudo-elements:</strong> :hover/:focus/:nth-child() select elements in a state; ::before/::after create phantoms inside an element (content required).</p>
-        <p><strong>Animation costs:</strong> transitions animate state changes; @keyframes sequence steps. Animate transform and opacity only — GPU-composited; animating layout properties (top/width) triggers reflows.</p>
-        <p><strong>Modern CSS:</strong> :has() (parent selector), clamp() for fluid type, nesting, gap in flexbox, custom properties for theming.</p>`,
+        <p><strong>Box model:</strong> every element is content → padding → border → margin. <code>box-sizing: border-box</code> makes <code>width</code>/<code>height</code> <em>include</em> padding and border, so a 100px element is actually 100px — set it globally, because the default <code>content-box</code> adds padding and border <em>on top</em>, and layouts drift. Vertical margins of adjacent siblings <strong>collapse</strong> into one margin (the larger of the two); padding never does.</p>
+        <pre><code>/* content-box (default): 100px + 2×10px padding + 2×2px border = 124px */
+.box { width: 100px; padding: 10px; border: 2px solid; }
+
+/* border-box: the box IS 100px, padding inside */
+* { box-sizing: border-box; }
+.box { width: 100px; padding: 10px; } /* renders exactly 100px */</code></pre>
+        <p><strong>Cascade & specificity:</strong> when rules compete, CSS resolves by <em>origin</em> (author vs user-agent vs inline), then <strong>specificity</strong> — inline (1000) &gt; id (100) &gt; class/attribute/pseudo-class (10) &gt; element (1) — then <em>source order</em> for ties. One id in a selector outweighs any number of classes, which is why <code>!important</code> wars start: someone needs to beat a specificity they can't outrank. Keep selectors low-specificity and class-based.</p>
+        <pre><code>/* Specificity scores: 100+10+1 vs 10 vs 1 */
+#nav .item a      /* 0-1-1-1 */
+.item a           /* 0-0-1-1 */
+a                 /* 0-0-0-1 */</code></pre>
+        <p><strong>Flexbox vs Grid:</strong> Flexbox is <em>one-dimensional</em> and content-driven — it distributes items along a row (or column) and lets content size decide: toolbars, card rows, button groups. Grid is <em>two-dimensional</em> and layout-driven — rows and columns defined first, items placed into cells: page shells, dashboards. They compose: <code>display: grid</code> on the page, <code>display: flex</code> inside each card.</p>
+        <pre><code>/* Grid: the page shell — two columns, rows defined first */
+.page { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 60px 1fr; }
+
+/* Flexbox: the toolbar inside — one dimension, content-driven */
+.toolbar { display: flex; gap: 12px; justify-content: space-between; }</code></pre>
+        <p><strong>Positioning:</strong> <code>relative</code> offsets the element from itself but <em>keeps its space</em> in the flow; <code>absolute</code> removes it from the flow, positioned against the nearest <em>positioned</em> ancestor (or the page if none); <code>fixed</code> pins it to the viewport; <code>sticky</code> scrolls normally and then sticks at its threshold — the scroll-spy header pattern.</p>
+        <pre><code>.card        { position: relative; }   /* anchor for the badge */
+.badge       { position: absolute; top: 8px; right: 8px; }
+.modal       { position: fixed; inset: 0; }    /* viewport overlay */
+.toc         { position: sticky; top: 0; }    /* sticks while scrolling */</code></pre>
+        <p><strong>Stacking contexts & z-index:</strong> <code>z-index</code> only compares elements <em>within the same stacking context</em>. Transform, opacity &lt; 1, filter, position+z-index and others each <em>create</em> a new context — and everything inside is locked into that context's league. "z-index: 9999 doesn't work" almost always means a parent created a context that traps the element below a sibling context.</p>
+        <pre><code>.parent { transform: translateZ(0); } /* creates a stacking context */
+.child  { position: relative; z-index: 9999; } /* still trapped below .sibling */</code></pre>
+        <p><strong>Units & responsive:</strong> <code>rem</code> scales with the root font size — it respects the user's browser font setting, so use it for type and spacing; <code>em</code> is relative to the element's own font and compounds through nesting; <code>px</code> is fixed (fine for borders, poor for type); <code>vw/vh</code> track the viewport. <strong>Media queries</strong> adapt to the <em>viewport</em> (page-level breakpoints); <strong>container queries</strong> adapt to the component's <em>own box</em> — the component-era primitive, so a card responds whether it sits in a narrow sidebar or the main column.</p>
+        <p><strong>Pseudo-classes vs pseudo-elements:</strong> <code>:hover</code>, <code>:focus</code>, <code>:nth-child()</code> select <em>existing</em> elements in a state; <code>::before</code>/<code>::after</code> insert <em>phantom children</em> inside an element (they require the <code>content</code> property, even empty) — used for decorations, badges, and clearfixes.</p>
+        <pre><code>.btn:hover        { }          /* pseudo-class: state of an existing element */
+.card::before     { content: ""; } /* pseudo-element: phantom child, needs content */</code></pre>
+        <p><strong>Animation costs:</strong> <code>transition</code> animates between states; <code>@keyframes</code> sequences steps. Only <code>transform</code> and <code>opacity</code> are cheap — the compositor runs them on the GPU without touching layout. Animating <code>top</code>/<code>left</code>/<code>width</code> forces a <em>reflow</em> every frame: jank. Animate transform/opacity; reserve layout properties for non-animated changes.</p>
+        <p><strong>Modern CSS:</strong> <code>:has()</code> is the parent selector (<code>.card:has(img)</code> styles a card that contains an image); <code>clamp()</code> gives fluid values with bounds (<code>font-size: clamp(1rem, 2.5vw, 1.5rem)</code>); native <em>nesting</em> removes preprocessor need; <code>gap</code> works in flexbox; custom properties (<code>--token</code>) power theming without a rebuild.</p>`,
       cards: [
-        { q: "What does box-sizing: border-box change?", a: "width/height then include padding and border, so a width: 100px element is actually 100px. Set it globally — the default content-box adds padding/border on top." },
-        { q: "How does the cascade resolve competing rules?", a: "Origin → specificity (inline > id > class/attr/pseudo-class > element) → source order. One id outweighs any number of classes; keep specificity low and class-based to avoid !important wars." },
-        { q: "When Flexbox, when Grid?", a: "Flexbox: one dimension, content-driven — rows of cards, toolbars, nav. Grid: two dimensions, layout-driven — page shells. Compose them: grid the page, flex inside components." },
-        { q: "relative vs absolute vs fixed vs sticky?", a: "Relative offsets from itself but keeps its space. Absolute leaves the flow, positioned vs the nearest positioned ancestor. Fixed pins to the viewport. Sticky scrolls normally, then sticks at its threshold." },
-        { q: "Why does z-index: 9999 sometimes do nothing?", a: "z-index compares only within a stacking context; a parent with transform, opacity < 1, or position+z-index creates one — your element is trapped in a different league than the one it must beat." },
-        { q: "rem vs em vs px?", a: "rem scales with the root font size (user zoom-friendly — type and spacing); em is relative to the element's font (compounds confusingly); px is fixed (fine for borders/hairlines, poor for type)." },
-        { q: "Media query vs container query?", a: "Media queries respond to the viewport; container queries respond to the component's own container — so a card adapts whether it sits in a sidebar or the main column. The component-era primitive." },
-        { q: "Pseudo-class vs pseudo-element?", a: ":hover, :focus, :nth-child() select existing elements in a state; ::before/::after insert phantom children (need the content property) for decorations." },
-        { q: "Which CSS properties are cheap to animate, and why?", a: "transform and opacity — handled by the compositor on the GPU. Animating top/left/width forces layout (reflow) every frame: jank." },
-        { q: "What does clamp() give you?", a: "Fluid values with bounds: font-size: clamp(1rem, 2.5vw, 1.5rem) scales with the viewport but never below/above the limits — responsive type without media queries." },
-        { q: "What is :has()?", a: "The parent selector: .card:has(img) styles a card that contains an image — previously impossible without JS or extra classes." }
+        { q: "What does box-sizing: border-box change?", a: "width/height include padding and border, so a width: 100px element is exactly 100px instead of 124px. Set it globally (*) — the content-box default makes layouts drift as padding grows." },
+        { q: "How does the cascade resolve competing rules?", a: "Origin → specificity (inline > id > class/attr/pseudo-class > element) → source order. One id (100) outweighs any number of classes (10 each) — that's what drives people to !important wars. Keep selectors low and class-based." },
+        { q: "When Flexbox, when Grid?", a: "Flexbox: one dimension, content-driven — toolbars, card rows, button groups. Grid: two dimensions, layout-driven — page shells, dashboards. Compose: grid the page, flex inside components." },
+        { q: "relative vs absolute vs fixed vs sticky?", a: "Relative offsets from itself but keeps its space in the flow. Absolute leaves the flow, positioned vs the nearest positioned ancestor. Fixed pins to the viewport. Sticky scrolls normally, then sticks at its threshold — the scroll-spy header pattern." },
+        { q: "Why does z-index: 9999 sometimes do nothing?", a: "z-index compares only within a stacking context, and transform/opacity<1/position+z-index each create one — a parent context traps the element below sibling contexts regardless of its number." },
+        { q: "rem vs em vs px?", a: "rem scales with the root font size (respects user browser settings — type and spacing); em is relative to the element's own font (compounds through nesting); px is fixed (fine for borders/hairlines, poor for type)." },
+        { q: "Media query vs container query?", a: "Media queries respond to the viewport — page-level breakpoints. Container queries respond to the component's own box — so a card adapts whether it sits in a narrow sidebar or the main column. The component-era primitive." },
+        { q: "Pseudo-class vs pseudo-element?", a: ":hover/:focus/:nth-child() select existing elements in a state; ::before/::after insert phantom children inside an element — they require the content property (even empty) to render." },
+        { q: "Which CSS properties are cheap to animate, and why?", a: "transform and opacity — the compositor runs them on the GPU without layout. Animating top/left/width forces a reflow every frame: jank. Animate transform/opacity; change layout properties non-animated." },
+        { q: "What does clamp() give you?", a: "Fluid values with bounds: font-size: clamp(1rem, 2.5vw, 1.5rem) scales with the viewport but never below 1rem or above 1.5rem — responsive type without media queries." },
+        { q: "What is :has()?", a: "The parent selector: .card:has(img) styles a card that contains an image — previously impossible without JS or extra classes. It finally lets CSS select upward." }
       ],
       quiz: [
         { q: "A modal must overlay everything but z-index: 9999 loses to a header. Most likely cause?", options: ["Modal needs position: fixed", "A parent stacking context traps the modal", "Browsers cap z-index at 9999", "The header has !important"], answer: 1, explain: "z-index compares within a stacking context; a transformed/positioned ancestor isolates the modal. Restructure contexts or move the modal." },
         { q: "Page shell (sidebar + main + footer bands) — best tool?", options: ["Floats", "Flexbox", "CSS Grid", "Tables"], answer: 2, explain: "Two-dimensional, layout-driven structure is Grid's job; Flexbox handles the one-dimensional pieces inside." },
         { q: "Your 60fps animation janks. It animates…", options: ["transform", "opacity", "top and width", "color"], answer: 2, explain: "top/width trigger reflow per frame; transform/opacity are compositor-only. Animate those." },
         { q: "A card component must adapt when placed in a narrow sidebar. Cleanest modern approach?", options: ["More media queries", "A container query", "!important overrides", "Duplicate the component"], answer: 1, explain: "Container queries let the component respond to its own box instead of the viewport." },
-        { q: "width: 100px + padding: 10px + border: 2px renders 100px wide when…", options: ["box-sizing: content-box (default)", "box-sizing: border-box", "display: flex", "Always"], answer: 1, explain: "border-box includes padding and border in the declared width." },
-        { q: "::before does nothing. The usual reason?", options: ["Missing z-index", "Missing the content property", "Wrong selector order", "Flexbox override"], answer: 1, explain: "Pseudo-elements require content (even an empty string) to render." }
+        { q: "width: 100px + padding: 10px + border: 2px renders 100px wide when…", options: ["box-sizing: content-box (default)", "box-sizing: border-box", "display: flex", "Always"], answer: 1, explain: "border-box includes padding and border in the declared width; content-box adds them on top (124px)." },
+        { q: "::before does nothing. The usual reason?", options: ["Missing z-index", "Missing the content property", "Wrong selector order", "Flexbox override"], answer: 1, explain: "Pseudo-elements require content (even an empty string) to render at all." }
       ]
     },
 
