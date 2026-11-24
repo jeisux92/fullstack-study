@@ -1,8 +1,138 @@
 /* Full-Stack Study — vanilla JS app. No build step; works from file:// or any static server. */
 (function () {
   "use strict";
-  const DATA = window.STUDY_DATA;
+  const DATA_EN = window.STUDY_DATA;
+  const DATA_ES = window.STUDY_DATA_ES;
+  let LANG = "en";
+  let DATA = DATA_EN;
   const app = document.getElementById("app");
+
+  /* UI strings per language */
+  const UI = {
+    en: {
+      docTitle: "Full-Stack Study — Interview Prep",
+      footer: 'Built from the Full-Stack Interview Guide · Progress saved locally in your browser · Keyboard: space flips, ←/→ navigate, 1/2 mark cards, 1–4 answer quiz.',
+      heroTitle: "Study smarter, not harder.",
+      heroLead: 'Pick a track, then learn each topic three ways: <strong>Read</strong> the essentials, drill <strong>Flashcards</strong>, and test yourself with a <strong>Quiz</strong>. Progress is saved in your browser.',
+      statTopics: "topics", statCards: "flashcards", statQuiz: "quiz questions",
+      metaTopics: n => `${n} topics`, metaCards: n => `${n} cards`, metaMastered: n => `${n} mastered`,
+      startStudying: "Start studying →",
+      reviewBanner: n => `🔁 <b>${n}</b> card${n === 1 ? "" : "s"} due for review — start a session →`,
+      howTitle: "How it works",
+      how1t: "Read", how1p: "Condensed, interview-ready notes with the trade-offs that matter.",
+      how2t: "Flashcards", how2p: 'Flip to reveal, mark "Got it" or "Still learning". Keyboard: space flips, ←/→ navigate, 1/2 mark.',
+      how3t: "Quiz", how3p: "Multiple choice with instant explanations. Your best score is saved per topic.",
+      allTracks: "← All tracks",
+      fullGuide: "📖 Read the full guide (one page)",
+      reviewDue: n => `🔁 Review due (${n})`,
+      btnRead: "📖 Read", btnCards: "🃏 Cards", btnQuiz: "✅ Quiz",
+      cardsWord: "cards", notTried: "Not tried", readDone: "read ✓", best: p => `Best ${p}%`,
+      topicsBack: n => `← ${n} topics`,
+      fullGuideTitle: n => `${n} — Full Guide`,
+      guideSub: n => `All ${n} topics on a single page.`,
+      contents: "Contents", backToTop: "↑ Back to top",
+      tabRead: "📖 Read", tabCards: "🃏 Flashcards", tabQuiz: "✅ Quiz",
+      reviewTitle: n => `Review — ${n}`,
+      reviewSub: "Spaced repetition: cards you flagged or that are due today.",
+      allTracksName: "All tracks",
+      reviewLeft: n => `${n} card${n === 1 ? "" : "s"} left in this review`,
+      reviewNote: "marking schedules the next repetition",
+      emptyTitle: "Nothing due right now",
+      emptyNext: t => `Next card comes back in <b>${t}</b>.`,
+      emptyHint: "Mark cards in a topic to build your review queue.",
+      back: "← Back", openDeck: "Open the full deck",
+      cardCount: (a, b) => `Card ${a} / ${b}`,
+      masteredLine: (a, b, c) => `${a} mastered · ${b} reviewing · ${c} new`,
+      shuffle: "Shuffle",
+      qLabel: "Question", aLabel: "Answer", flipHint: "click or press space to flip",
+      prev: "← Prev", next: "Next →",
+      btnStill: "1 · Still learning", btnGot: "2 · Got it",
+      restart: "↺ Restart deck", takeQuiz: "Take the quiz →",
+      badgeGot: "Got it", badgeReview: "Still learning", badgeDue: "due",
+      markRead: "Mark as read", markedRead: "✓ Marked as read", drill: "Drill flashcards →",
+      startOfTrack: "← Start of track", endOfTrack: "End of track ✓",
+      quizCount: (a, b) => `Question ${a} / ${b}`,
+      scoreLine: (a, b) => `Score ${a} / ${b}`,
+      chooseAnswer: "Choose an answer.",
+      correct: "Correct!", wrong: "Not quite.",
+      seeResults: "See results →", nextQuestion: "Next question →",
+      doneScore: (a, b) => `${a} / ${b} correct`,
+      doneMsgs: ["Perfect run! 🎉", "Strong work. 💪", "Getting there — review the misses.", "Worth another pass through the cards."],
+      bestScore: (p, a) => `Best score for this topic: <b>${p}%</b> · Attempts: ${a}`,
+      retry: "↺ Retry quiz", reviewCards: "🃏 Review flashcards", backTopics: "Back to topics",
+      resetConfirm: "Reset all study progress? This cannot be undone.",
+      langTitle: "Cambiar a español"
+    },
+    es: {
+      docTitle: "Full-Stack Study — Preparación para Entrevistas",
+      footer: 'Basado en la Full-Stack Interview Guide · Progreso guardado en tu navegador · Teclado: espacio voltea, ←/→ navegan, 1/2 califica tarjetas, 1–4 responde el quiz.',
+      heroTitle: "Estudia inteligente, no más duro.",
+      heroLead: 'Elige una ruta y aprende cada tema de tres formas: <strong>lee</strong> lo esencial, practica con <strong>tarjetas</strong> y pruébate con un <strong>quiz</strong>. Tu progreso se guarda en tu navegador.',
+      statTopics: "temas", statCards: "tarjetas", statQuiz: "preguntas de quiz",
+      metaTopics: n => `${n} temas`, metaCards: n => `${n} tarjetas`, metaMastered: n => `${n} dominadas`,
+      startStudying: "Empieza a estudiar →",
+      reviewBanner: n => `🔁 <b>${n}</b> tarjeta${n === 1 ? "" : "s"} para repasar — inicia una sesión →`,
+      howTitle: "Cómo funciona",
+      how1t: "Leer", how1p: "Notas condensadas y listas para entrevista con los trade-offs que importan.",
+      how2t: "Tarjetas", how2p: 'Voltea para revelar y marca "La sé" o "Repasar". Teclado: espacio voltea, ←/→ navegan, 1/2 califican.',
+      how3t: "Quiz", how3p: "Opción múltiple con explicaciones al instante. Tu mejor puntaje se guarda por tema.",
+      allTracks: "← Todas las rutas",
+      fullGuide: "📖 Lee la guía completa (una página)",
+      reviewDue: n => `🔁 Repasar pendientes (${n})`,
+      btnRead: "📖 Leer", btnCards: "🃏 Tarjetas", btnQuiz: "✅ Quiz",
+      cardsWord: "tarjetas", notTried: "Sin intentar", readDone: "leído ✓", best: p => `Mejor ${p}%`,
+      topicsBack: n => `← Temas de ${n}`,
+      fullGuideTitle: n => `${n} — Guía completa`,
+      guideSub: n => `Los ${n} temas en una sola página.`,
+      contents: "Contenido", backToTop: "↑ Volver arriba",
+      tabRead: "📖 Leer", tabCards: "🃏 Tarjetas", tabQuiz: "✅ Quiz",
+      reviewTitle: n => `Repaso — ${n}`,
+      reviewSub: "Repetición espaciada: tarjetas que marcaste o que vencen hoy.",
+      allTracksName: "Todas las rutas",
+      reviewLeft: n => `Queda${n === 1 ? "" : "n"} ${n} tarjeta${n === 1 ? "" : "s"} en este repaso`,
+      reviewNote: "calificar programa la siguiente repetición",
+      emptyTitle: "No hay nada pendiente ahora",
+      emptyNext: t => `La próxima tarjeta vuelve en <b>${t}</b>.`,
+      emptyHint: "Marca tarjetas en un tema para llenar tu cola de repaso.",
+      back: "← Volver", openDeck: "Abrir el mazo completo",
+      cardCount: (a, b) => `Tarjeta ${a} / ${b}`,
+      masteredLine: (a, b, c) => `${a} dominadas · ${b} en repaso · ${c} nuevas`,
+      shuffle: "Aleatorio",
+      qLabel: "Pregunta", aLabel: "Respuesta", flipHint: "clic o barra espaciadora para voltear",
+      prev: "← Anterior", next: "Siguiente →",
+      btnStill: "1 · Repasar", btnGot: "2 · La sé",
+      restart: "↺ Reiniciar mazo", takeQuiz: "Hacer el quiz →",
+      badgeGot: "La sé", badgeReview: "Repasar", badgeDue: "pendiente",
+      markRead: "Marcar como leído", markedRead: "✓ Marcado como leído", drill: "Practicar tarjetas →",
+      startOfTrack: "← Inicio de la ruta", endOfTrack: "Fin de la ruta ✓",
+      quizCount: (a, b) => `Pregunta ${a} / ${b}`,
+      scoreLine: (a, b) => `Aciertos ${a} / ${b}`,
+      chooseAnswer: "Elige una respuesta.",
+      correct: "¡Correcto!", wrong: "Casi.",
+      seeResults: "Ver resultados →", nextQuestion: "Siguiente pregunta →",
+      doneScore: (a, b) => `${a} / ${b} correctas`,
+      doneMsgs: ["¡Ronda perfecta! 🎉", "¡Muy bien! 💪", "Vas bien — repasa los errores.", "Vale la pena otra pasada por las tarjetas."],
+      bestScore: (p, a) => `Mejor puntaje en este tema: <b>${p}%</b> · Intentos: ${a}`,
+      retry: "↺ Repetir quiz", reviewCards: "🃏 Repasar tarjetas", backTopics: "Volver a los temas",
+      resetConfirm: "¿Restablecer todo tu progreso de estudio? Esto no se puede deshacer.",
+      langTitle: "Switch to English"
+    }
+  };
+  const L = () => UI[LANG];
+  function applyLang() {
+    document.documentElement.lang = LANG;
+    document.title = UI[LANG].docTitle;
+    const foot = document.querySelector(".site-footer");
+    if (foot) foot.innerHTML = UI[LANG].footer;
+    const lb = document.getElementById("lang-toggle");
+    if (lb) { lb.textContent = "🌐 " + LANG.toUpperCase(); lb.title = UI[LANG].langTitle; }
+    document.querySelectorAll("#lang-menu .dropdown-item").forEach(b => {
+      const on = b.dataset.lang === LANG;
+      b.classList.toggle("active", on);
+      const chk = b.querySelector(".check");
+      if (chk) chk.textContent = on ? "✓" : "";
+    });
+  }
 
   /* ---------------- persistence ---------------- */
   const P_KEY = "fs-study-progress-v1";
@@ -15,6 +145,9 @@
   let settings = load(S_KEY, { dark: false });
   function saveProgress() { localStorage.setItem(P_KEY, JSON.stringify(progress)); }
   function saveSettings() { localStorage.setItem(S_KEY, JSON.stringify(settings)); }
+  LANG = settings.lang === "es" ? "es" : "en";
+  DATA = LANG === "es" ? DATA_ES : DATA_EN;
+  applyLang();
 
   /* ---------------- helpers ---------------- */
   function esc(s) {
@@ -59,6 +192,25 @@
   function bar(pct) {
     return `<div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>`;
   }
+  /* Animated scroll that doesn't depend on native smooth-scroll support
+     (some WebViews silently ignore scrollIntoView/scrollTo with behavior:"smooth"). */
+  function smoothScrollTo(targetY) {
+    const startY = window.pageYOffset;
+    const diff = Math.round(targetY) - startY;
+    if (Math.abs(diff) < 2) return;
+    const dur = Math.min(700, 300 + Math.abs(diff) / 3);
+    const t0 = performance.now();
+    (function step(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      const eased = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p; // easeInOutQuad
+      window.scrollTo(0, startY + diff * eased);
+      if (p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  function scrollToSection(el) {
+    const y = el.getBoundingClientRect().top + window.pageYOffset - 84; // clear the sticky header
+    smoothScrollTo(Math.max(0, y));
+  }
 
   /* ---------------- routing ---------------- */
   function parseHash() {
@@ -98,10 +250,10 @@
         <h2>${t.name}</h2>
         <p>${esc(t.tagline)}</p>
         <div class="track-meta">
-          <span>${s.topics} topics</span><span>${s.cards} cards</span><span>${s.known} mastered</span>
+          <span>${L().metaTopics(s.topics)}</span><span>${L().metaCards(s.cards)}</span><span>${L().metaMastered(s.known)}</span>
         </div>
         ${bar(s.pct)}
-        <span class="track-cta">Start studying →</span>
+        <span class="track-cta">${L().startStudying}</span>
       </a>`;
     }).join("");
     const totalCards = Object.values(DATA.topics).reduce((n, t) => n + t.cards.length, 0);
@@ -109,24 +261,22 @@
     const dueAll = dueRefs("all").length;
     app.innerHTML = `
       <section class="hero">
-        <h1>Study smarter, not harder.</h1>
-        <p class="lead">Pick a track, then learn each topic three ways: <strong>Read</strong> the essentials,
-        drill <strong>Flashcards</strong>, and test yourself with a <strong>Quiz</strong>.
-        Progress is saved in your browser.</p>
+        <h1>${L().heroTitle}</h1>
+        <p class="lead">${L().heroLead}</p>
         <div class="hero-stats">
-          <div><b>${Object.keys(DATA.topics).length}</b><span>topics</span></div>
-          <div><b>${totalCards}</b><span>flashcards</span></div>
-          <div><b>${totalQuiz}</b><span>quiz questions</span></div>
+          <div><b>${Object.keys(DATA.topics).length}</b><span>${L().statTopics}</span></div>
+          <div><b>${totalCards}</b><span>${L().statCards}</span></div>
+          <div><b>${totalQuiz}</b><span>${L().statQuiz}</span></div>
         </div>
       </section>
-      ${dueAll ? `<a class="review-banner" href="#/review/all">🔁 <b>${dueAll}</b> card${dueAll === 1 ? "" : "s"} due for review — start a session →</a>` : ""}
+      ${dueAll ? `<a class="review-banner" href="#/review/all">🔁 ${L().reviewBanner(dueAll)}</a>` : ""}
       <section class="track-grid">${cards}</section>
       <section class="how">
-        <h3>How it works</h3>
+        <h3>${L().howTitle}</h3>
         <div class="how-grid">
-          <div class="how-item"><span>📖</span><h4>Read</h4><p>Condensed, interview-ready notes with the trade-offs that matter.</p></div>
-          <div class="how-item"><span>🃏</span><h4>Flashcards</h4><p>Flip to reveal, mark "Got it" or "Still learning". Keyboard: space flips, ←/→ navigate, 1/2 mark.</p></div>
-          <div class="how-item"><span>✅</span><h4>Quiz</h4><p>Multiple choice with instant explanations. Your best score is saved per topic.</p></div>
+          <div class="how-item"><span>📖</span><h4>${L().how1t}</h4><p>${L().how1p}</p></div>
+          <div class="how-item"><span>🃏</span><h4>${L().how2t}</h4><p>${L().how2p}</p></div>
+          <div class="how-item"><span>✅</span><h4>${L().how3t}</h4><p>${L().how3p}</p></div>
         </div>
       </section>`;
   }
@@ -138,37 +288,45 @@
     const s = trackStats(trackId);
     const rows = t.topics.map(id => {
       const topic = DATA.topics[id], st = topicStats(id);
-      const quizLabel = st.quiz ? `Best ${st.quiz.best}%` : "Not tried";
-      return `<div class="topic-row">
+      const quizLabel = st.quiz ? L().best(st.quiz.best) : L().notTried;
+      return `<div class="topic-row" data-go="#/study/${trackId}/${id}/read">
         <div class="topic-main">
           <span class="topic-icon">${topic.icon}</span>
           <div class="topic-info">
             <h3>${esc(topic.title)}</h3>
-            <div class="topic-sub">${st.total} cards · ${topic.quiz.length} quiz · ${quizLabel}${st.read ? " · read ✓" : ""}</div>
+            <p class="topic-def">${esc(topic.blurb)}</p>
+            <div class="topic-sub">${st.total} ${L().cardsWord} · ${topic.quiz.length} quiz · ${quizLabel}${st.read ? " · " + L().readDone : ""}</div>
             ${bar(st.pct)}
           </div>
           ${ring(st.pct, 46)}
         </div>
         <div class="topic-actions">
-          <a class="btn ghost" href="#/study/${trackId}/${id}/read">📖 Read</a>
-          <a class="btn" href="#/study/${trackId}/${id}/cards">🃏 Cards</a>
-          <a class="btn" href="#/study/${trackId}/${id}/quiz">✅ Quiz</a>
+          <a class="btn ghost" href="#/study/${trackId}/${id}/read">${L().btnRead}</a>
+          <a class="btn" href="#/study/${trackId}/${id}/cards">${L().btnCards}</a>
+          <a class="btn" href="#/study/${trackId}/${id}/quiz">${L().btnQuiz}</a>
         </div>
       </div>`;
     }).join("");
     app.innerHTML = `
       <div class="page-head">
-        <a class="back" href="#/">← All tracks</a>
+        <a class="back" href="#/">${L().allTracks}</a>
         <div class="page-title"><span class="track-icon-lg">${t.icon}</span>
           <div><h1>${t.name}</h1><p>${esc(t.tagline)}</p></div>
           ${ring(s.pct, 64)}
         </div>
         <div class="track-cta-row">
-          <a class="btn" href="#/guide/${trackId}">📖 Read the full guide (one page)</a>
-          <a class="btn ghost" href="#/review/${trackId}">🔁 Review due (${dueRefs(trackId).length})</a>
+          <a class="btn" href="#/guide/${trackId}">${L().fullGuide}</a>
+          <a class="btn ghost" href="#/review/${trackId}">${L().reviewDue(dueRefs(trackId).length)}</a>
         </div>
       </div>
       <div class="topic-list">${rows}</div>`;
+    // clicking anywhere on a topic row opens its read section (buttons keep their own targets)
+    app.querySelectorAll(".topic-row").forEach(row => {
+      row.addEventListener("click", e => {
+        if (e.target.closest(".topic-actions")) return;
+        location.hash = row.dataset.go;
+      });
+    });
   }
 
   /* ---------------- full guide (one page per track) ---------------- */
@@ -189,36 +347,39 @@
             <a class="btn ghost sm" href="#/study/${trackId}/${id}/quiz">✅ Quiz</a>
           </div>
         </div>
+        <p class="def-lead">${esc(topic.blurb)}</p>
         <div class="read guide-body">${topic.read}</div>
       </section>`;
     }).join("");
     app.innerHTML = `
       <div class="page-head">
-        <a class="back" href="#/track/${trackId}">← ${t.name} topics</a>
+        <a class="back" href="#/track/${trackId}">${L().topicsBack(t.name)}</a>
         <div class="page-title"><span class="track-icon-lg">${t.icon}</span>
-          <div><h1>${t.name} — Full Guide</h1><p>All ${t.topics.length} topics on a single page.</p></div>
+          <div><h1>${L().fullGuideTitle(t.name)}</h1><p>${L().guideSub(t.topics.length)}</p></div>
         </div>
       </div>
-      <div class="guide-layout">
+      <div class="guide-layout" id="guide-layout">
         <nav class="guide-toc" id="guide-toc">
-          <h4>Contents</h4>
+          <h4>${L().contents}</h4>
           ${toc}
-          <button class="toc-top" id="toc-top">↑ Back to top</button>
+          <button class="toc-top" data-top>${L().backToTop}</button>
         </nav>
         <div class="guide-content">${sections}</div>
       </div>`;
 
-    const tocEl = document.getElementById("guide-toc");
-    tocEl.addEventListener("click", e => {
-      const btn = e.target.closest("[data-target]");
-      if (btn) {
-        const el = document.getElementById(btn.dataset.target);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    // one delegated handler covers the TOC, per-section prev/next, and back-to-top
+    const layout = document.getElementById("guide-layout");
+    layout.addEventListener("click", e => {
+      const nav = e.target.closest("[data-target]");
+      if (nav) {
+        const el = document.getElementById(nav.dataset.target);
+        if (el) scrollToSection(el);
         return;
       }
-      if (e.target.closest("#toc-top")) window.scrollTo({ top: 0, behavior: "smooth" });
+      if (e.target.closest("[data-top]")) smoothScrollTo(0);
     });
     // scroll-spy: highlight the section currently in view
+    const tocEl = document.getElementById("guide-toc");
     const links = Array.from(tocEl.querySelectorAll(".toc-link"));
     const byId = {};
     links.forEach(l => byId[l.dataset.target] = l);
@@ -240,7 +401,7 @@
     const topic = DATA.topics[topicId];
     if (!topic || !DATA.tracks[trackId]) return renderHome();
     const tabs = ["read", "cards", "quiz"].map(m => {
-      const label = { read: "📖 Read", cards: "🃏 Flashcards", quiz: "✅ Quiz" }[m];
+      const label = { read: L().tabRead, cards: L().tabCards, quiz: L().tabQuiz }[m];
       const on = m === mode ? " active" : "";
       return `<a class="tab${on}" href="#/study/${trackId}/${topicId}/${m}">${label}</a>`;
     }).join("");
@@ -248,7 +409,7 @@
       <div class="page-head">
         <a class="back" href="#/track/${trackId}">← ${DATA.tracks[trackId].name}</a>
         <div class="page-title"><span class="track-icon-lg">${topic.icon}</span>
-          <div><h1>${esc(topic.title)}</h1></div>
+          <div><h1>${esc(topic.title)}</h1><p class="topic-def">${esc(topic.blurb)}</p></div>
         </div>
         <div class="tabs">${tabs}</div>
       </div>
@@ -263,14 +424,26 @@
   function renderRead(body, trackId, topicId) {
     const topic = DATA.topics[topicId];
     const done = !!progress.read[topicId];
+    const ids = DATA.tracks[trackId].topics;
+    const pos = ids.indexOf(topicId);
+    const prevId = pos > 0 ? ids[pos - 1] : null;
+    const nextId = pos >= 0 && pos < ids.length - 1 ? ids[pos + 1] : null;
     body.innerHTML = `
       <article class="read">
         ${topic.read}
         <div class="read-foot">
-          <button id="mark-read" class="btn ${done ? "ghost" : ""}">${done ? "✓ Marked as read" : "Mark as read"}</button>
-          <a class="btn" href="#/study/${trackId}/${topicId}/cards">Drill flashcards →</a>
+          <button id="mark-read" class="btn ${done ? "ghost" : ""}">${done ? L().markedRead : L().markRead}</button>
+          <a class="btn" href="#/study/${trackId}/${topicId}/cards">${L().drill}</a>
         </div>
-      </article>`;
+      </article>
+      <div class="guide-nav lesson-nav">
+        ${prevId
+          ? `<a class="btn ghost" href="#/study/${trackId}/${prevId}/read">← ${esc(DATA.topics[prevId].title)}</a>`
+          : `<button class="btn ghost" disabled>${L().startOfTrack}</button>`}
+        ${nextId
+          ? `<a class="btn" href="#/study/${trackId}/${nextId}/read">${esc(DATA.topics[nextId].title)} →</a>`
+          : `<button class="btn" disabled>${L().endOfTrack}</button>`}
+      </div>`;
     document.getElementById("mark-read").addEventListener("click", () => {
       progress.read[topicId] = !progress.read[topicId];
       saveProgress();
@@ -334,13 +507,13 @@
   }
   function renderReview(scope) {
     session = { kind: "review", scope, deck: dueRefs(scope), pos: 0, flipped: false, shuffle: false };
-    const label = scope === "all" ? "All tracks" : DATA.tracks[scope].name;
+    const label = scope === "all" ? L().allTracksName : DATA.tracks[scope].name;
     const back = scope === "all" ? "#/" : "#/track/" + scope;
     app.innerHTML = `
       <div class="page-head">
         <a class="back" href="${back}">← ${label}</a>
         <div class="page-title"><span class="track-icon-lg">🔁</span>
-          <div><h1>Review — ${label}</h1><p>Spaced repetition: cards you flagged or that are due today.</p></div>
+          <div><h1>${L().reviewTitle(label)}</h1><p>${L().reviewSub}</p></div>
         </div>
       </div>
       <div id="study-body"></div>`;
@@ -352,11 +525,11 @@
     body.innerHTML = `
       <div class="quiz-done">
         <div class="empty-emoji">🎉</div>
-        <h2>Nothing due right now</h2>
-        <p class="quiz-msg">${nxt ? "Next card comes back in <b>" + fmtRel(nxt) + "</b>." : "Mark cards in a topic to build your review queue."}</p>
+        <h2>${L().emptyTitle}</h2>
+        <p class="quiz-msg">${nxt ? L().emptyNext(fmtRel(nxt)) : L().emptyHint}</p>
         <div class="cards-actions center">
-          <a class="btn" href="${back}">← Back</a>
-          ${ctx.kind === "topic" ? `<a class="btn ghost" href="#/study/${ctx.trackId}/${ctx.topicId}/cards">Open the full deck</a>` : ""}
+          <a class="btn" href="${back}">${L().back}</a>
+          ${ctx.kind === "topic" ? `<a class="btn ghost" href="#/study/${ctx.trackId}/${ctx.topicId}/cards">${L().openDeck}</a>` : ""}
         </div>
       </div>`;
   }
@@ -369,43 +542,43 @@
     const id = cardId(ref.topicId, ref.idx);
     const mark = progress.cards[id];
     const srs = progress.srs && progress.srs[id];
-    const markBadge = mark === "known" ? '<span class="badge known">Got it</span>'
-      : mark === "review" ? '<span class="badge review">Still learning</span>' : "";
-    const dueBadge = (srs && srs.due <= Date.now()) ? '<span class="badge review">due</span>' : "";
+    const markBadge = mark === "known" ? `<span class="badge known">${L().badgeGot}</span>`
+      : mark === "review" ? `<span class="badge review">${L().badgeReview}</span>` : "";
+    const dueBadge = (srs && srs.due <= Date.now()) ? `<span class="badge review">${L().badgeDue}</span>` : "";
     const topicTag = ctx.kind === "review" ? `<span class="badge topic">${topic.icon} ${esc(topic.title)}</span>` : "";
 
     let progressLine, topRight, foot;
     if (ctx.kind === "topic") {
       const st = topicStats(ctx.topicId);
-      progressLine = `${st.known} mastered · ${st.review} reviewing · ${st.total - st.known - st.review} new`;
-      topRight = `<label class="shuffle"><input type="checkbox" id="shuffle" ${s.shuffle ? "checked" : ""}> Shuffle</label>`;
-      foot = `<button class="btn ghost sm" id="restart">↺ Restart deck</button>
-              <a class="btn sm" href="#/study/${ctx.trackId}/${ctx.topicId}/quiz">Take the quiz →</a>`;
+      progressLine = L().masteredLine(st.known, st.review, st.total - st.known - st.review);
+      topRight = `<label class="shuffle"><input type="checkbox" id="shuffle" ${s.shuffle ? "checked" : ""}> ${L().shuffle}</label>`;
+      foot = `<button class="btn ghost sm" id="restart">${L().restart}</button>
+              <a class="btn sm" href="#/study/${ctx.trackId}/${ctx.topicId}/quiz">${L().takeQuiz}</a>`;
     } else {
-      progressLine = `${s.deck.length} card${s.deck.length === 1 ? "" : "s"} left in this review`;
-      topRight = `<span class="cards-progress">marking schedules the next repetition</span>`;
-      foot = `<a class="btn ghost sm" href="${ctx.scope === "all" ? "#/" : "#/track/" + ctx.scope}">← Back</a>`;
+      progressLine = L().reviewLeft(s.deck.length);
+      topRight = `<span class="cards-progress">${L().reviewNote}</span>`;
+      foot = `<a class="btn ghost sm" href="${ctx.scope === "all" ? "#/" : "#/track/" + ctx.scope}">${L().back}</a>`;
     }
 
     body.innerHTML = `
       <div class="cards-wrap">
         <div class="cards-top">
-          <div class="cards-count">Card ${s.pos + 1} / ${s.deck.length} ${markBadge}${dueBadge}${topicTag}</div>
+          <div class="cards-count">${L().cardCount(s.pos + 1, s.deck.length)} ${markBadge}${dueBadge}${topicTag}</div>
           <div class="cards-progress">${progressLine}</div>
           ${topRight}
         </div>
         ${bar(Math.round((s.pos + 1) / s.deck.length * 100))}
         <div class="flashcard ${s.flipped ? "flipped" : ""}" id="flashcard" tabindex="0" role="button" aria-label="Flip card">
           <div class="fc-inner">
-            <div class="fc-face fc-front"><span class="fc-label">Question</span><p>${esc(card.q)}</p><span class="fc-hint">click or press space to flip</span></div>
-            <div class="fc-face fc-back"><span class="fc-label">Answer</span><p>${esc(card.a)}</p></div>
+            <div class="fc-face fc-front"><span class="fc-label">${L().qLabel}</span><p>${esc(card.q)}</p><span class="fc-hint">${L().flipHint}</span></div>
+            <div class="fc-face fc-back"><span class="fc-label">${L().aLabel}</span><p>${esc(card.a)}</p></div>
           </div>
         </div>
         <div class="cards-actions">
-          <button class="btn ghost" id="prev" ${s.pos === 0 ? "disabled" : ""}>← Prev</button>
-          <button class="btn review" id="mark-review">1 · Still learning</button>
-          <button class="btn known" id="mark-known">2 · Got it</button>
-          <button class="btn ghost" id="next" ${s.pos === s.deck.length - 1 ? "disabled" : ""}>Next →</button>
+          <button class="btn ghost" id="prev" ${s.pos === 0 ? "disabled" : ""}>${L().prev}</button>
+          <button class="btn review" id="mark-review">${L().btnStill}</button>
+          <button class="btn known" id="mark-known">${L().btnGot}</button>
+          <button class="btn ghost" id="next" ${s.pos === s.deck.length - 1 ? "disabled" : ""}>${L().next}</button>
         </div>
         <div class="cards-foot">${foot}</div>
       </div>`;
@@ -478,15 +651,15 @@
     }).join("");
     const feedback = s.selected !== null
       ? `<div class="feedback ${s.selected === q.answer ? "good" : "bad"}">
-          <b>${s.selected === q.answer ? "Correct!" : "Not quite."}</b> ${esc(q.explain)}
+          <b>${s.selected === q.answer ? L().correct : L().wrong}</b> ${esc(q.explain)}
         </div>
-        <button class="btn" id="qnext">${s.pos === s.order.length - 1 ? "See results →" : "Next question →"}</button>`
-      : `<p class="quiz-hint">Choose an answer.</p>`;
+        <button class="btn" id="qnext">${s.pos === s.order.length - 1 ? L().seeResults : L().nextQuestion}</button>`
+      : `<p class="quiz-hint">${L().chooseAnswer}</p>`;
     body.innerHTML = `
       <div class="quiz-wrap">
         <div class="cards-top">
-          <div class="cards-count">Question ${s.pos + 1} / ${s.order.length}</div>
-          <div class="cards-progress">Score ${s.score} / ${s.pos + (s.selected !== null ? 1 : 0)}</div>
+          <div class="cards-count">${L().quizCount(s.pos + 1, s.order.length)}</div>
+          <div class="cards-progress">${L().scoreLine(s.score, s.pos + (s.selected !== null ? 1 : 0))}</div>
         </div>
         ${bar(Math.round((s.pos + (s.selected !== null ? 1 : 0)) / s.order.length * 100))}
         <div class="quiz-q">${esc(q.q)}</div>
@@ -532,17 +705,18 @@
     const total = s.order.length;
     const pct = s.resultPct;
     const best = progress.quiz[topicId].best;
-    const msg = pct === 100 ? "Perfect run! 🎉" : pct >= 80 ? "Strong work. 💪" : pct >= 50 ? "Getting there — review the misses." : "Worth another pass through the cards.";
+    const msgs = L().doneMsgs;
+    const msg = pct === 100 ? msgs[0] : pct >= 80 ? msgs[1] : pct >= 50 ? msgs[2] : msgs[3];
     body.innerHTML = `
       <div class="quiz-done">
         ${ring(pct, 120)}
-        <h2>${s.score} / ${total} correct</h2>
+        <h2>${L().doneScore(s.score, total)}</h2>
         <p class="quiz-msg">${msg}</p>
-        <p class="quiz-best">Best score for this topic: <b>${best}%</b> · Attempts: ${progress.quiz[topicId].attempts}</p>
+        <p class="quiz-best">${L().bestScore(best, progress.quiz[topicId].attempts)}</p>
         <div class="cards-actions center">
-          <button class="btn" id="retry">↺ Retry quiz</button>
-          <a class="btn ghost" href="#/study/${trackId}/${topicId}/cards">🃏 Review flashcards</a>
-          <a class="btn ghost" href="#/track/${trackId}">Back to topics</a>
+          <button class="btn" id="retry">${L().retry}</button>
+          <a class="btn ghost" href="#/study/${trackId}/${topicId}/cards">${L().reviewCards}</a>
+          <a class="btn ghost" href="#/track/${trackId}">${L().backTopics}</a>
         </div>
       </div>`;
     document.getElementById("retry").addEventListener("click", () => {
@@ -553,6 +727,7 @@
 
   /* ---------------- keyboard ---------------- */
   document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { const dd = document.getElementById("lang-dd"); if (dd) dd.classList.remove("open"); }
     const route = parseHash();
     if (route.view !== "study" || !session) return;
     const tag = (e.target.tagName || "").toLowerCase();
@@ -576,8 +751,33 @@
   document.getElementById("dark-toggle").addEventListener("click", () => {
     settings.dark = !settings.dark; saveSettings(); applyTheme(); render();
   });
+  const langDD = document.getElementById("lang-dd");
+  const langBtn = document.getElementById("lang-toggle");
+  function closeLangMenu() {
+    langDD.classList.remove("open");
+    langBtn.setAttribute("aria-expanded", "false");
+  }
+  langBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    langDD.classList.toggle("open");
+    langBtn.setAttribute("aria-expanded", String(langDD.classList.contains("open")));
+  });
+  document.querySelectorAll("#lang-menu .dropdown-item").forEach(b => {
+    b.addEventListener("click", () => {
+      const lang = b.dataset.lang;
+      closeLangMenu();
+      if (lang === LANG) return;
+      LANG = lang;
+      DATA = lang === "es" ? DATA_ES : DATA_EN;
+      settings.lang = LANG; saveSettings();
+      applyLang(); render();
+    });
+  });
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#lang-dd")) closeLangMenu();
+  });
   document.getElementById("reset-btn").addEventListener("click", () => {
-    if (confirm("Reset all study progress? This cannot be undone.")) {
+    if (confirm(L().resetConfirm)) {
       progress = { cards: {}, quiz: {}, read: {}, srs: {} }; saveProgress(); render();
     }
   });

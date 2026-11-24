@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=3" />
+  <link rel="stylesheet" href="css/styles.css?v=18" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>" />
 </head>
 <body>
@@ -16,6 +16,13 @@
     <a class="brand" href="#/"><span class="logo">📚</span> Full-Stack Study</a>
     <nav class="track-pills" id="track-pills"></nav>
     <div class="header-actions">
+      <div class="dropdown" id="lang-dd">
+        <button class="icon-btn" id="lang-toggle" aria-haspopup="true" aria-expanded="false" title="Language">🌐 EN</button>
+        <div class="dropdown-menu" id="lang-menu" role="menu">
+          <button class="dropdown-item" data-lang="en"><span class="dd-code">EN</span> English <span class="check">✓</span></button>
+          <button class="dropdown-item" data-lang="es"><span class="dd-code">ES</span> Español <span class="check">✓</span></button>
+        </div>
+      </div>
       <button class="icon-btn" id="dark-toggle" title="Toggle theme">☀️</button>
       <button class="icon-btn" id="reset-btn" title="Reset all progress">🗑️</button>
     </div>
@@ -27,7 +34,8 @@
     Built from the Full-Stack Interview Guide · Progress saved locally in your browser · Keyboard: space flips, ←/→ navigate, 1/2 mark cards, 1–4 answer quiz.
   </footer>
 
-  <script src="js/data.js?v=3"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="js/data.js?v=18"></script>
+  <script src="js/data-es.js?v=18"></script>
+  <script src="js/app.js?v=18"></script>
 </body>
 </html>

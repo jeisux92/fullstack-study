@@ -28,6 +28,7 @@ window.STUDY_DATA = {
       title: "Monolith vs. Microservices",
       track: "backend",
       icon: "🏛️",
+      blurb: "Software architecture is the high-level organization of a system into deployable units: a monolith ships as one application, while microservices split it into small, independently deployable services that talk over a network.",
       read: `
         <p>The decision is not "which is better" but <strong>when to use each</strong>.</p>
         <table><thead><tr><th></th><th>Monolith / Modular Monolith</th><th>Microservices</th></tr></thead>
@@ -61,6 +62,7 @@ window.STUDY_DATA = {
       title: "Distributed Systems Patterns",
       track: "backend",
       icon: "🌐",
+      blurb: "A distributed system is a set of services running on separate machines that coordinate over a network. Its patterns are proven solutions for doing that reliably — handling communication, partial failures, and transactions that span services.",
       read: `
         <p><strong>Communication:</strong> synchronous (REST/gRPC) waits for a response — right for immediate queries, risks cascading failures. Asynchronous (Kafka/RabbitMQ) publishes and moves on — decoupling and resilience, at the cost of eventual consistency.</p>
         <p><strong>Resilience toolkit:</strong> Timeout (every remote call needs a deadline) · Retry with exponential backoff + jitter · Circuit Breaker (fail fast when a dependency keeps failing) · Bulkhead (isolate resource pools per dependency).</p>
@@ -93,6 +95,7 @@ window.STUDY_DATA = {
       title: "APIs: REST, gRPC, GraphQL",
       track: "backend",
       icon: "🔌",
+      blurb: "An API (Application Programming Interface) is the contract through which clients and services exchange data over HTTP. REST, gRPC, and GraphQL are the three dominant styles for designing that contract.",
       read: `
         <table><thead><tr><th>Protocol</th><th>Ideal for</th><th>Trade-off</th></tr></thead><tbody>
         <tr><td>REST</td><td>Public APIs, CRUD, browsers</td><td>Ubiquitous, cacheable, readable; over/under-fetching</td></tr>
@@ -127,6 +130,7 @@ window.STUDY_DATA = {
       title: "Databases & Concurrency",
       track: "backend",
       icon: "🗃️",
+      blurb: "A database stores and retrieves application data. SQL databases keep data in tables with ACID transaction guarantees; NoSQL trades some guarantees for flexible schemas and horizontal scale — while concurrency control keeps simultaneous readers and writers from corrupting it.",
       read: `
         <p><strong>SQL vs NoSQL:</strong> SQL = rigid schema, ACID, joins/reporting; traditionally vertical scaling (sharding complex). NoSQL = flexible schema, eventual consistency, horizontal scaling, high volume. Caveat: Vitess/CockroachDB/Spanner/Aurora scale SQL horizontally too — choose by guarantees and query patterns, not possibility.</p>
         <p><strong>ACID:</strong> Atomicity, Consistency, Isolation, Durability. <strong>CAP:</strong> during a Partition you must choose Consistency or Availability; tunable per operation; PACELC adds latency-vs-consistency even without partitions.</p>
@@ -163,6 +167,7 @@ window.STUDY_DATA = {
       title: "Cache & Messaging",
       track: "backend",
       icon: "⚡",
+      blurb: "A cache is a fast in-memory layer (such as Redis) that keeps frequently used data close to the application to avoid hitting the database. A message broker (RabbitMQ, Kafka) lets services communicate asynchronously by passing messages or events.",
       read: `
         <p><strong>Cache strategies:</strong> Cache-Aside (read cache; on miss read DB + populate; invalidate on write — the default) · Write-Through (write cache + DB together; strong consistency, higher write latency) · Write-Behind (write cache, DB async; fastest, risk of data loss).</p>
         <p><strong>Failure modes:</strong> Penetration (non-existent keys always hit DB → cache empty markers) · Avalanche (many keys expire at once → jittered TTLs) · Hot Key (one key saturates a node → replicate/local cache) · Stampede (hot key expires, many miss → request coalescing).</p>
@@ -193,6 +198,7 @@ window.STUDY_DATA = {
       title: "Security & Authentication",
       track: "backend",
       icon: "🔐",
+      blurb: "Authentication verifies who a user is; authorization decides what that user may do. Application security also means protecting data and endpoints — JWTs for stateless sessions, OAuth 2.0/OIDC for delegated access, and parameterized queries against injection.",
       read: `
         <p><strong>AuthN vs AuthZ:</strong> Authentication verifies <em>who you are</em> (login); Authorization verifies <em>what you may do</em> (permissions).</p>
         <p><strong>JWT:</strong> a <em>signed, not encrypted</em> token carrying claims; server verifies the signature, no session store → stateless scaling. Revocation requires a blocklist in Redis or a per-user session version. Short-lived access + long-lived refresh tokens limit damage.</p>
@@ -220,6 +226,7 @@ window.STUDY_DATA = {
       title: "Design Principles",
       track: "backend",
       icon: "🧭",
+      blurb: "Design principles are guidelines that keep code maintainable as it grows — SOLID, DRY, KISS, and YAGNI at the class level, plus system-level rules like statelessness, bounded contexts, and observability by design.",
       read: `
         <p><strong>SOLID:</strong> SRP (one reason to change) · OCP (extend without modifying) · LSP (subtypes substitutable) · ISP (small specific interfaces) · DIP (depend on abstractions).</p>
         <p><strong>Others:</strong> DRY (don't duplicate knowledge; duplicating twice isn't always wrong) · KISS · YAGNI (build when needed) · Separation of Concerns · Composition over inheritance · Fail fast · Law of Demeter (no a.getB().getC() chains).</p>
@@ -250,6 +257,7 @@ window.STUDY_DATA = {
       title: "Design Patterns",
       track: "backend",
       icon: "🧱",
+      blurb: "A design pattern is a named, reusable solution to a problem that recurs in software design. The classic Gang-of-Four catalog covers object creation and structure; backend development adds architectural ones like Repository, Saga, and Outbox.",
       read: `
         <table><thead><tr><th>Pattern</th><th>Backend use</th></tr></thead><tbody>
         <tr><td>Repository</td><td>Abstracts data access; domain doesn't know SQL/Mongo/API; no ORM leakage</td></tr>
@@ -290,6 +298,7 @@ window.STUDY_DATA = {
       title: "OOP for Backend",
       track: "backend",
       icon: "🧩",
+      blurb: "Object-Oriented Programming (OOP) models software as objects that bundle data with the behavior that operates on it, built on four pillars: encapsulation, inheritance, polymorphism, and abstraction.",
       read: `
         <p><strong>4 pillars:</strong> Encapsulation (protect invariants: Order.confirm() not setStatus()) · Inheritance (use sparingly) · Polymorphism (PaymentService handles Card/PayPal without if/else) · Abstraction (EmailSender decouples from provider).</p>
         <p><strong>Abstract class vs interface:</strong> abstract = shared state + behavior, single inheritance, 'is-a'; interface = capability/contract, multiple inheritance. Prefer interfaces by default.</p>
@@ -329,6 +338,7 @@ window.STUDY_DATA = {
       title: "Anti-Patterns",
       track: "backend",
       icon: "⚠️",
+      blurb: "An anti-pattern is a solution that looks reasonable but reliably causes harm — like the distributed monolith or N+1 queries. Naming them gives teams a shared shorthand for spotting and fixing them.",
       read: `
         <ul>
         <li><strong>Distributed monolith</strong> — services coupled by shared DB or joint deployment.</li>
@@ -362,6 +372,7 @@ window.STUDY_DATA = {
       title: "React Fundamentals",
       track: "frontend",
       icon: "⚛️",
+      blurb: "React is a JavaScript library for building user interfaces from components — self-contained functions that receive props, hold state, and describe their markup; React re-renders them through a Virtual DOM when their data changes.",
       read: `
         <p><strong>Virtual DOM & reconciliation:</strong> React keeps an in-memory element tree; on change it diffs (reconciles) and applies minimal real DOM updates. Nuance: not inherently faster than hand-optimized DOM — the value is a declarative model, batching, and cross-platform abstraction.</p>
         <p><strong>Reconciliation rules:</strong> different element type → unmount/rebuild subtree; same type → update props. Keys identify list items across renders.</p>
@@ -390,6 +401,7 @@ window.STUDY_DATA = {
       title: "React Hooks",
       track: "frontend",
       icon: "🪝",
+      blurb: "React Hooks are functions that let function components \"hook into\" React features without writing a class — useState adds local state, useEffect runs side effects, and others handle context, memoization, and refs.",
       read: `
         <p><strong>Rules:</strong> call hooks only at the top level of a React function — never in conditions/loops/nested functions. Hook state is stored in fixed call order; conditional calls corrupt it.</p>
         <table><thead><tr><th>Hook</th><th>Purpose / trap</th></tr></thead><tbody>
@@ -429,6 +441,7 @@ window.STUDY_DATA = {
       title: "React Rendering & Keys",
       track: "frontend",
       icon: "🔁",
+      blurb: "Rendering is how React turns a component's current props and state into on-screen UI. A re-render re-runs the component function; reconciliation diffs the output and applies the minimal DOM changes, with keys identifying list items.",
       read: `
         <p>A component re-renders when: <strong>its own state changes</strong>, <strong>its parent re-renders</strong> (unless memoized), or <strong>a context it consumes changes</strong>. Crucially, <strong>re-render ≠ DOM update</strong> — reconciliation may produce zero DOM changes.</p>
         <p><strong>Keys:</strong> use stable unique IDs. <strong>Index-as-key is a bug</strong> when the list can reorder/insert/delete: React matches by position, so component state (e.g. an uncontrolled input) attaches to the wrong item.</p>
@@ -452,6 +465,7 @@ window.STUDY_DATA = {
       title: "React Performance",
       track: "frontend",
       icon: "🚀",
+      blurb: "React performance work is the practice of making apps re-render less and load faster — memoization (React.memo, useMemo, useCallback), list virtualization, and code splitting — always guided by profiling rather than guesswork.",
       read: `
         <table><thead><tr><th>Tool</th><th>When worth it / not</th></tr></thead><tbody>
         <tr><td>React.memo</td><td>Expensive component + stable props; new object/function props defeat it</td></tr>
@@ -483,6 +497,7 @@ window.STUDY_DATA = {
       title: "React State Management",
       track: "frontend",
       icon: "🗂️",
+      blurb: "State is the data a component owns that can change over time and trigger re-renders. State management is the discipline of deciding where each piece lives — locally, lifted, in Context, in an external store, or in a server-cache library.",
       read: `
         <p><strong>Decision ladder</strong> (climb only as far as needed):</p>
         <ol>
@@ -516,6 +531,7 @@ window.STUDY_DATA = {
       title: "Rendering Strategies & Suspense",
       track: "frontend",
       icon: "🖥️",
+      blurb: "Rendering strategies determine where and when your HTML is produced: in the browser (CSR), per request on a server (SSR), at build time (SSG/ISR), or on the server as components (RSC). Hydration, Suspense, and transitions govern how it becomes interactive.",
       read: `
         <table><thead><tr><th>Strategy</th><th>Where HTML is produced / trade-off</th></tr></thead><tbody>
         <tr><td>CSR</td><td>Browser after JS loads; simplest deploy, slow first paint, poor SEO</td></tr>
@@ -548,6 +564,7 @@ window.STUDY_DATA = {
       title: "React Testing & Errors",
       track: "frontend",
       icon: "🧪",
+      blurb: "React testing verifies what users actually experience. React Testing Library renders components and queries them by role and text; error boundaries contain render failures; StrictMode double-invokes effects in development to expose unsafe cleanup.",
       read: `
         <p><strong>React Testing Library philosophy:</strong> test <em>behavior, not implementation</em> — query by role/label/text (what the user sees), interact with userEvent, assert on outcomes. Don't assert on internal state; those tests break on every refactor.</p>
         <p><strong>Error boundaries:</strong> catch errors in the render tree below them and show a fallback. They do NOT catch event-handler or async errors — handle those with try/catch. Class-based API; react-error-boundary is the common wrapper.</p>
