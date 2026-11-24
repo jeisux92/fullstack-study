@@ -5,23 +5,24 @@ window.STUDY_DATA = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Architecture, APIs, databases & concurrency, caching, security, Node.js & .NET, principles, patterns & OOP.",
-      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns"],
+      tagline: "Architecture, APIs, system design scenarios, databases & concurrency, caching, security, Node.js & .NET, DevOps, principles, patterns & OOP.",
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns"],
       groups: [
-        { name: "System Design", topics: ["architecture", "distributed", "apis"] },
+        { name: "System Design", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Security", topics: ["security"] },
         { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Code Design", topics: ["principles", "patterns", "oop", "antipatterns"] }
+        { name: "Delivery & Ops", topics: ["devops"] },
+        { name: "Code Design", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] }
       ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "JavaScript & CSS fundamentals, React in depth, and real-time WebSockets.",
-      topics: ["js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      tagline: "JavaScript, TypeScript, CSS & HTTP fundamentals, React in depth, and real-time WebSockets.",
+      topics: ["js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
-        { name: "Web Fundamentals", topics: ["js-core", "css-web"] },
+        { name: "Web Fundamentals", topics: ["js-core", "typescript", "css-web", "http"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Real-Time Web", topics: ["web-rt"] }
       ]
@@ -30,14 +31,15 @@ window.STUDY_DATA = {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Everything: the complete back-end and front-end curriculum in one track.",
-      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns", "js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns", "js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
-        { name: "System Design", topics: ["architecture", "distributed", "apis"] },
+        { name: "System Design", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Data & Caching", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Security", topics: ["security"] },
         { name: "Platform & Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Code Design", topics: ["principles", "patterns", "oop", "antipatterns"] },
-        { name: "Web Fundamentals", topics: ["js-core", "css-web"] },
+        { name: "Delivery & Ops", topics: ["devops"] },
+        { name: "Code Design", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
+        { name: "Web Fundamentals", topics: ["js-core", "typescript", "css-web", "http"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Real-Time Web", topics: ["web-rt"] }
       ]
@@ -1077,6 +1079,285 @@ a                 /* 0-0-0-1 */</code></pre>
         { q: "You must reject unauthenticated WS clients. Where?", options: ["After connecting, close the socket", "During the handshake, before the upgrade completes", "On the first message", "In the browser"], answer: 1, explain: "Validate the token during the upgrade request and return 401 — don't accept unauthenticated channels." },
         { q: "A dashboard updates once an hour. Best transport?", options: ["WebSocket", "SSE", "Polling / refetch on focus", "Long polling"], answer: 2, explain: "Rare updates don't justify a persistent channel — poll or refetch on visibility." },
         { q: "Pushing 50MB files over WS is a bad idea because…", options: ["WS frames can't exceed 64KB", "It blocks the channel and defeats backpressure; send a reference and download via HTTP", "Browsers forbid binary WS", "TLS doesn't cover binary"], answer: 1, explain: "Big payloads monopolize the connection and buffers — upload to storage and push the URL." }
+      ]
+    },
+
+    "http": {
+      title: "HTTP & Networking",
+      track: "frontend",
+      icon: "🔗",
+      blurb: "HTTP is the request/response protocol of the web: a client sends a method, headers and optional body; a server answers with a status, headers and body. Knowing versions, caching, CORS, cookies and TLS is what lets you debug real network problems.",
+      read: `
+        <p><strong>Anatomy of a request:</strong> the client sends a method and path, headers, and an optional body; the server answers with a status code, headers, and an optional body. HTTP is <em>stateless</em> — the server remembers nothing between requests, which is exactly why cookies and tokens exist: state lives on the client or in an explicit store.</p>
+        <pre><code>GET /orders/42 HTTP/1.1
+Host: api.shop.com
+Authorization: Bearer eyJhbGci...
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: private, max-age=60
+
+{ "id": 42, "status": "shipped" }</code></pre>
+        <table><thead><tr><th>Version</th><th>Transport</th><th>Key property / trade-off</th></tr></thead><tbody>
+        <tr><td>HTTP/1.1</td><td>TCP</td><td>One request per connection at a time (pipelining was broken in practice) — browsers open ~6 parallel connections per host; keep-alive avoids re-handshaking</td></tr>
+        <tr><td>HTTP/2</td><td>TCP</td><td>Binary framing + <strong>multiplexing</strong> many streams over one connection; per-stream flow control; still blocked when a TCP packet is lost (transport-level head-of-line)</td></tr>
+        <tr><td>HTTP/3</td><td>QUIC over UDP</td><td>Streams recover independently (no TCP head-of-line), 0/1-RTT handshakes, connection migration on network change</td></tr>
+        </tbody></table>
+        <p><strong>Caching (the cheapest performance win):</strong> <code>Cache-Control: max-age=3600</code> lets the client reuse a response for an hour without asking; <code>no-cache</code> means "store it but revalidate every time"; <code>no-store</code> means "never store". Revalidation uses <code>ETag</code>: the client sends <code>If-None-Match</code>, the server answers <code>304 Not Modified</code> with no body when nothing changed — saving bandwidth, not a round trip.</p>
+        <pre><code>GET /avatar.png
+If-None-Match: "abc123"
+
+HTTP/1.1 304 Not Modified
+ETag: "abc123"   // no body sent</code></pre>
+        <p><strong>CORS — why the browser blocks your fetch:</strong> the <em>same-origin policy</em> stops scripts from reading responses of another origin (scheme + host + port). Cross-origin reads need explicit server permission via <code>Access-Control-*</code> headers. Requests that are not "simple" (methods like PUT/DELETE, custom headers, <code>Content-Type: application/json</code>) trigger a <strong>preflight</strong>: the browser first sends <code>OPTIONS</code>, and only if the server approves does the real request go.</p>
+        <pre><code>Browser                          api.other.com
+  │  OPTIONS /orders                 │
+  │  Origin: https://app.shop.com    │
+  │  Access-Control-Request-Method: PUT
+  │ ───────────────────────────────► │
+  │  204 + Access-Control-Allow-Origin: https://app.shop.com
+  │        Access-Control-Allow-Methods: PUT
+  │        Access-Control-Allow-Headers: content-type
+  │        Access-Control-Max-Age: 600   (cache preflight 10 min)
+  │ ◄─────────────────────────────── │
+  │  PUT /orders (the real request)  │
+  │ ───────────────────────────────► │</code></pre>
+        <p><strong>CORS gotchas to name out loud:</strong> with <code>credentials: "include"</code> the server must send an exact origin (wildcard <code>*</code> is rejected) plus <code>Access-Control-Allow-Credentials: true</code>; a CORS failure is <em>a browser rule, not a server error</em> — curl works because it ignores CORS; and error messages point at the blocked response, not always at the missing header.</p>
+        <p><strong>Cookies vs storage:</strong> <code>Set-Cookie</code> supports <code>HttpOnly</code> (invisible to JavaScript — XSS can't steal it), <code>Secure</code> (HTTPS only), and <code>SameSite</code> (<code>Strict</code> = never sent cross-site; <code>Lax</code> = top-level navigations only; <code>None</code> requires Secure). That combination is why the hardened pattern is: access token in memory, refresh token in an HttpOnly+Secure+SameSite cookie, and CSRF protection where cookies are used. <code>localStorage</code> is readable by any script on the page, so an XSS bug becomes token theft; it has no expiry and no send-automatically behavior.</p>
+        <p><strong>DNS & TLS:</strong> before the first byte, the browser resolves the hostname (browser cache → OS cache → configured resolver → root → TLD → authoritative nameserver), then completes a TLS handshake: TLS 1.2 needs two round trips before the first request; TLS 1.3 needs one (and 0-RTT on resumption via a pre-shared key) — that is why "upgrade TLS" is a latency answer too.</p>`,
+      cards: [
+        { q: "HTTP/1.1 vs HTTP/2 vs HTTP/3?", a: "1.1: one request at a time per connection — browsers open ~6 connections per host and use keep-alive to avoid re-handshaking. 2: binary framing and multiplexed streams over one TCP connection, but one lost TCP packet still stalls every stream. 3: QUIC over UDP — streams recover independently, 1-RTT (0-RTT resumed) handshakes, and connections survive network changes." },
+        { q: "Cache-Control: no-cache vs no-store?", a: "no-cache: the response may be stored but must be revalidated with the server before every use. no-store: never write it to any cache, period — for secrets and personal data. max-age=N allows reuse for N seconds without asking at all." },
+        { q: "How does ETag revalidation save bandwidth?", a: "The server returns an ETag with the response; the client sends If-None-Match on the next request; if unchanged, the server answers 304 Not Modified with no body. You still pay one round trip, but skip re-sending the payload." },
+        { q: "When does the browser send a CORS preflight?", a: "When the request is not 'simple': methods other than GET/POST/HEAD, custom headers, or Content-Type like application/json. The browser sends OPTIONS first with Access-Control-Request-Method/Headers, and only proceeds if the server's Access-Control-* response allows it." },
+        { q: "Why does my fetch fail with a CORS error while curl works?", a: "CORS is a browser-enforced policy on reading cross-origin responses — curl doesn't implement it. The server must send Access-Control-Allow-Origin (and friends). The error often points at the blocked response, not the missing server header." },
+        { q: "CORS with credentials: what changes?", a: "The browser sends cookies only if the request sets credentials: 'include'; the server must then echo the exact origin (wildcard * is invalid) and send Access-Control-Allow-Credentials: true." },
+        { q: "What do HttpOnly, Secure and SameSite do?", a: "HttpOnly: JavaScript cannot read the cookie — XSS can't steal it. Secure: sent only over HTTPS. SameSite: Strict never sends it cross-site, Lax sends it on top-level navigations only, None requires Secure. Together they make a refresh token hard to steal and hard to CSRF." },
+        { q: "Why not store JWTs in localStorage?", a: "Any script on the page can read localStorage, so one XSS becomes full token theft, and there's no built-in expiry or scoping. The hardened pattern is access token in memory plus refresh token in an HttpOnly+Secure+SameSite cookie." },
+        { q: "What made TLS 1.3 faster?", a: "One round trip to establish the handshake (TLS 1.2 needed two) and 0-RTT resumption via a pre-shared key — plus a smaller cipher suite set that removed legacy options." },
+        { q: "What happens, step by step, when you type a URL?", a: "DNS resolution (browser/OS cache → resolver → root/TLD/authoritative), TCP + TLS handshake, HTTP request, response — then parsing and subresource fetches, with caching headers and connection reuse (multiplexing on HTTP/2+) cutting the cost of everything after the first request." }
+      ],
+      quiz: [
+        { q: "Which method does the browser use for a CORS preflight?", options: ["GET", "HEAD", "OPTIONS", "POST"], answer: 2, explain: "Preflight is an OPTIONS request carrying Access-Control-Request-Method/Headers; the real request only fires if the server approves." },
+        { q: "You must never let a response be written to any cache. Use…", options: ["Cache-Control: no-cache", "Cache-Control: no-store", "ETag", "max-age=0"], answer: 1, explain: "no-cache allows storage with revalidation; no-store forbids storage entirely — right for secrets and personal data." },
+        { q: "A response comes back 304 Not Modified. What does it mean?", options: ["The resource was deleted", "The client's cached copy is still valid — reuse it", "The server is rate limiting", "The request was malformed"], answer: 1, explain: "The ETag matched via If-None-Match, so the server skips the body and the client reuses its cached copy." },
+        { q: "SameSite=Strict on a session cookie means…", options: ["The cookie is only sent over HTTPS", "JavaScript cannot read it", "The cookie is never sent on cross-site requests", "It expires when the tab closes"], answer: 2, explain: "Strict suppresses the cookie on all cross-site requests — good against CSRF, but it also breaks inbound cross-site links for authenticated users." },
+        { q: "HTTP/2 multiplexing primarily solves…", options: ["TCP packet loss recovery", "The HTTP-level head-of-line blocking of one request per connection", "TLS handshake latency", "DNS lookup time"], answer: 1, explain: "Many streams share one connection, so a slow response no longer blocks the others. TCP-level loss still stalls them — that's what HTTP/3 fixes." }
+      ]
+    },
+
+    "typescript": {
+      title: "TypeScript",
+      track: "frontend",
+      icon: "🔷",
+      blurb: "TypeScript is JavaScript with a static type system that is erased at build time: it catches errors in the editor, documents intent, and makes refactors safe — while the runtime stays plain JavaScript.",
+      read: `
+        <p><strong>Types are erased:</strong> the compiler checks your code, then emits plain JavaScript with all the types stripped. Nothing validates types at runtime — a value typed as <code>User</code> can still be <code>null</code> if it comes from an API; runtime validation (zod, io-ts) is a separate concern from compilation.</p>
+        <p><strong>Structural typing:</strong> compatibility is decided by <em>shape</em>, not by name — anything with the right fields satisfies the type. That's why plain object literals work where an interface is expected, and why a "class from another package" still fits if its shape matches.</p>
+        <pre><code>interface Point { x: number; y: number }
+
+const p: Point = { x: 1, y: 2 };     // no class needed — shape matches
+const named = { x: 1, y: 2, label: "a" };
+const q: Point = named;              // extra fields are fine on assignment</code></pre>
+        <p><strong>interface vs type:</strong> both describe shapes. <code>interface</code> can be extended and <em>merged</em> (declaration merging — useful for augmenting libraries); <code>type</code> can alias unions, tuples and primitives. Rule of thumb: interfaces for object contracts you expect to extend, types for everything else.</p>
+        <p><strong>Generics:</strong> type parameters make functions and components reusable without losing information — <code>first&lt;T&gt;(items: T[]): T | undefined</code> returns the same type it received. Constraints (<code>T extends { id: string }</code>) let you require a shape while keeping the concrete type; defaults (<code>T = string</code>) give ergonomic fallbacks.</p>
+        <pre><code>function first&lt;T extends { id: string }&gt;(items: T[]): T | undefined {
+    return items[0];
+}
+
+async function apiGet&lt;T&gt;(path: string): Promise&lt;T&gt; {
+    const res = await fetch(path);
+    return res.json() as Promise&lt;T&gt;;   // trust, but validate at the boundary
+}</code></pre>
+        <p><strong>Utility types</strong> transform existing types instead of re-declaring them — they keep one source of truth:</p>
+        <pre><code>interface User { id: string; email: string; name: string }
+
+type UserPatch   = Partial&lt;User&gt;;          // all fields optional (PATCH payloads)
+type UserSummary = Pick&lt;User, "id" | "name"&gt;;
+type UserSecret  = Omit&lt;User, "email"&gt;;
+type ById        = Record&lt;string, User&gt;;   // a lookup map
+type Created     = ReturnType&lt;typeof createUser&gt;;</code></pre>
+        <p><strong>Unions, narrowing and discriminated unions:</strong> a union type must be narrowed before you can use members-specific fields — via <code>typeof</code>, <code>in</code>, <code>instanceof</code>, truthiness, or custom type guards (<code>value is T</code>). The killer feature is the discriminated union: a shared literal field lets a <code>switch</code> narrow each variant, and an exhaustive check (<code>never</code>) makes adding a variant a compile error instead of a runtime bug.</p>
+        <pre><code>type Shape =
+    | { kind: "circle"; radius: number }
+    | { kind: "square"; side: number };
+
+function area(s: Shape): number {
+    switch (s.kind) {
+        case "circle": return Math.PI * s.radius ** 2;
+        case "square": return s.side ** 2;
+        default: {
+            const exhaustive: never = s;   // adding a variant breaks the build
+            return exhaustive;
+        }
+    }
+}</code></pre>
+        <p><strong>unknown vs any:</strong> <code>any</code> switches the checker off — errors propagate silently. <code>unknown</code> is the safe top type: you can receive it, but you must narrow it before use. Prefer <code>unknown</code> at system boundaries (API responses, JSON.parse, catch variables in strict mode) plus a validating type guard.</p>
+        <p><strong>Strict mode:</strong> <code>strictNullChecks</code> makes <code>null</code>/<code>undefined</code> explicit — the single biggest source of production bugs disappears at compile time; <code>noImplicitAny</code> stops silent anys. Turn both on from day one; retrofitting strict hurts.</p>`,
+      cards: [
+        { q: "What does TypeScript do to types at runtime?", a: "Nothing — types are erased at compile time. The output is plain JavaScript, so API payloads, env vars and JSON are unvalidated; runtime validation (zod, io-ts, manual guards) is a separate layer." },
+        { q: "What is structural typing?", a: "Compatibility by shape, not by name: any value with the required fields satisfies the type, even without a class or an explicit implements. Extra fields are allowed on assignment." },
+        { q: "interface vs type?", a: "Both describe shapes. Interfaces can be extended and merged (declaration merging), which suits library augmentation; type aliases can express unions, tuples and primitives, which interfaces cannot." },
+        { q: "Why generics?", a: "Type parameters keep information flowing: first<T>(items: T[]) returns T, not any. Constraints (T extends { id: string }) require a shape, defaults give fallbacks, and the caller gets full inference." },
+        { q: "What are Partial, Pick, Omit and Record for?", a: "Partial<T>: all fields optional — PATCH payloads. Pick<T, K>: a subset. Omit<T, K>: everything except K. Record<K, V>: a lookup map. They derive types from one source of truth instead of re-declaring." },
+        { q: "unknown vs any?", a: "any disables checking entirely; errors leak silently. unknown accepts anything but forces narrowing before use — the right type for API responses, JSON.parse and catch variables." },
+        { q: "How do type guards work?", a: "A function returning value is T tells the compiler the narrowing: if (isUser(x)) { x.email }. Combined with typeof/in/instanceof checks, they make unions safely usable." },
+        { q: "What is a discriminated union and why is it powerful?", a: "Variants sharing a literal field (kind: 'circle' | 'square') that a switch narrows; an exhaustive never check turns adding a variant into a compile error — the compiler becomes a checklist." },
+        { q: "Why enable strictNullChecks?", a: "It makes null and undefined explicit instead of implicitly assignable everywhere — eliminating a whole class of production bugs at compile time. Retrofitting strict later is much more painful than starting with it." },
+        { q: "How do you type an API response safely?", a: "Type the boundary as unknown, validate with a schema/guard, then return the narrow type — generic helpers like apiGet<T> give convenience, but only validation makes the T true at runtime." }
+      ],
+      quiz: [
+        { q: "What happens to TypeScript types when the code runs?", options: ["They are checked at runtime", "They are erased — plain JavaScript runs", "They are converted to JSDoc", "They are enforced by V8"], answer: 1, explain: "Compilation strips all type annotations; runtime validation is a separate concern." },
+        { q: "Which can express a union type?", options: ["interface", "type", "Both", "Neither"], answer: 1, explain: "Interfaces describe object shapes (and can merge); type aliases can also express unions, tuples and primitives." },
+        { q: "Why prefer unknown over any for an API payload?", options: ["It is faster", "It forces narrowing/validation before use", "It works with JSON.parse and any doesn't", "It is shorter"], answer: 1, explain: "any disables the checker; unknown requires proving the shape before accessing fields." },
+        { q: "Partial<User> produces…", options: ["A user with all fields required", "A type with all User fields optional", "A readonly user", "A union of all fields"], answer: 1, explain: "Partial marks every property optional — the classic PATCH payload type." },
+        { q: "In a discriminated union, the exhaustive never check…", options: ["Runs at runtime", "Turns adding an unhandled variant into a compile error", "Prevents null values", "Is only documentation"], answer: 1, explain: "If a new variant isn't handled, the default branch's assignment to never fails compilation — a built-in checklist." }
+      ]
+    },
+
+    "testing": {
+      title: "Testing Back-End",
+      track: "backend",
+      icon: "🧫",
+      blurb: "Automated tests are executable specifications: they catch regressions, document behavior, and make refactoring safe. The skill is knowing what to test, at which level, and what to fake.",
+      read: `
+        <p><strong>The test pyramid</strong> balances cost against confidence: many fast <em>unit</em> tests at the base, fewer <em>integration</em> tests in the middle, a few slow <em>end-to-end</em> tests at the top. The inverted pyramid ("ice cream cone": mostly e2e, few unit tests) produces a suite that is slow, flaky and hard to debug — the most common anti-pattern.</p>
+        <pre><code>        /\        E2E — full system, few, slowest, highest confidence
+       /  \
+      /----\      Integration — real DB/queue/HTTP, moderate cost
+     /      \
+    /--------\    Unit — pure logic, milliseconds, hundreds of them</code></pre>
+        <p><strong>What makes a test good:</strong> it tests <em>behavior</em> (observable outcomes) rather than implementation; it's deterministic (no real clock, randomness or network); it fails for one reason with a message that tells you which; it follows arrange-act-assert and a name that reads like a spec ("returns 409 when the email is taken").</p>
+        <p><strong>Test doubles — stub, mock, fake</strong> (same taxonomy as OOP): a stub returns canned data, a mock verifies interactions, a fake is a lightweight working implementation. In backend tests, prefer <strong>fakes</strong> for infrastructure (in-memory repository, test container) and reserve mocks for genuine interaction contracts — over-mocking couples every test to implementation details and makes refactoring miserable.</p>
+        <p><strong>Testing database code:</strong> mocking the ORM tests your mocks, not your SQL. Prefer an integration test against a real database in a container (Testcontainers), running each test in a transaction that rolls back, with migrations applied once per suite. The payoff is catching constraint, isolation and mapping bugs that mocks can never see.</p>
+        <p><strong>Contract testing</strong> protects service-to-service integration without a brittle full-environment e2e suite: consumer-driven contracts record what the consumer expects; the provider runs those expectations in its own CI, so a breaking change fails the provider's build before deployment.</p>
+        <pre><code>// Test data builder — readable, evolvable, no giant fixtures
+const alice = new UserBuilder().withEmail("alice@x.com").active().build();
+// .withRole("admin") can be added without touching existing tests</code></pre>
+        <p><strong>Flaky tests</strong> are worse than no tests — they teach the team to ignore red. Root causes: real time/sleeps, order dependence, shared mutable state, async waits. Policy: quarantine, find the root cause, fix; never paper over with blanket retries.</p>
+        <p><strong>Coverage is a signal, not a goal:</strong> 100% coverage of trivial getters proves nothing; uncovered error paths are where the bugs hide. Use coverage to find untested <em>critical</em> paths, not to hit a number.</p>
+        <p><strong>In CI:</strong> unit tests on every push, integration on pull requests, e2e on main/nightly; parallelize, cache dependencies, fail fast, and publish reports. The suite speed matters — a slow suite stops being run.</p>`,
+      cards: [
+        { q: "What are the three levels of the test pyramid?", a: "Unit (pure logic, ms, many), integration (real DB/queue/HTTP, seconds, fewer), e2e (whole system, slowest, few). More cost and less speed as you go up; more confidence too." },
+        { q: "What's wrong with the inverted pyramid?", a: "Mostly e2e tests: slow, flaky, hard to localize failures, and expensive to maintain. That's the ice cream cone anti-pattern — confidence per minute collapses." },
+        { q: "What distinguishes a good test?", a: "Tests behavior not implementation; deterministic (no wall clock, randomness or network); one reason to fail with a clear message; arrange-act-assert; a name that reads like a specification." },
+        { q: "Stub vs mock vs fake?", a: "Stub returns canned responses; mock verifies interactions; fake is a lightweight working implementation. Backend default: fakes for infrastructure, mocks only when the interaction is the contract." },
+        { q: "Why is over-mocking harmful?", a: "Tests become coupled to implementation details — refactoring breaks them without any behavior change — and they verify your mocks rather than real SQL/HTTP behavior." },
+        { q: "How do you test database code properly?", a: "Against a real database in a container (Testcontainers), migrations applied once, each test in a rolled-back transaction. Mocking the ORM hides constraints, isolation and mapping bugs." },
+        { q: "What does contract testing solve?", a: "It protects service-to-service APIs without a full e2e environment: consumers publish expectations, providers verify them in their own CI, so breaking changes fail the provider's build." },
+        { q: "Why use test data builders?", a: "Readable construction (UserBuilder().withEmail(...).active().build()), no giant shared fixtures, and adding a new default doesn't force edits across every test." },
+        { q: "How do you handle flaky tests?", a: "Quarantine them, find the root cause (time, order dependence, shared state, async waits) and fix it. Blanket retries hide instability and train the team to ignore red builds." },
+        { q: "Is 100% coverage a goal?", a: "No — coverage is a signal. Trivial code inflates the number while untested error paths stay untested. Aim coverage at critical and edge-case paths, not at the metric." }
+      ],
+      quiz: [
+        { q: "Which test level should you have the most of?", options: ["E2E", "Integration", "Unit", "Manual"], answer: 2, explain: "The pyramid's base is unit tests: fastest feedback and cheapest to maintain, forming the majority of the suite." },
+        { q: "An integration test typically…", options: ["Mocks every dependency", "Runs against real infrastructure like a database or queue", "Tests only pure functions", "Replaces e2e entirely"], answer: 1, explain: "Integration tests exercise the seams — real DB/queue/HTTP — at a moderate cost, catching bugs mocks can't see." },
+        { q: "For repository tests, the preferred double is…", options: ["A mock verifying calls", "A fake: a real in-memory or container-backed implementation", "A stub returning JSON", "None — skip them"], answer: 1, explain: "Fakes exercise real behavior; mocks would only verify that methods were called, not that SQL/constraints work." },
+        { q: "You need to catch a provider breaking a consumer's API without a full e2e suite. Use…", options: ["More unit tests", "Contract testing", "Higher coverage", "Manual QA"], answer: 1, explain: "Consumer-driven contracts are verified by the provider's CI, failing its build before consumers break." },
+        { q: "A test fails intermittently in CI. The right response is…", options: ["Add retries until it passes", "Quarantine it and fix the root cause (time, order, async waits)", "Delete it", "Ignore it"], answer: 1, explain: "Retries mask instability; the root cause is usually non-determinism that will eventually bite in production." }
+      ]
+    },
+
+    "devops": {
+      title: "DevOps & Operations",
+      track: "backend",
+      icon: "🚢",
+      blurb: "DevOps is the practice of shipping software continuously and operating it reliably: containers package the app, CI/CD automates delivery, and observability tells you what production is actually doing.",
+      read: `
+        <p><strong>Containers vs VMs:</strong> a VM virtualizes hardware and runs a full guest OS (GBs, minutes to boot); a container shares the host kernel and isolates just the process (MBs, milliseconds). An image is built from immutable layers — each Dockerfile instruction adds one — and a registry stores/tags them; deploying the same image everywhere is what makes "works on my machine" disappear.</p>
+        <pre><code># Multi-stage: build with the SDK, ship only the runtime — no compilers in prod
+FROM node:22 AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:22-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+RUN npm ci --omit=dev
+CMD ["node", "dist/server.js"]</code></pre>
+        <p><strong>Orchestration (Kubernetes, in one diagram):</strong> a Deployment owns replicas and rolling updates; Pods are the running containers; a Service gives them a stable virtual IP/load balancing; an Ingress terminates external HTTP and routes by host/path; ConfigMaps hold config and Secrets hold sensitive values; the Horizontal Pod Autoscaler adds replicas on CPU/latency signals.</p>
+        <pre><code>Internet ──► Ingress (TLS, host/path routing)
+                │
+                ▼
+             Service (stable IP, load balances)
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+     Pod (app)        Pod (app)      ← replicas from a Deployment
+     liveness  → is the process alive?   (restart if not)
+     readiness → can it take traffic?    (remove from Service if not)</code></pre>
+        <p><strong>CI vs CD:</strong> continuous <em>integration</em> means every push is built and tested; continuous <em>delivery</em> means the artifact is always releasable; continuous <em>deployment</em> ships it automatically. A typical pipeline: lint → unit → build image → scan → integration → deploy staging → e2e → deploy production.</p>
+        <pre><code>commit ─► lint ─► unit ─► build image ─► vuln scan ─► integration
+                                                    │
+                    prod ◄─ smoke ◄─ staging ◄───────┘
+                    (blue-green / canary with rollback)</code></pre>
+        <p><strong>Release strategies:</strong> <em>blue-green</em> runs two environments and flips traffic (instant rollback, double cost); <em>canary</em> routes a small percentage to the new version and ramps up while watching metrics (real-traffic validation, slower rollout); <em>feature flags</em> decouple deploy from release — code ships dark and is enabled per user/percentage, giving the fastest kill switch.</p>
+        <p><strong>Infrastructure as code:</strong> Terraform (or Pulumi/CloudFormation) declares desired infrastructure; the tool diffs state against reality and applies changes — reviewed like code, reproducible, no snowflake servers.</p>
+        <p><strong>Observability — the three pillars:</strong> <em>logs</em> (discrete events with context), <em>metrics</em> (aggregated numbers over time), <em>traces</em> (a request's path across services, tied by correlation/trace IDs). Define <strong>SLIs</strong> (what you measure: request latency, error rate), an <strong>SLO</strong> (the target: 99.9% of requests under 300ms), and an <strong>error budget</strong> (the allowed failure) — then alert on <em>symptoms</em> (SLO burn) rather than causes (a single CPU spike).</p>`,
+      cards: [
+        { q: "Containers vs virtual machines?", a: "VMs virtualize hardware and boot a full guest OS (GBs, slow); containers share the host kernel and isolate the process (MBs, instant). Images are immutable layer stacks stored in registries." },
+        { q: "Why multi-stage Docker builds?", a: "The build stage carries the SDK/compilers; the final stage copies only the artifacts and production dependencies — smaller images, fewer CVEs, faster pulls, no build tooling in production." },
+        { q: "Image tag vs digest?", a: "A tag like latest is mutable and can point anywhere; a digest is the content hash and immutable. Deploy by digest (or unique tags) for reproducible rollbacks." },
+        { q: "Deployment vs Service vs Ingress in Kubernetes?", a: "Deployment: desired replicas and rolling updates of Pods. Service: a stable virtual IP that load-balances to those Pods. Ingress: external HTTP(S) entry with host/path routing and TLS." },
+        { q: "Liveness vs readiness probes?", a: "Liveness: is the process alive? Failing restarts it. Readiness: can it serve traffic now? Failing removes it from the Service without restarting — a warming app stays alive but gets no requests." },
+        { q: "CI vs continuous delivery vs continuous deployment?", a: "CI builds and tests every push. Continuous delivery keeps every artifact releasable with a manual gate. Continuous deployment ships automatically. The pipeline is the same; only the gate differs." },
+        { q: "Blue-green vs canary?", a: "Blue-green: run two full environments and flip traffic — instant rollback, double cost. Canary: route a small percentage to the new version, watch metrics, ramp up — real-traffic validation, slower to full." },
+        { q: "What do feature flags change?", a: "They separate deploy from release: code ships dark and is enabled per user/percentage instantly — the fastest kill switch, at the cost of flag debt you must clean up." },
+        { q: "What are SLI, SLO and error budget?", a: "SLI: the measured signal (latency p99, error rate). SLO: the target (99.9% under 300ms). Error budget: 100% minus SLO — how much failure you can afford before halting risky releases." },
+        { q: "Why alert on symptoms instead of causes?", a: "Causes (CPU at 80%) are noisy and often harmless; symptoms (SLO burn, error rate, latency) are what users feel. Alert on what's broken for users, dashboards for why." }
+      ],
+      quiz: [
+        { q: "The main benefit of multi-stage Docker builds is…", options: ["Faster unit tests", "Smaller, safer runtime images without build tooling", "Automatic TLS", "Free registry hosting"], answer: 1, explain: "Only runtime artifacts and production deps land in the final stage — smaller images, fewer vulnerabilities, faster pulls." },
+        { q: "An app is starting up and needs 20s before it can serve traffic. Which probe should fail meanwhile?", options: ["Liveness", "Readiness", "Both", "Neither"], answer: 1, explain: "Readiness keeps it out of the Service while warming; liveness stays green so it isn't restarted mid-boot." },
+        { q: "Canary releases mean…", options: ["Deploying to 100% at once", "Routing a small percentage of traffic to the new version and ramping while watching metrics", "Running two full environments", "Shipping behind a feature flag only"], answer: 1, explain: "Canary validates with real traffic on a small blast radius before a full rollout." },
+        { q: "An SLO of 99.9% monthly availability implies an error budget of…", options: ["0.1% of the month (~43 minutes)", "99.9% of the month", "Unlimited failures", "Exactly 1 outage"], answer: 0, explain: "Error budget = 100% − SLO = 0.1%, roughly 43 minutes per 30-day month." },
+        { q: "Better alerting practice is to page on…", options: ["CPU above 80%", "Disk usage trends", "SLO burn / user-facing symptoms", "Pod restarts"], answer: 2, explain: "Symptoms reflect what users experience; causes belong on dashboards for investigation." }
+      ]
+    },
+
+    "sysdesign": {
+      title: "System Design Scenarios",
+      track: "backend",
+      icon: "🏗️",
+      blurb: "System design interviews test structured thinking: clarify requirements, estimate capacity, sketch the API and data model, then deep-dive the hard parts. This topic gives the reusable framework plus five worked scenarios.",
+      read: `
+        <p><strong>The framework (use it every time):</strong> 1) <em>clarify requirements</em> — functional (what users do) and non-functional (scale, latency, consistency, availability); 2) <em>estimate</em> — back-of-envelope QPS, storage and bandwidth; 3) <em>API design</em> — the few endpoints that matter; 4) <em>data model</em> — entities, keys, access patterns; 5) <em>high-level diagram</em> — client → gateway → services → storage with caches/queues; 6) <em>deep dives</em> — the one or two genuinely hard parts; 7) <em>trade-offs</em> — what you chose and what it costs. Interviewers score the structure and the trade-offs, not a perfect answer.</p>
+        <pre><code>Estimation example — a URL shortener at 100M new links/day:
+  writes: 100M / 86,400s ≈ 1,160/s average; peak ≈ 3× ≈ 3,500/s
+  reads:  short links are read ~10× more → ≈ 12k/s average
+  storage: 500 bytes/link × 100M/day × 365 × 5 years ≈ 91 TB
+⇒ consequences: reads dominate → cache redirects; IDs must be
+  generated without collisions; storage justifies sharding.</code></pre>
+        <p><strong>Scenario 1 — URL shortener.</strong> Key decisions: short codes via a global counter encoded in base62 (6 chars ≈ 56B values) or a Snowflake-style ID (time-ordered, shard-friendly); collisions are impossible with a counter, possible with hashing (needs retry). Redirects: <em>301</em> (permanent, cacheable — best for load) vs <em>302</em> (temporary, every click hits you — needed for analytics and expiring links). Read path: cache the code→URL mapping (Redis, LRU), then the DB.</p>
+        <pre><code>write:  client ─► API ─► ID generator (counter/Snowflake) ─► DB
+read:   client ─► API ─► cache (hit ~95%) ─► DB on miss ─► 302 redirect</code></pre>
+        <p><strong>Scenario 2 — rate limiter.</strong> Algorithm choice is the interview (token bucket for bursts, sliding window for precision — see the APIs topic). Architecture: enforce at the edge/gateway or in middleware, keyed per user/IP; counters in Redis with TTL; atomic increments (Lua/INCR) to avoid races; return <code>429</code> + <code>Retry-After</code>. Discuss fail-open vs fail-closed when Redis is down.</p>
+        <p><strong>Scenario 3 — news feed.</strong> Fan-out on <em>write</em> (precompute each follower's timeline — fast reads, expensive writes for celebrities) vs fan-out on <em>read</em> (merge sources at read time — cheap writes, slow reads). The standard answer is <strong>hybrid</strong>: push for normal accounts, pull for celebrities; cache timelines; paginate with a cursor (not OFFSET, which drifts).</p>
+        <p><strong>Scenario 4 — chat.</strong> Persistent WebSocket connections (see the WebSockets topic) for delivery and presence; per-conversation ordering (sequence numbers per room); messages persisted before ack; fan-out via a pub/sub backplane (Redis) across instances; offline users get a queue/notification; read receipts and delivery states as separate events.</p>
+        <p><strong>Scenario 5 — payments.</strong> The hard part is exactly-once <em>effects</em>, not exactly-once delivery: idempotency keys on the charge endpoint (store first result, replay on retry), local transaction + outbox event, saga with compensations across services, and reconciliation jobs against the provider — because "the network failed after the charge" must never mean "charge twice".</p>`,
+      cards: [
+        { q: "What are the seven steps of the system design framework?", a: "Clarify functional and non-functional requirements; estimate QPS/storage/bandwidth; define the API; model the data and access patterns; sketch the high-level diagram; deep-dive the hard parts; state trade-offs. Structure scores higher than completeness." },
+        { q: "How do you do a back-of-envelope estimation?", a: "Round aggressively: 86,400s/day, per-user triples, reads ≫ writes often 10–100×. Compute QPS = operations/day ÷ 86,400, peak ≈ 3× average, storage = record size × volume × retention — then say what it implies (cache? shard?)." },
+        { q: "URL shortener: counter vs hashing for short codes?", a: "A global counter (base62) guarantees uniqueness and is shard-friendly with ranges/Snowflake; hashing the URL can collide and needs retry or probing. Either way, six base62 chars cover ~56 billion values." },
+        { q: "301 vs 302 redirect for a shortener?", a: "301 (permanent): browsers/CDNs cache it — cheapest for load, but analytics and expiry break. 302 (temporary): every click hits your service — required when you track clicks or links expire." },
+        { q: "News feed: fan-out on write or read?", a: "Push on write: precompute timelines, fast reads, expensive for celebrity posts. Pull on read: merge at read time, cheap writes, slow reads. Standard answer: hybrid — push for normal users, pull for celebrities; cache and paginate by cursor." },
+        { q: "Where does a rate limiter keep its counters?", a: "In Redis with TTL per window and atomic increments (INCR or a Lua script), enforcing at the gateway/middleware by user or IP — and deciding explicitly whether it fails open or closed when Redis is down." },
+        { q: "Why is cursor pagination preferred to OFFSET?", a: "OFFSET drifts when items are inserted/deleted (skips and duplicates) and gets slower deeper in; a cursor encodes the last seen key and stays stable and index-friendly." },
+        { q: "Chat: how do you guarantee per-conversation order?", a: "Persist the message first, assign a monotonically increasing sequence number per conversation, then fan out via pub/sub; clients order by that sequence and fetch missed messages after reconnect." },
+        { q: "Payments: how do you avoid charging twice?", a: "Idempotency keys (store the first result per key and replay it on retries), local transaction + outbox for events, saga compensations across services, and reconciliation against the provider." },
+        { q: "What should you cover in the trade-offs step?", a: "Every major choice with its cost: consistency vs availability, sync vs async, cache vs fresh reads, SQL vs NoSQL, single region vs multi-region — and when the alternative would win." }
+      ],
+      quiz: [
+        { q: "The first thing to do in a system design interview is…", options: ["Draw the database schema", "Clarify functional and non-functional requirements", "Choose the database", "Write the API spec"], answer: 1, explain: "Requirements drive every later decision; jumping to diagrams without them is the classic failure mode." },
+        { q: "A URL shortener is read ~10× more than written. The design consequence is…", options: ["Shard the write path first", "Cache the code→URL mapping aggressively", "Use synchronous replication only", "Avoid redirects"], answer: 1, explain: "Reads dominate, so an LRU cache in front of the mapping store is the highest-leverage decision." },
+        { q: "A celebrity with 100M followers posts. Plain fan-out-on-write breaks because…", options: ["Reads become too slow", "One post means 100M timeline writes", "The cache evicts", "WebSockets disconnect"], answer: 1, explain: "Write amplification explodes — hence the hybrid: pull on read for the celebrity's posts, push for everyone else." },
+        { q: "Rate limiter: which storage pattern fits?", options: ["Counters in Redis with TTL and atomic increments", "A file per user", "A Postgres row locked per request", "Browser localStorage"], answer: 0, explain: "Redis gives shared, atomic, expiring counters across instances — the standard distributed limiter." },
+        { q: "For analytics on every click, the shortener should return…", options: ["301 permanent", "302 temporary", "304 not modified", "204 no content"], answer: 1, explain: "302 forces each click through your service so you can log it; 301 would be cached and skip you." }
       ]
     }
   }

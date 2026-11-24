@@ -5,23 +5,24 @@ window.STUDY_DATA_ES = {
     backend: {
       name: "Back-End",
       icon: "🗄️",
-      tagline: "Arquitectura, APIs, bases de datos y concurrencia, caché, seguridad, Node.js y .NET, principios, patrones y POO.",
-      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns"],
+      tagline: "Arquitectura, APIs, escenarios de system design, bases de datos y concurrencia, caché, seguridad, Node.js y .NET, DevOps, principios, patrones y POO.",
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns"],
       groups: [
-        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis"] },
+        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Seguridad", topics: ["security"] },
         { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "antipatterns"] }
+        { name: "Entrega y Operaciones", topics: ["devops"] },
+        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] }
       ]
     },
     frontend: {
       name: "Front-End",
       icon: "⚛️",
-      tagline: "Fundamentos de JavaScript y CSS, React a fondo y WebSockets en tiempo real.",
-      topics: ["js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      tagline: "Fundamentos de JavaScript, TypeScript, CSS y HTTP, React a fondo y WebSockets en tiempo real.",
+      topics: ["js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
-        { name: "Fundamentos Web", topics: ["js-core", "css-web"] },
+        { name: "Fundamentos Web", topics: ["js-core", "typescript", "css-web", "http"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Web en Tiempo Real", topics: ["web-rt"] }
       ]
@@ -30,14 +31,15 @@ window.STUDY_DATA_ES = {
       name: "Full-Stack",
       icon: "🧩",
       tagline: "Todo: el currículo completo de back-end y front-end en una sola ruta.",
-      topics: ["architecture", "distributed", "apis", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "principles", "patterns", "oop", "antipatterns", "js-core", "css-web", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
+      topics: ["architecture", "distributed", "apis", "sysdesign", "databases", "db-advanced", "cache-messaging", "security", "nodejs", "dotnet", "devops", "principles", "patterns", "oop", "testing", "antipatterns", "js-core", "typescript", "css-web", "http", "react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing", "web-rt"],
       groups: [
-        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis"] },
+        { name: "Diseño de Sistemas", topics: ["architecture", "distributed", "apis", "sysdesign"] },
         { name: "Datos y Caché", topics: ["databases", "db-advanced", "cache-messaging"] },
         { name: "Seguridad", topics: ["security"] },
         { name: "Plataforma y Runtime", topics: ["nodejs", "dotnet"] },
-        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "antipatterns"] },
-        { name: "Fundamentos Web", topics: ["js-core", "css-web"] },
+        { name: "Entrega y Operaciones", topics: ["devops"] },
+        { name: "Diseño de Código", topics: ["principles", "patterns", "oop", "testing", "antipatterns"] },
+        { name: "Fundamentos Web", topics: ["js-core", "typescript", "css-web", "http"] },
         { name: "React", topics: ["react-fundamentals", "react-hooks", "react-rendering", "react-performance", "react-state", "react-strategies", "react-testing"] },
         { name: "Web en Tiempo Real", topics: ["web-rt"] }
       ]
@@ -1077,6 +1079,285 @@ a                 /* 0-0-0-1 */</code></pre>
         { q: "Debes rechazar clientes WS no autenticados. ¿Dónde?", options: ["Tras conectar, cierra el socket", "Durante el handshake, antes de completar el upgrade", "En el primer mensaje", "En el navegador"], answer: 1, explain: "Valida el token durante el request de upgrade y devuelve 401 — no aceptes canales sin autenticar." },
         { q: "Un dashboard se actualiza una vez por hora. Mejor transporte?", options: ["WebSocket", "SSE", "Polling / refetch al enfocar", "Long polling"], answer: 2, explain: "Las actualizaciones esporádicas no justifican un canal persistente — pollea o refetch por visibilidad." },
         { q: "Empujar archivos de 50MB por WS es mala idea porque…", options: ["Los frames WS no pasan de 64KB", "Bloquea el canal y derota el backpressure; manda una referencia y descarga por HTTP", "Los navegadores prohíben WS binario", "TLS no cubre binario"], answer: 1, explain: "Los payloads grandes monopolizan la conexión y los buffers — sube a storage y empuja la URL." }
+      ]
+    },
+
+    "http": {
+      title: "HTTP y Redes",
+      track: "frontend",
+      icon: "🔗",
+      blurb: "HTTP es el protocolo request/response de la web: el cliente envía método, cabeceras y cuerpo opcional; el servidor responde con estado, cabeceras y cuerpo. Conocer versiones, caché, CORS, cookies y TLS es lo que te deja depurar problemas de red reales.",
+      read: `
+        <p><strong>Anatomía de un request:</strong> el cliente envía un método y una ruta, cabeceras y un cuerpo opcional; el servidor responde con un status, cabeceras y un cuerpo opcional. HTTP es <em>stateless</em> — el servidor no recuerda nada entre requests, y por eso existen cookies y tokens: el estado vive en el cliente o en un store explícito.</p>
+        <pre><code>GET /orders/42 HTTP/1.1
+Host: api.shop.com
+Authorization: Bearer eyJhbGci...
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: private, max-age=60
+
+{ "id": 42, "status": "shipped" }</code></pre>
+        <table><thead><tr><th>Versión</th><th>Transporte</th><th>Propiedad clave / trade-off</th></tr></thead><tbody>
+        <tr><td>HTTP/1.1</td><td>TCP</td><td>Un request por conexión a la vez (el pipelining quedó roto en la práctica) — los navegadores abren ~6 conexiones paralelas por host; keep-alive evita re-handshakes</td></tr>
+        <tr><td>HTTP/2</td><td>TCP</td><td>Framing binario + <strong>multiplexing</strong> de muchos streams sobre una conexión; control de flujo por stream; igual se bloquea si un paquete TCP se pierde (head-of-line a nivel transporte)</td></tr>
+        <tr><td>HTTP/3</td><td>QUIC sobre UDP</td><td>Los streams se recuperan de forma independiente (sin head-of-line de TCP), handshakes de 0/1 RTT y migración de conexión al cambiar de red</td></tr>
+        </tbody></table>
+        <p><strong>Caché (la mejora de rendimiento más barata):</strong> <code>Cache-Control: max-age=3600</code> permite reutilizar una respuesta una hora sin preguntar; <code>no-cache</code> significa "guardala pero revalida siempre"; <code>no-store</code> significa "nunca la guardes". La revalidación usa <code>ETag</code>: el cliente manda <code>If-None-Match</code> y el servidor responde <code>304 Not Modified</code> sin cuerpo si nada cambió — ahorra ancho de banda, no el round trip.</p>
+        <pre><code>GET /avatar.png
+If-None-Match: "abc123"
+
+HTTP/1.1 304 Not Modified
+ETag: "abc123"   // sin cuerpo</code></pre>
+        <p><strong>CORS — por qué el navegador bloquea tu fetch:</strong> la <em>same-origin policy</em> impide que los scripts lean respuestas de otro origen (esquema + host + puerto). Las lecturas cross-origin necesitan permiso explícito del servidor vía cabeceras <code>Access-Control-*</code>. Los requests que no son "simples" (métodos como PUT/DELETE, cabeceras custom, <code>Content-Type: application/json</code>) disparan un <strong>preflight</strong>: el navegador manda primero <code>OPTIONS</code> y solo si el servidor aprueba va el request real.</p>
+        <pre><code>Navegador                        api.other.com
+  │  OPTIONS /orders                 │
+  │  Origin: https://app.shop.com    │
+  │  Access-Control-Request-Method: PUT
+  │ ───────────────────────────────► │
+  │  204 + Access-Control-Allow-Origin: https://app.shop.com
+  │        Access-Control-Allow-Methods: PUT
+  │        Access-Control-Allow-Headers: content-type
+  │        Access-Control-Max-Age: 600   (cachea el preflight 10 min)
+  │ ◄─────────────────────────────── │
+  │  PUT /orders (el request real)   │
+  │ ───────────────────────────────► │</code></pre>
+        <p><strong>Gotchas de CORS para nombrar en voz alta:</strong> con <code>credentials: "include"</code> el servidor debe devolver el origen exacto (el wildcard <code>*</code> se rechaza) más <code>Access-Control-Allow-Credentials: true</code>; un fallo de CORS es <em>una regla del navegador, no un error del servidor</em> — curl funciona porque ignora CORS; y los mensajes de error apuntan a la respuesta bloqueada, no siempre a la cabecera que falta.</p>
+        <p><strong>Cookies vs storage:</strong> <code>Set-Cookie</code> soporta <code>HttpOnly</code> (invisible a JavaScript — un XSS no puede robarla), <code>Secure</code> (solo HTTPS) y <code>SameSite</code> (<code>Strict</code> = nunca cross-site; <code>Lax</code> = solo navegaciones top-level; <code>None</code> exige Secure). Esa combinación es la razón del patrón endurecido: access token en memoria, refresh token en cookie HttpOnly+Secure+SameSite y protección CSRF donde uses cookies. <code>localStorage</code> lo lee cualquier script de la página, así que un XSS se convierte en robo de token; no tiene expiración ni envío automático.</p>
+        <p><strong>DNS y TLS:</strong> antes del primer byte, el navegador resuelve el hostname (caché del navegador → caché del SO → resolver configurado → root → TLD → nameserver autoritativo) y luego completa el handshake TLS: TLS 1.2 necesita dos round trips antes del primer request; TLS 1.3 necesita uno (y 0-RTT al reanudar con pre-shared key) — por eso "actualizar TLS" también es una respuesta de latencia.</p>`,
+      cards: [
+        { q: "¿HTTP/1.1 vs HTTP/2 vs HTTP/3?", a: "1.1: un request a la vez por conexión — los navegadores abren ~6 conexiones por host y usan keep-alive para evitar re-handshakes. 2: framing binario y streams multiplexados sobre una conexión TCP, pero un paquete TCP perdido frena todos los streams. 3: QUIC sobre UDP — streams que se recuperan independientemente, handshakes de 1 RTT (0-RTT al reanudar) y conexiones que sobreviven cambios de red." },
+        { q: "¿Cache-Control: no-cache vs no-store?", a: "no-cache: la respuesta puede guardarse pero debe revalidarse con el servidor antes de cada uso. no-store: nunca se escribe en ninguna caché — para secretos y datos personales. max-age=N permite reutilizar N segundos sin preguntar." },
+        { q: "¿Cómo ahorra ancho de banda la revalidación con ETag?", a: "El servidor devuelve un ETag con la respuesta; el cliente manda If-None-Match en el siguiente request; si no cambió, el servidor responde 304 Not Modified sin cuerpo. Pagas un round trip, pero no reenvías el payload." },
+        { q: "¿Cuándo manda el navegador un preflight de CORS?", a: "Cuando el request no es 'simple': métodos distintos de GET/POST/HEAD, cabeceras custom o Content-Type como application/json. El navegador manda OPTIONS primero con Access-Control-Request-Method/Headers y solo sigue si la respuesta Access-Control-* del servidor lo permite." },
+        { q: "¿Por qué mi fetch falla con error CORS y curl funciona?", a: "CORS es una política que impone el navegador al leer respuestas cross-origin — curl no la implementa. El servidor debe mandar Access-Control-Allow-Origin (y compañía). El error suele apuntar a la respuesta bloqueada, no a la cabecera que falta." },
+        { q: "CORS con credentials: ¿qué cambia?", a: "El navegador envía cookies solo si el request usa credentials: 'include'; el servidor debe entonces devolver el origen exacto (el wildcard * es inválido) y enviar Access-Control-Allow-Credentials: true." },
+        { q: "¿Qué hacen HttpOnly, Secure y SameSite?", a: "HttpOnly: JavaScript no puede leer la cookie — un XSS no la roba. Secure: solo se envía por HTTPS. SameSite: Strict nunca la manda cross-site, Lax solo en navegaciones top-level, None exige Secure. Juntas hacen que un refresh token sea difícil de robar y de atacar con CSRF." },
+        { q: "¿Por qué no guardar JWTs en localStorage?", a: "Cualquier script de la página puede leer localStorage, así que un solo XSS se vuelve robo total del token, y no hay expiración ni scoping. El patrón endurecido es access token en memoria y refresh token en cookie HttpOnly+Secure+SameSite." },
+        { q: "¿Qué hizo más rápido a TLS 1.3?", a: "Un round trip para establecer el handshake (TLS 1.2 necesitaba dos) y reanudación 0-RTT con pre-shared key — más un conjunto de cifrados más pequeño que eliminó opciones legacy." },
+        { q: "¿Qué pasa, paso a paso, cuando escribes una URL?", a: "Resolución DNS (caché navegador/SO → resolver → root/TLD/autoritativo), handshake TCP + TLS, request HTTP, respuesta — luego parsing y subrecursos, con cabeceras de caché y reutilización de conexión (multiplexing en HTTP/2+) abaratando todo después del primer request." }
+      ],
+      quiz: [
+        { q: "¿Qué método usa el navegador para el preflight de CORS?", options: ["GET", "HEAD", "OPTIONS", "POST"], answer: 2, explain: "El preflight es un OPTIONS que lleva Access-Control-Request-Method/Headers; el request real sale solo si el servidor lo aprueba." },
+        { q: "No debes permitir que una respuesta se escriba en NINGUNA caché. Usa…", options: ["Cache-Control: no-cache", "Cache-Control: no-store", "ETag", "max-age=0"], answer: 1, explain: "no-cache permite guardar con revalidación; no-store prohíbe guardar — correcto para secretos y datos personales." },
+        { q: "Una respuesta llega 304 Not Modified. ¿Qué significa?", options: ["El recurso fue eliminado", "La copia cacheada del cliente sigue válida — reutilizala", "El servidor está rate-limitando", "El request estaba mal formado"], answer: 1, explain: "El ETag coincidió vía If-None-Match, así que el servidor omite el cuerpo y el cliente reutiliza su copia." },
+        { q: "SameSite=Strict en una cookie de sesión significa…", options: ["La cookie solo se envía por HTTPS", "JavaScript no puede leerla", "La cookie nunca se envía en requests cross-site", "Expira al cerrar la pestaña"], answer: 2, explain: "Strict suprime la cookie en todo request cross-site — bueno contra CSRF, pero rompe los enlaces entrantes para usuarios autenticados." },
+        { q: "El multiplexing de HTTP/2 resuelve principalmente…", options: ["La recuperación de paquetes TCP perdidos", "El head-of-line HTTP de un request por conexión", "La latencia del handshake TLS", "El tiempo de DNS"], answer: 1, explain: "Muchos streams comparten una conexión, así una respuesta lenta ya no bloquea a las demás. La pérdida TCP sigue frenándolas — eso lo arregla HTTP/3." }
+      ]
+    },
+
+    "typescript": {
+      title: "TypeScript",
+      track: "frontend",
+      icon: "🔷",
+      blurb: "TypeScript es JavaScript con un sistema de tipos estático que se borra en build: detecta errores en el editor, documenta la intención y hace seguros los refactors — mientras el runtime sigue siendo JavaScript puro.",
+      read: `
+        <p><strong>Los tipos se borran:</strong> el compilador revisa tu código y emite JavaScript plano con los tipos eliminados. Nada valida tipos en runtime — un valor tipado como <code>User</code> puede seguir siendo <code>null</code> si viene de una API; la validación en runtime (zod, io-ts) es una capa aparte de la compilación.</p>
+        <p><strong>Tipado estructural:</strong> la compatibilidad se decide por <em>forma</em>, no por nombre — cualquier valor con los campos requeridos satisface el tipo. Por eso los object literals funcionan donde se espera una interface, y una "clase de otro paquete" encaja si su forma coincide.</p>
+        <pre><code>interface Point { x: number; y: number }
+
+const p: Point = { x: 1, y: 2 };     // sin clase — la forma coincide
+const named = { x: 1, y: 2, label: "a" };
+const q: Point = named;              // campos extra están bien al asignar</code></pre>
+        <p><strong>interface vs type:</strong> ambos describen formas. <code>interface</code> se extiende y se <em>fusiona</em> (declaration merging — útil para aumentar librerías); <code>type</code> puede aliase unions, tuplas y primitivos. Regla: interfaces para contratos de objetos que esperas extender, types para lo demás.</p>
+        <p><strong>Genéricos:</strong> los parámetros de tipo hacen reutilizables funciones y componentes sin perder información — <code>first&lt;T&gt;(items: T[]): T | undefined</code> devuelve el mismo tipo que recibe. Las restricciones (<code>T extends { id: string }</code>) exigen una forma conservando el tipo concreto; los defaults (<code>T = string</code>) dan fallbacks cómodos.</p>
+        <pre><code>function first&lt;T extends { id: string }&gt;(items: T[]): T | undefined {
+    return items[0];
+}
+
+async function apiGet&lt;T&gt;(path: string): Promise&lt;T&gt; {
+    const res = await fetch(path);
+    return res.json() as Promise&lt;T&gt;;   // confía, pero valida en el borde
+}</code></pre>
+        <p><strong>Utility types</strong> transforman tipos existentes en vez de redeclararlos — mantienen una sola fuente de verdad:</p>
+        <pre><code>interface User { id: string; email: string; name: string }
+
+type UserPatch   = Partial&lt;User&gt;;          // todos opcionales (payloads PATCH)
+type UserSummary = Pick&lt;User, "id" | "name"&gt;;
+type UserSecret  = Omit&lt;User, "email"&gt;;
+type ById        = Record&lt;string, User&gt;;   // un mapa de lookup
+type Created     = ReturnType&lt;typeof createUser&gt;;</code></pre>
+        <p><strong>Uniones, narrowing y uniones discriminadas:</strong> una unión debe estrecharse antes de usar campos específicos de un miembro — vía <code>typeof</code>, <code>in</code>, <code>instanceof</code>, truthiness o type guards propios (<code>value is T</code>). La joya es la unión discriminada: un campo literal compartido permite que un <code>switch</code> estreche cada variante, y un chequeo exhaustivo (<code>never</code>) convierte agregar una variante en error de compilación en vez de bug en runtime.</p>
+        <pre><code>type Shape =
+    | { kind: "circle"; radius: number }
+    | { kind: "square"; side: number };
+
+function area(s: Shape): number {
+    switch (s.kind) {
+        case "circle": return Math.PI * s.radius ** 2;
+        case "square": return s.side ** 2;
+        default: {
+            const exhaustive: never = s;   // agregar una variante rompe el build
+            return exhaustive;
+        }
+    }
+}</code></pre>
+        <p><strong>unknown vs any:</strong> <code>any</code> apaga el checker — los errores se propagan en silencio. <code>unknown</code> es el tipo superior seguro: puedes recibirlo, pero debes estrecharlo antes de usarlo. Prefiere <code>unknown</code> en los bordes (respuestas de API, JSON.parse, variables de catch en strict) más un type guard que valide.</p>
+        <p><strong>Strict mode:</strong> <code>strictNullChecks</code> hace explícitos <code>null</code>/<code>undefined</code> — la mayor fuente de bugs de producción desaparece en compilación; <code>noImplicitAny</code> frena los anys silenciosos. Actívalos desde el día uno; retrofittear strict duele.</p>`,
+      cards: [
+        { q: "¿Qué hace TypeScript con los tipos en runtime?", a: "Nada — los tipos se borran en compilación. La salida es JavaScript plano, así que payloads de API, env vars y JSON quedan sin validar; la validación en runtime (zod, io-ts, guards manuales) es una capa aparte." },
+        { q: "¿Qué es el tipado estructural?", a: "Compatibilidad por forma, no por nombre: cualquier valor con los campos requeridos satisface el tipo, incluso sin clase ni implements explícito. Los campos extra se permiten al asignar." },
+        { q: "¿interface vs type?", a: "Ambos describen formas. Las interfaces se extienden y fusionan (declaration merging), útil para aumentar librerías; los type aliases expresan uniones, tuplas y primitivos, que las interfaces no pueden." },
+        { q: "¿Para qué sirven los genéricos?", a: "Los parámetros de tipo mantienen la información fluyendo: first<T>(items: T[]) devuelve T, no any. Las restricciones (T extends { id: string }) exigen una forma, los defaults dan fallbacks y el llamador obtiene inferencia completa." },
+        { q: "¿Para qué sirven Partial, Pick, Omit y Record?", a: "Partial<T>: todos los campos opcionales — payloads PATCH. Pick<T, K>: un subconjunto. Omit<T, K>: todo menos K. Record<K, V>: un mapa de lookup. Derivan tipos de una sola fuente de verdad en vez de redeclarar." },
+        { q: "¿unknown vs any?", a: "any desactiva el checking; los errores se filtran en silencio. unknown acepta cualquier cosa pero fuerza narrowing antes de usarla — el tipo correcto para respuestas de API, JSON.parse y variables de catch." },
+        { q: "¿Cómo funcionan los type guards?", a: "Una función que devuelve value is T le comunica el narrowing al compilador: if (isUser(x)) { x.email }. Combinados con typeof/in/instanceof, hacen seguras las uniones." },
+        { q: "¿Qué es una unión discriminada y por qué es poderosa?", a: "Variantes que comparten un campo literal (kind: 'circle' | 'square') que un switch estrecha; un chequeo exhaustivo con never convierte agregar una variante en error de compilación — el compilador se vuelve checklist." },
+        { q: "¿Por qué activar strictNullChecks?", a: "Hace explícitos null y undefined en vez de asignables en todo — elimina una clase entera de bugs de producción en compilación. Retrofittear strict después es mucho más doloroso que empezar con él." },
+        { q: "¿Cómo tipas una respuesta de API de forma segura?", a: "Tipa el borde como unknown, valida con un schema/guard y devuelve el tipo estrecho — helpers genéricos como apiGet<T> dan comodidad, pero solo la validación hace verdadero el T en runtime." }
+      ],
+      quiz: [
+        { q: "¿Qué pasa con los tipos de TypeScript cuando el código corre?", options: ["Se revisan en runtime", "Se borran — corre JavaScript plano", "Se convierten a JSDoc", "Los impone V8"], answer: 1, explain: "La compilación elimina las anotaciones; la validación en runtime es un tema aparte." },
+        { q: "¿Cuál puede expresar un tipo unión?", options: ["interface", "type", "Ambos", "Ninguno"], answer: 1, explain: "Las interfaces describen formas de objeto (y se fusionan); los type aliases también expresan uniones, tuplas y primitivos." },
+        { q: "¿Por qué preferir unknown sobre any para un payload de API?", options: ["Es más rápido", "Fuerza narrowing/validación antes de usar", "Funciona con JSON.parse y any no", "Es más corto"], answer: 1, explain: "any desactiva el checker; unknown exige probar la forma antes de acceder a campos." },
+        { q: "Partial<User> produce…", options: ["Un user con todos los campos requeridos", "Un tipo con todos los campos de User opcionales", "Un user readonly", "Una unión de todos los campos"], answer: 1, explain: "Partial marca cada propiedad como opcional — el tipo clásico de payload PATCH." },
+        { q: "En una unión discriminada, el chequeo exhaustivo con never…", options: ["Corre en runtime", "Convierte agregar una variante no manejada en error de compilación", "Evita los null", "Solo es documentación"], answer: 1, explain: "Si una variante nueva no se maneja, la asignación a never del default falla la compilación — un checklist incorporado." }
+      ]
+    },
+
+    "testing": {
+      title: "Testing Back-End",
+      track: "backend",
+      icon: "🧫",
+      blurb: "Los tests automatizados son especificaciones ejecutables: atrapan regresiones, documentan comportamiento y hacen seguro el refactor. La habilidad es saber qué probar, en qué nivel y qué falsear.",
+      read: `
+        <p><strong>La pirámide de tests</strong> equilibra costo y confianza: muchos tests <em>unit</em> rápidos en la base, menos de <em>integración</em> en el medio y pocos <em>end-to-end</em> lentos arriba. La pirámide invertida ("cono de helado": mayoría e2e, pocos unit) produce una suite lenta, inestable y difícil de depurar — el antipatrón más común.</p>
+        <pre><code>        /\        E2E — sistema completo, pocos, más lentos, máxima confianza
+       /  \
+      /----\      Integración — BD/cola/HTTP reales, costo moderado
+     /      \
+    /--------\    Unit — lógica pura, milisegundos, cientos de ellos</code></pre>
+        <p><strong>Qué hace bueno a un test:</strong> prueba <em>comportamiento</em> (resultados observables) y no implementación; es determinista (sin reloj real, azar ni red); falla por una sola razón con un mensaje que la identifica; sigue arrange-act-assert y un nombre que se lee como especificación ("devuelve 409 cuando el email ya existe").</p>
+        <p><strong>Test doubles — stub, mock, fake</strong> (misma taxonomía que POO): el stub devuelve datos fijos, el mock verifica interacciones, el fake es una implementación ligera que funciona. En tests de back-end, prefiere <strong>fakes</strong> para infraestructura (repositorio en memoria, test container) y reserva mocks para contratos de interacción genuinos — el over-mocking acopla cada test a detalles de implementación y hace del refactor un martirio.</p>
+        <p><strong>Probar código de base de datos:</strong> mockear el ORM testea tus mocks, no tu SQL. Prefiere un test de integración contra una base real en contenedor (Testcontainers), cada test en una transacción que hace rollback, con migraciones aplicadas una vez por suite. La recompensa: atrapar bugs de constraints, aislamiento y mapeo que los mocks nunca ven.</p>
+        <p><strong>Contract testing</strong> protege la integración entre servicios sin una suite e2e de entorno completo y frágil: los contratos consumer-driven registran lo que espera el consumidor; el provider corre esas expectativas en su propio CI, así un cambio incompatible falla el build del provider antes de desplegar.</p>
+        <pre><code>// Test data builder — legible, evolutivo, sin fixtures gigantes
+const alice = new UserBuilder().withEmail("alice@x.com").active().build();
+// .withRole("admin") se agrega sin tocar los tests existentes</code></pre>
+        <p><strong>Los tests flaky</strong> son peores que no tener tests — enseñan al equipo a ignorar el rojo. Causas raíz: tiempo/sleeps reales, dependencia de orden, estado mutable compartido, esperas asíncronas. Política: cuarentena, encontrar la causa, arreglar; nunca tapar con retries a lo bruto.</p>
+        <p><strong>La cobertura es una señal, no una meta:</strong> 100% en getters triviales no prueba nada; los caminos de error sin cubrir son donde viven los bugs. Usa la cobertura para encontrar rutas <em>críticas</em> sin test, no para llegar a un número.</p>
+        <p><strong>En CI:</strong> unit en cada push, integración en pull requests, e2e en main/nightly; paraleliza, cachea dependencias, falla rápido y publica reportes. La velocidad importa — una suite lenta deja de correrse.</p>`,
+      cards: [
+        { q: "¿Cuáles son los tres niveles de la pirámide de tests?", a: "Unit (lógica pura, ms, muchos), integración (BD/cola/HTTP reales, segundos, menos), e2e (sistema completo, lo más lento, pocos). Más costo y menos velocidad al subir; más confianza también." },
+        { q: "¿Qué tiene de malo la pirámide invertida?", a: "Casi todo e2e: lento, flaky, difícil de localizar fallos y caro de mantener. Es el antipatrón del cono de helado — la confianza por minuto se derrumba." },
+        { q: "¿Qué distingue a un buen test?", a: "Prueba comportamiento y no implementación; determinista (sin reloj, azar ni red); una sola razón para fallar con mensaje claro; arrange-act-assert; un nombre que se lee como especificación." },
+        { q: "¿Stub vs mock vs fake?", a: "Stub devuelve respuestas fijas; mock verifica interacciones; fake es una implementación ligera que funciona. Default en backend: fakes para infraestructura, mocks solo cuando la interacción es el contrato." },
+        { q: "¿Por qué es dañino el over-mocking?", a: "Los tests se acoplan a detalles de implementación — el refactor los rompe sin cambiar comportamiento — y verifican tus mocks en vez del SQL/HTTP real." },
+        { q: "¿Cómo se prueba bien el código de base de datos?", a: "Contra una base real en contenedor (Testcontainers), migraciones una vez, cada test en una transacción con rollback. Mockear el ORM esconde bugs de constraints, aislamiento y mapeo." },
+        { q: "¿Qué resuelve el contract testing?", a: "Protege APIs entre servicios sin entorno e2e completo: los consumidores publican expectativas, los providers las verifican en su CI, y un cambio incompatible falla el build del provider." },
+        { q: "¿Por qué usar test data builders?", a: "Construcción legible (UserBuilder().withEmail(...).active().build()), sin fixtures gigantes compartidos, y agregar un default nuevo no obliga a editar todos los tests." },
+        { q: "¿Cómo manejar tests flaky?", a: "Ponerlos en cuarentena, encontrar la causa raíz (tiempo, orden, estado compartido, esperas async) y arreglarla. Los retries a lo bruto esconden la inestabilidad y entrenan al equipo a ignorar el rojo." },
+        { q: "¿El 100% de cobertura es una meta?", a: "No — la cobertura es una señal. El código trivial infla el número mientras los caminos de error quedan sin probar. Apunta la cobertura a rutas críticas y de borde, no a la métrica." }
+      ],
+      quiz: [
+        { q: "¿De qué nivel de test deberías tener más?", options: ["E2E", "Integración", "Unit", "Manual"], answer: 2, explain: "La base de la pirámide son los unit tests: feedback más rápido y mantenimiento más barato, la mayoría de la suite." },
+        { q: "Un test de integración típicamente…", options: ["Mockea todas las dependencias", "Corre contra infraestructura real como una BD o cola", "Prueba solo funciones puras", "Reemplaza al e2e"], answer: 1, explain: "Los tests de integración ejercitan las costuras — BD/cola/HTTP reales — a costo moderado, atrapando bugs que los mocks no ven." },
+        { q: "Para tests de repositorio, el double preferido es…", options: ["Un mock que verifica llamadas", "Un fake: implementación real en memoria o con contenedor", "Un stub que devuelve JSON", "Ninguno — se omiten"], answer: 1, explain: "Los fakes ejercitan comportamiento real; los mocks solo verificarían que se llamaron métodos, no que el SQL/constraints funcionen." },
+        { q: "Debes detectar que un provider rompe la API de un consumidor sin suite e2e completa. Usa…", options: ["Más unit tests", "Contract testing", "Más cobertura", "QA manual"], answer: 1, explain: "Los contratos consumer-driven los verifica el CI del provider, fallando su build antes de que rompan los consumidores." },
+        { q: "Un test falla intermitentemente en CI. La respuesta correcta es…", options: ["Agregar retries hasta que pase", "Cuarentena y arreglar la causa raíz (tiempo, orden, esperas async)", "Borrarlo", "Ignorarlo"], answer: 1, explain: "Los retries tapan la inestabilidad; la causa suele ser no-determinismo que tarde o temprano muerde en producción." }
+      ]
+    },
+
+    "devops": {
+      title: "DevOps y Operaciones",
+      track: "backend",
+      icon: "🚢",
+      blurb: "DevOps es la práctica de entregar software continuamente y operarlo con fiabilidad: los contenedores empaquetan la app, CI/CD automatiza la entrega y la observabilidad te dice qué está pasando en producción.",
+      read: `
+        <p><strong>Contenedores vs VMs:</strong> una VM virtualiza hardware y arranca un SO invitado completo (GBs, minutos); un contenedor comparte el kernel del host y aísla solo el proceso (MBs, milisegundos). Una imagen se construye en capas inmutables — cada instrucción del Dockerfile agrega una — y un registry las guarda/etiqueta; desplegar la misma imagen en todas partes hace desaparecer el "en mi máquina funciona".</p>
+        <pre><code># Multi-stage: compila con el SDK, envía solo el runtime — sin compiladores en prod
+FROM node:22 AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:22-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+RUN npm ci --omit=dev
+CMD ["node", "dist/server.js"]</code></pre>
+        <p><strong>Orquestación (Kubernetes, en un diagrama):</strong> un Deployment posee réplicas y rolling updates; los Pods son los contenedores corriendo; un Service les da IP virtual estable y balanceo; un Ingress termina HTTP externo y enruta por host/path; los ConfigMaps guardan config y los Secrets valores sensibles; el Horizontal Pod Autoscaler agrega réplicas por CPU/latencia.</p>
+        <pre><code>Internet ──► Ingress (TLS, routing por host/path)
+                │
+                ▼
+             Service (IP estable, balancea)
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+     Pod (app)        Pod (app)      ← réplicas de un Deployment
+     liveness  → ¿el proceso está vivo?     (reinicia si no)
+     readiness → ¿puede recibir tráfico?    (fuera del Service si no)</code></pre>
+        <p><strong>CI vs CD:</strong> <em>integración</em> continua significa que cada push se compila y testea; <em>entrega</em> continua significa que el artefacto es siempre desplegable; <em>despliegue</em> continuo lo envía automáticamente. Pipeline típico: lint → unit → build imagen → scan → integración → deploy staging → e2e → deploy producción.</p>
+        <pre><code>commit ─► lint ─► unit ─► build image ─► vuln scan ─► integration
+                                                    │
+                    prod ◄─ smoke ◄─ staging ◄───────┘
+                    (blue-green / canary con rollback)</code></pre>
+        <p><strong>Estrategias de release:</strong> <em>blue-green</em> corre dos entornos y cambia el tráfico (rollback instantáneo, costo doble); <em>canary</em> enruta un porcentaje pequeño a la versión nueva y sube mientras mira métricas (validación con tráfico real, rollout más lento); <em>feature flags</em> separan deploy de release — el código viaja apagado y se enciende por usuario/porcentaje, el kill switch más rápido.</p>
+        <p><strong>Infraestructura como código:</strong> Terraform (o Pulumi/CloudFormation) declara la infraestructura deseada; la herramienta diffea el estado contra la realidad y aplica cambios — revisado como código, reproducible, sin servidores snowflake.</p>
+        <p><strong>Observabilidad — los tres pilares:</strong> <em>logs</em> (eventos discretos con contexto), <em>métricas</em> (números agregados en el tiempo), <em>traces</em> (el camino de un request entre servicios, unidos por correlation/trace IDs). Define <strong>SLIs</strong> (qué mides: latencia, error rate), un <strong>SLO</strong> (la meta: 99.9% de requests bajo 300ms) y un <strong>error budget</strong> (el fallo permitido) — y alerta sobre <em>síntomas</em> (SLO burn) en vez de causas (un pico de CPU aislado).</p>`,
+      cards: [
+        { q: "¿Contenedores vs máquinas virtuales?", a: "Las VMs virtualizan hardware y arrancan un SO invitado completo (GBs, lento); los contenedores comparten el kernel del host y aíslan el proceso (MBs, instantáneo). Las imágenes son capas inmutables guardadas en registries." },
+        { q: "¿Por qué Dockerfiles multi-stage?", a: "La etapa de build lleva SDK/compiladores; la final copia solo artefactos y dependencias de producción — imágenes más chicas, menos CVEs, pulls más rápidos y sin tooling de build en producción." },
+        { q: "¿Tag vs digest de imagen?", a: "Un tag como latest es mutable y puede apuntar a cualquier cosa; el digest es el hash del contenido e inmutable. Despliega por digest (o tags únicos) para rollbacks reproducibles." },
+        { q: "¿Deployment vs Service vs Ingress en Kubernetes?", a: "Deployment: réplicas deseadas y rolling updates de Pods. Service: IP virtual estable que balancea a esos Pods. Ingress: entrada HTTP(S) externa con routing por host/path y TLS." },
+        { q: "¿Liveness vs readiness probes?", a: "Liveness: ¿el proceso está vivo? Fallar lo reinicia. Readiness: ¿puede servir tráfico ahora? Fallar lo quita del Service sin reiniciar — una app calentando sigue viva pero no recibe requests." },
+        { q: "¿CI vs entrega continua vs despliegue continuo?", a: "CI compila y testea cada push. La entrega continua mantiene cada artefacto desplegable con una compuerta manual. El despliegue continuo envía automáticamente. El pipeline es el mismo; cambia la compuerta." },
+        { q: "¿Blue-green vs canary?", a: "Blue-green: dos entornos completos y cambio de tráfico — rollback instantáneo, costo doble. Canary: un porcentaje pequeño a la versión nueva, mirar métricas y subir — validación con tráfico real, más lento." },
+        { q: "¿Qué cambian los feature flags?", a: "Separan deploy de release: el código viaja apagado y se enciende por usuario/porcentaje al instante — el kill switch más rápido, al costo de deuda de flags que hay que limpiar." },
+        { q: "¿Qué son SLI, SLO y error budget?", a: "SLI: la señal medida (latencia p99, error rate). SLO: la meta (99.9% bajo 300ms). Error budget: 100% menos el SLO — cuánto fallo puedes permitirte antes de frenar releases riesgosos." },
+        { q: "¿Por qué alertar sobre síntomas y no causas?", a: "Las causas (CPU al 80%) son ruidosas y muchas veces inocuas; los síntomas (SLO burn, error rate, latencia) son lo que sienten los usuarios. Alerta sobre lo que está roto para el usuario; los dashboards explican el porqué." }
+      ],
+      quiz: [
+        { q: "El beneficio principal de los Dockerfiles multi-stage es…", options: ["Tests unit más rápidos", "Imágenes de runtime más chicas y seguras, sin tooling de build", "TLS automático", "Hosting de registry gratis"], answer: 1, explain: "Solo artefactos y deps de producción llegan a la etapa final — imágenes más chicas, menos vulnerabilidades, pulls más rápidos." },
+        { q: "Una app tarda 20s en quedar lista para servir tráfico. ¿Qué probe debe fallar mientras tanto?", options: ["Liveness", "Readiness", "Ambos", "Ninguno"], answer: 1, explain: "Readiness la mantiene fuera del Service mientras calienta; liveness sigue verde para no reiniciarla a mitad del arranque." },
+        { q: "Los canary releases significan…", options: ["Desplegar al 100% de golpe", "Enrutar un porcentaje pequeño del tráfico a la versión nueva y subir mientras se miran métricas", "Correr dos entornos completos", "Publicar solo detrás de un feature flag"], answer: 1, explain: "Canary valida con tráfico real y radio de impacto pequeño antes del rollout completo." },
+        { q: "Un SLO de 99.9% de disponibilidad mensual implica un error budget de…", options: ["0.1% del mes (~43 minutos)", "99.9% del mes", "Fallos ilimitados", "Exactamente 1 outage"], answer: 0, explain: "Error budget = 100% − SLO = 0.1%, aproximadamente 43 minutos por mes de 30 días." },
+        { q: "La mejor práctica de alertas es paginar por…", options: ["CPU por encima del 80%", "Tendencias de disco", "SLO burn / síntomas que ve el usuario", "Reinicios de pods"], answer: 2, explain: "Los síntomas reflejan la experiencia del usuario; las causas van en dashboards para investigar." }
+      ]
+    },
+
+    "sysdesign": {
+      title: "Escenarios de System Design",
+      track: "backend",
+      icon: "🏗️",
+      blurb: "Las entrevistas de system design prueban pensamiento estructurado: aclarar requisitos, estimar capacidad, esbozar la API y el modelo de datos, y profundizar en lo difícil. Este tema da el framework reutilizable más cinco escenarios resueltos.",
+      read: `
+        <p><strong>El framework (úsalo siempre):</strong> 1) <em>aclarar requisitos</em> — funcionales (qué hacen los usuarios) y no funcionales (escala, latencia, consistencia, disponibilidad); 2) <em>estimar</em> — QPS, almacenamiento y ancho de banda a ojo; 3) <em>diseñar la API</em> — los pocos endpoints que importan; 4) <em>modelo de datos</em> — entidades, llaves, patrones de acceso; 5) <em>diagrama de alto nivel</em> — cliente → gateway → servicios → storage con cachés/colas; 6) <em>deep dives</em> — las una o dos partes realmente difíciles; 7) <em>trade-offs</em> — qué elegiste y qué cuesta. El entrevistador puntúa la estructura y los trade-offs, no una respuesta perfecta.</p>
+        <pre><code>Estimación — un acortador de URLs a 100M links nuevos/día:
+  escrituras: 100M / 86,400s ≈ 1,160/s promedio; pico ≈ 3× ≈ 3,500/s
+  lecturas:   los links se leen ~10× → ≈ 12k/s promedio
+  storage:    500 bytes/link × 100M/día × 365 × 5 años ≈ 91 TB
+⇒ consecuencias: las lecturas dominan → cachea redirects; los IDs
+  deben generarse sin colisiones; el storage justifica sharding.</code></pre>
+        <p><strong>Escenario 1 — acortador de URLs.</strong> Decisiones clave: códigos cortos con un contador global en base62 (6 chars ≈ 56 mil millones de valores) o un ID estilo Snowflake (ordenado por tiempo, amigable con shards); con contador las colisiones son imposibles, con hashing son posibles (necesita retry). Redirects: <em>301</em> (permanente, cacheable — mejor para carga) vs <em>302</em> (temporal, cada clic llega a ti — necesario para analítica y links que expiran). Camino de lectura: cachea el mapeo código→URL (Redis, LRU) y luego la BD.</p>
+        <pre><code>escritura: cliente ─► API ─► generador de IDs (contador/Snowflake) ─► BD
+lectura:   cliente ─► API ─► caché (hit ~95%) ─► BD en miss ─► redirect 302</code></pre>
+        <p><strong>Escenario 2 — rate limiter.</strong> La elección de algoritmo es la entrevista (token bucket para ráfagas, sliding window para precisión — ver el tema de APIs). Arquitectura: aplica en el borde/gateway o en middleware, por usuario/IP; contadores en Redis con TTL; incrementos atómicos (Lua/INCR) para evitar carreras; devuelve <code>429</code> + <code>Retry-After</code>. Discute fail-open vs fail-closed si Redis se cae.</p>
+        <p><strong>Escenario 3 — news feed.</strong> Fan-out al <em>escribir</em> (precalcular el timeline de cada seguidor — lecturas rápidas, escrituras caras para celebridades) vs fan-out al <em>leer</em> (merge de fuentes al leer — escrituras baratas, lecturas lentas). La respuesta estándar es <strong>híbrida</strong>: push para cuentas normales, pull para celebridades; cachea timelines; pagina con cursor (no OFFSET, que se desfasa).</p>
+        <p><strong>Escenario 4 — chat.</strong> Conexiones WebSocket persistentes (ver el tema de WebSockets) para entrega y presencia; orden por conversación (sequence numbers por sala); mensajes persistidos antes del ack; fan-out por un bus pub/sub (Redis) entre instancias; los usuarios offline reciben cola/notificación; read receipts y estados de entrega como eventos separados.</p>
+        <p><strong>Escenario 5 — pagos.</strong> Lo difícil es <em>efectos</em> exactly-once, no entrega exactly-once: idempotency keys en el endpoint de cobro (guardar el primer resultado y replicarlo en reintentos), transacción local + outbox para eventos, saga con compensaciones entre servicios y jobs de reconciliación contra el proveedor — porque "la red falló después del cobro" nunca debe significar "cobrar dos veces".</p>`,
+      cards: [
+        { q: "¿Cuáles son los siete pasos del framework de system design?", a: "Aclarar requisitos funcionales y no funcionales; estimar QPS/storage/ancho de banda; definir la API; modelar datos y patrones de acceso; esbozar el diagrama de alto nivel; deep-dive de lo difícil; declarar trade-offs. La estructura puntúa más que la completitud." },
+        { q: "¿Cómo haces una estimación back-of-envelope?", a: "Redondea agresivo: 86,400s/día, triples por usuario, lecturas ≫ escrituras a menudo 10–100×. QPS = operaciones/día ÷ 86,400, pico ≈ 3× el promedio, storage = tamaño de registro × volumen × retención — y di qué implica (¿cache? ¿shard?)." },
+        { q: "Acortador de URLs: ¿contador vs hashing para los códigos?", a: "Un contador global (base62) garantiza unicidad y es amigable con shards por rangos/Snowflake; hashear la URL puede colisionar y necesita retry o probing. Con seis chars base62 cubres ~56 mil millones de valores." },
+        { q: "¿301 vs 302 en un acortador?", a: "301 (permanente): navegadores/CDNs lo cachean — lo más barato para carga, pero rompe analítica y expiración. 302 (temporal): cada clic llega a tu servicio — requerido si trackeas clics o los links expiran." },
+        { q: "News feed: ¿fan-out al escribir o al leer?", a: "Push al escribir: timelines precalculados, lecturas rápidas, caro para celebridades. Pull al leer: merge al momento, escrituras baratas, lecturas lentas. Respuesta estándar: híbrida — push para usuarios normales, pull para celebridades; cachea y pagina por cursor." },
+        { q: "¿Dónde guarda un rate limiter sus contadores?", a: "En Redis con TTL por ventana e incrementos atómicos (INCR o script Lua), aplicando en el gateway/middleware por usuario o IP — y decidiendo explícitamente si falla abierto o cerrado cuando Redis se cae." },
+        { q: "¿Por qué se prefiere paginación por cursor a OFFSET?", a: "OFFSET se desfasa cuando se insertan/borran ítems (saltos y duplicados) y se vuelve más lento al fondo; un cursor codifica la última llave vista y queda estable y amigable con el índice." },
+        { q: "Chat: ¿cómo garantizas el orden por conversación?", a: "Persiste el mensaje primero, asigna un sequence number monotónico por conversación y luego fan-out por pub/sub; los clientes ordenan por ese sequence y piden los mensajes perdidos al reconectar." },
+        { q: "Pagos: ¿cómo evitas cobrar dos veces?", a: "Idempotency keys (guardar el primer resultado por llave y replicarlo en reintentos), transacción local + outbox para eventos, compensaciones de saga entre servicios y reconciliación contra el proveedor." },
+        { q: "¿Qué cubrir en el paso de trade-offs?", a: "Cada decisión mayor con su costo: consistencia vs disponibilidad, sync vs async, caché vs lecturas frescas, SQL vs NoSQL, una región vs multi-región — y cuándo ganaría la alternativa." }
+      ],
+      quiz: [
+        { q: "Lo primero que se hace en una entrevista de system design es…", options: ["Dibujar el esquema de la BD", "Aclarar requisitos funcionales y no funcionales", "Elegir la base de datos", "Escribir la spec de la API"], answer: 1, explain: "Los requisitos guían toda decisión posterior; saltar a diagramas sin ellos es el modo de fallo clásico." },
+        { q: "Un acortador se lee ~10× más de lo que se escribe. La consecuencia de diseño es…", options: ["Shardear primero el camino de escritura", "Cachear agresivamente el mapeo código→URL", "Usar solo replicación síncrona", "Evitar redirects"], answer: 1, explain: "Las lecturas dominan, así que una caché LRU delante del store de mapeos es la decisión de mayor palanca." },
+        { q: "Una celebridad con 100M de seguidores publica. El fan-out-al-escribir simple se rompe porque…", options: ["Las lecturas se vuelven lentas", "Un post significa 100M de escrituras de timeline", "La caché se vacía", "Los WebSockets se desconectan"], answer: 1, explain: "La amplificación de escritura explota — de ahí el híbrido: pull al leer para la celebridad, push para el resto." },
+        { q: "Rate limiter: ¿qué patrón de storage encaja?", options: ["Contadores en Redis con TTL e incrementos atómicos", "Un archivo por usuario", "Una fila Postgres bloqueada por request", "localStorage del navegador"], answer: 0, explain: "Redis da contadores compartidos, atómicos y con expiración entre instancias — el limiter distribuido estándar." },
+        { q: "Para analítica en cada clic, el acortador debe devolver…", options: ["301 permanente", "302 temporal", "304 not modified", "204 no content"], answer: 1, explain: "El 302 obliga a cada clic a pasar por tu servicio para poder registrarlo; el 301 se cachearía y te saltaría." }
       ]
     }
   }
